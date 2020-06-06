@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:workbook/screens/landing_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,8 +10,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(fontFamily: 'Monserrat'),
+      home: LandingPage(),
     );
   }
 }
