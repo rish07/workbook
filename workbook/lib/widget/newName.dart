@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class NewNome extends StatefulWidget {
+class NewName extends StatefulWidget {
   @override
-  _NewNomeState createState() => _NewNomeState();
+  _NewNameState createState() => _NewNameState();
 }
 
-class _NewNomeState extends State<NewNome> {
+class _NewNameState extends State<NewName> {
   @override
   Widget build(BuildContext context) {
     return Padding(

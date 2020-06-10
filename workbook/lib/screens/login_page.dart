@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:workbook/constants.dart';
 import 'package:workbook/widget/button.dart';
 import 'package:workbook/widget/first.dart';
 import 'package:workbook/widget/inputEmail.dart';
@@ -20,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
           gradient: LinearGradient(
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
-              colors: [Color(0xFF163F49), Color(0xFF377C7D)]),
+              colors: [teal1, teal2]),
         ),
         child: ListView(
           children: <Widget>[

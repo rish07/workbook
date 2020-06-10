@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 class TextNew extends StatefulWidget {
   @override
@@ -11,24 +12,21 @@ class _TextNewState extends State<TextNew> {
     return Padding(
       padding: const EdgeInsets.only(top: 30.0, left: 10.0),
       child: Container(
+        padding: EdgeInsets.all(16),
+
         //color: Colors.green,
-        height: 200,
-        width: 200,
-        child: Column(
-          children: <Widget>[
-            Container(
-              height: 60,
+        height: MediaQuery.of(context).size.height * 0.35,
+        width: MediaQuery.of(context).size.width * 0.8,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 60.0),
+          child: Text(
+            'We can start\nsomething\nnew',
+            style: TextStyle(
+              fontSize: 38,
+              color: Colors.white,
             ),
-            Center(
-              child: Text(
-                'We can start something new',
-                style: TextStyle(
-                  fontSize: 24,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
+            textAlign: TextAlign.end,
+          ),
         ),
       ),
     );
