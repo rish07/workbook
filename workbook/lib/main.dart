@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:workbook/screens/landing_page.dart';
+import 'package:workbook/screens/login_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -11,8 +12,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(fontFamily: 'Monserrat'),
-      home: LandingPage(),
+      theme: ThemeData(fontFamily: 'Montserrat'),
+      home: LoginPage(),
     );
   }
 }
