@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/widget/buttonNewUser.dart';
-import 'package:workbook/widget/newEmail.dart';
-import 'package:workbook/widget/newName.dart';
+import 'package:workbook/widget/forms.dart';
+import 'package:workbook/widget/input_field.dart';
 import 'package:workbook/widget/password.dart';
 import 'package:workbook/widget/signup.dart';
 import 'package:workbook/widget/textNew.dart';
-import 'package:workbook/widget/userOld.dart';
+
 import 'package:workbook/widget/registerButton.dart';
 
 class RegistrationPage extends StatefulWidget {
@@ -46,19 +46,59 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.08,
                 ),
-                registerButton(role: 'Admin', page: null, context: context),
+                registerButton(
+                    role: 'Admin',
+                    context: context,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                            child: AdminForm(),
+                            type: PageTransitionType.rightToLeft),
+                      );
+                    }),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.02,
                 ),
-                registerButton(role: 'Employee', page: null, context: context),
+                registerButton(
+                    role: 'Employee',
+                    context: context,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                            child: AdminForm(),
+                            type: PageTransitionType.rightToLeft),
+                      );
+                    }),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.02,
                 ),
-                registerButton(role: 'Driver', page: null, context: context),
+                registerButton(
+                    role: 'Driver',
+                    context: context,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                            child: AdminForm(),
+                            type: PageTransitionType.rightToLeft),
+                      );
+                    }),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.02,
                 ),
-                registerButton(role: 'Customer', page: null, context: context),
+                registerButton(
+                    role: 'Customer',
+                    context: context,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                            child: AdminForm(),
+                            type: PageTransitionType.rightToLeft),
+                      );
+                    }),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.02,
                 ),

@@ -9,7 +9,7 @@ class _SignUpState extends State<SignUp> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 10),
+      padding: const EdgeInsets.only(left: 12),
       child: RotatedBox(
           quarterTurns: -1,
           child: Text(

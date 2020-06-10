@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:workbook/constants.dart';
@@ -39,11 +39,10 @@ class _LandingPageState extends State<LandingPage> {
           children: [
             Container(
               width: MediaQuery.of(context).size.width * 0.7,
-              child: FadeAnimatedTextKit(
+              child: AutoSizeText('Workbook',
+                  maxLines: 1,
                   textAlign: TextAlign.center,
-                  repeatForever: false,
-                  text: ['Workbook'],
-                  textStyle: TextStyle(fontSize: 70, color: Colors.white)),
+                  style: TextStyle(fontSize: 70, color: Colors.white)),
             ),
             Image.asset('images/book.gif'),
           ],

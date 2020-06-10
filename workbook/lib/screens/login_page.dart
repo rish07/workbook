@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/widget/button.dart';
 import 'package:workbook/widget/first.dart';
-import 'package:workbook/widget/inputEmail.dart';
+import 'package:workbook/widget/input_field.dart';
+
 import 'package:workbook/widget/password.dart';
 import 'package:workbook/widget/textLogin.dart';
 import 'package:workbook/widget/verticalText.dart';
@@ -29,8 +30,21 @@ class _LoginPageState extends State<LoginPage> {
               VerticalText(),
               TextLogin(),
             ]),
-            InputEmail(),
-            PasswordInput(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: InputField(
+                validate: false,
+                labelText: 'Email',
+                textInputType: TextInputType.emailAddress,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8),
+              child: PasswordInput(
+                validate: false,
+                labelText: 'Password',
+              ),
+            ),
             ButtonLogin(),
             FirstTime(),
           ],
