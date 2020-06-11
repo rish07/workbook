@@ -706,3 +706,5 @@ var cities = {
     "Uttar Dinajpur"
   ],
 };
+
+List<String> instituteType = ['Joint Venture', 'LLC', 'Proprietaryship'];

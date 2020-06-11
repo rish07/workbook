@@ -4,11 +4,17 @@ import 'package:flutter/material.dart';
 class PasswordInput extends StatefulWidget {
   final String labelText;
   final String errorText;
-  final bool validate;
+  bool validate;
   final TextEditingController controller;
+  final String helpText;
 
-  const PasswordInput(
-      {Key key, this.labelText, this.errorText, this.validate, this.controller})
+  PasswordInput(
+      {Key key,
+      this.labelText,
+      this.errorText,
+      this.validate,
+      this.controller,
+      this.helpText})
       : super(key: key);
   @override
   _PasswordInputState createState() => _PasswordInputState();
@@ -24,12 +30,18 @@ class _PasswordInputState extends State<PasswordInput> {
         height: 60,
         width: MediaQuery.of(context).size.width,
         child: TextField(
+          onTap: () {
+            setState(() {
+              widget.validate = false;
+            });
+          },
           controller: widget.controller,
-          style: TextStyle(
-            color: Colors.white,
-          ),
+          style: TextStyle(color: Colors.white, fontSize: 18),
           obscureText: !isVisible,
           decoration: InputDecoration(
+            helperText: widget.helpText ?? null,
+            focusedErrorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white, width: 2)),
             errorText: widget.validate ? widget.errorText : null,
             suffixIcon: IconButton(
                 color: Colors.white,
@@ -41,7 +53,10 @@ class _PasswordInputState extends State<PasswordInput> {
                     isVisible = !isVisible;
                   });
                 }),
-            border: InputBorder.none,
+            enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white70)),
+            focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white, width: 2)),
             labelText: widget.labelText,
             labelStyle: TextStyle(
               fontSize: 20,
