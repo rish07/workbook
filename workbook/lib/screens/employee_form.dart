@@ -341,7 +341,9 @@ class _EmployeeFormState extends State<EmployeeForm> {
                             _emailController.clear();
                             _passwordController.clear();
                             _passwordReController.clear();
-
+                            _selectedInstitution = null;
+                            _selectedGrade = null;
+                            _selectedDivision = null;
                             _aadharController.clear();
                             _phoneController.clear();
                           }

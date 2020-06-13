@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:regexed_validator/regexed_validator.dart';
@@ -20,6 +21,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  List _roles = ['Admin', 'Employee', 'Customer', 'Driver'];
+  String _selectedRole;
+  bool _validateRole = false;
   bool _loading = false;
   bool _validateEmail = false;
   bool _validatePassword = false;
@@ -35,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future loginUser() async {
     var response = await http
-        .post('https://app-workbook.herokuapp.com/admin/login', body: {
+        .post('https://app-workbook.herokuapp.com/$_selectedRole/login', body: {
       "email": _emailController.text,
       "password": _passwordController.text
     });
@@ -46,14 +50,24 @@ class _LoginPageState extends State<LoginPage> {
     });
     var resp = json.decode(response.body)['payload'];
     if (resp['approved'] == true) {
+      var tempo = resp[_selectedRole.toLowerCase()];
+      User user = User();
       setState(() {
-        userName = resp['admin']['userName'];
-        userID = resp['admin']['_id'];
-        userRole = resp['admin']['role'];
-        userEmail = resp['admin']['userID'];
-        instituteName = resp['admin']['instituteName'];
-        instituteImage = resp['admin']['instituteImage'];
-        userInstituteType = resp['admin']['instituteType'];
+        user.userName = tempo['userName'] ?? null;
+        user.userID = tempo['_id'] ?? null;
+        user.userRole = tempo['role'] ?? null;
+        user.userEmail = tempo['userID'] ?? null;
+        user.instituteName = tempo['instituteName'] ?? null;
+        user.instituteImage = tempo['instituteImage'] ?? null;
+        user.userInstituteType = tempo['instituteType'] ?? null;
+        user.numberOfMembers = tempo['numberOfMembers'] ?? null;
+        user.state = tempo['state'] ?? null;
+        user.city = tempo['city'] ?? null;
+        user.mailAddress = tempo['mailAddress'] ?? null;
+        user.aadharNumber = tempo['adharNumber'] ?? null;
+        user.grade = tempo['grade'] ?? null;
+        user.division = tempo['division'] ?? null;
+        user.contactNumber = tempo['contactNumber'] ?? null;
       });
       Navigator.push(
         context,
@@ -113,6 +127,51 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               Padding(
+                padding: EdgeInsets.all(24),
+                child: DropdownButtonFormField(
+                  onTap: () {
+                    setState(() {
+                      _validateRole = false;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    errorText: _validateRole ? 'Please choose an option' : null,
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white70),
+                    ),
+                  ),
+                  icon: Icon(Icons.keyboard_arrow_down),
+                  iconDisabledColor: Colors.white,
+                  iconEnabledColor: Colors.white,
+                  iconSize: 24,
+                  dropdownColor: Colors.teal,
+                  style: TextStyle(
+                    fontFamily: 'Montserrat',
+                    fontSize: 20,
+                    color: Colors.white70,
+                  ),
+                  hint: Text(
+                    'Login as',
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                  value: _selectedRole,
+                  onChanged: (newValue) {
+                    setState(() {
+                      _selectedRole = newValue;
+                    });
+                  },
+                  items: _roles.map((location) {
+                    return DropdownMenuItem(
+                      child: AutoSizeText(
+                        location,
+                        maxLines: 1,
+                      ),
+                      value: location,
+                    );
+                  }).toList(),
+                ),
+              ),
+              Padding(
                 padding: const EdgeInsets.only(top: 40, right: 20, left: 250),
                 child: Container(
                   alignment: Alignment.bottomRight,
@@ -123,12 +182,12 @@ class _LoginPageState extends State<LoginPage> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: FlatButton(
-                    onPressed: () {
+                    onPressed: () async {
                       print('working');
 
-                      setState(() {
-                        _loading = true;
-                      });
+                      if (_selectedRole == null) {
+                        _validateRole = true;
+                      }
                       (_emailController.text.isEmpty ||
                               !validator.email(_emailController.text))
                           ? _validateEmail = true
@@ -136,7 +195,18 @@ class _LoginPageState extends State<LoginPage> {
                       _passwordController.text.isEmpty
                           ? _validatePassword = true
                           : _validatePassword = false;
-                      loginUser();
+
+                      if (!_validateRole &&
+                          !_validatePassword &&
+                          !_validateEmail) {
+                        setState(() {
+                          _loading = true;
+                        });
+                        await loginUser();
+                        _passwordController.clear();
+                        _emailController.clear();
+                        _selectedRole = null;
+                      }
                     },
                     child: Center(
                       child: Text(
