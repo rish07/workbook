@@ -51,7 +51,7 @@ class _AdminFormState extends State<AdminForm> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _mailController = TextEditingController();
 
-  Future registerUser() async {
+  Future _registerUser() async {
     var response = await http
         .post('https://app-workbook.herokuapp.com/admin/register', body: {
       "role": "Admin",
@@ -177,8 +177,9 @@ class _AdminFormState extends State<AdminForm> {
                     });
                   },
                   decoration: InputDecoration(
-                    errorText:
-                        _validateState ? 'Please choose an option' : null,
+                    errorText: _validateInstituteType
+                        ? 'Please choose an option'
+                        : null,
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white70),
                     ),
@@ -436,7 +437,7 @@ class _AdminFormState extends State<AdminForm> {
                             !_validatePassword &&
                             !_validateRePassword &&
                             _image != null) {
-                          registerUser();
+                          _registerUser();
                           _nameController.clear();
                           _emailController.clear();
                           _passwordController.clear();

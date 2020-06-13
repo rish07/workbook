@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:workbook/constants.dart';
+import 'package:workbook/screens/employee_form.dart';
 import 'package:workbook/widget/buttonNewUser.dart';
-import 'package:workbook/widget/forms.dart';
+import 'package:workbook/screens/admin_form.dart';
 import 'package:workbook/widget/input_field.dart';
 import 'package:workbook/widget/password.dart';
 import 'package:workbook/widget/signup.dart';
@@ -67,7 +68,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       Navigator.push(
                         context,
                         PageTransition(
-                            child: AdminForm(),
+                            child: EmployeeForm(),
                             type: PageTransitionType.rightToLeft),
                       );
                     }),

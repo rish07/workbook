@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:workbook/user.dart';
 
 class DashBoard extends StatefulWidget {
   @override
@@ -6,6 +7,11 @@ class DashBoard extends StatefulWidget {
 }
 
 class _DashBoardState extends State<DashBoard> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
