@@ -110,7 +110,7 @@ class _AdminFormState extends State<AdminForm> {
 
   Future upload() async {
     var res = await uploadImage(
-        imagePath, 'https://552f72546178.ngrok.io/admin/register');
+        imagePath, 'https://app-workbook.herokuapp.com/admin/register');
     setState(() {
       state = res;
       _isLoading = false;

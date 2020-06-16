@@ -65,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void showNotification(message) async {
     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
-      'com.rish.workbook',
+      '91512',
       'Workbook',
       'your channel description',
       playSound: true,

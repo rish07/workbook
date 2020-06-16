@@ -5,7 +5,7 @@ class User {
   static String userEmail;
   static String instituteName;
   static String userInstituteType;
-  static String instituteImage;
+  static var instituteImage;
   static int numberOfMembers;
   static String state;
   static String city;

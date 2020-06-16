@@ -3,7 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:slimy_card/slimy_card.dart';
+
 import 'package:workbook/constants.dart';
 import 'package:workbook/user.dart';
 import 'dart:convert';
@@ -16,13 +16,15 @@ class DashBoard extends StatefulWidget {
 }
 
 class _DashBoardState extends State<DashBoard> {
+  int counter = 0;
   bool _loading = false;
   List _employeeList = [];
+
   Future _getEmployees() async {
     var response = await http.post(
       "https://app-workbook.herokuapp.com/admin/viewAllEmployees",
       body: {
-        "instituteName": "IEEE",
+        "instituteName": User.instituteName,
       },
     );
     print('Response status: ${response.statusCode}');
@@ -48,9 +50,53 @@ class _DashBoardState extends State<DashBoard> {
         body: {"id": id});
     print('Response status: ${response.statusCode}');
     print(response.body);
+    setState(() {
+      _loading = false;
+    });
     if (response.statusCode == 200) {
+      setState(() {
+        _loading = true;
+        _employeeList.clear();
+      });
       _getEmployees();
-      setState(() {});
+    } else {
+      throw Exception('Failed to load the employees');
+    }
+  }
+
+  Future _rejectEmployee({String id}) async {
+    print('working');
+    var response = await http.post(
+        'https://app-workbook.herokuapp.com/admin/rejectEmployee',
+        body: {"id": id});
+    print('Response status: ${response.statusCode}');
+    print(response.body);
+    setState(() {
+      _loading = false;
+    });
+    if (response.statusCode == 200) {
+      setState(() {
+        _loading = true;
+        _employeeList.clear();
+      });
+      _getEmployees();
+    } else {
+      throw Exception('Failed to load the employees');
+    }
+  }
+
+  Future _sendNotification(
+      {String fcmToken, String message, String title}) async {
+    var response = await http.post(
+        'https://app-workbook.herokuapp.com/sendNotification',
+        body: {"fcmToken": fcmToken, "message": message, "title": title});
+    print('Response status: ${response.statusCode}');
+    print(response.body);
+    setState(() {
+      _loading = false;
+    });
+    if (response.statusCode == 200) {
+      print('Notification Sent');
     } else {
       throw Exception('Failed to load the employees');
     }
@@ -58,6 +104,9 @@ class _DashBoardState extends State<DashBoard> {
 
   @override
   void initState() {
+    setState(() {
+      _loading = true;
+    });
     _getEmployees();
     super.initState();
   }
@@ -157,7 +206,7 @@ class _DashBoardState extends State<DashBoard> {
                                     ),
                                     onPressed: () {
                                       popDialog(
-                                          title: "Confirm Employee",
+                                          title: "Approve Employee",
                                           content:
                                               'Do you want to approve the registration of this employee?',
                                           context: context,
@@ -167,6 +216,12 @@ class _DashBoardState extends State<DashBoard> {
                                             _approveEmployee(
                                                 id: _employeeList[index]
                                                     ['_id']);
+                                            _sendNotification(
+                                                fcmToken: _employeeList[index]
+                                                    ['fcmToken'],
+                                                title: "Request Approved",
+                                                message:
+                                                    "You have been approved as an employee. Please login now");
                                             Navigator.pop(context);
                                           });
                                     },
@@ -182,7 +237,27 @@ class _DashBoardState extends State<DashBoard> {
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      popDialog(
+                                          title: "Reject Employee",
+                                          content:
+                                              'Do you want to reject the registration of this employee?',
+                                          context: context,
+                                          buttonTitle: 'Reject',
+                                          onPress: () {
+                                            _loading = true;
+                                            _rejectEmployee(
+                                                id: _employeeList[index]
+                                                    ['_id']);
+                                            _sendNotification(
+                                                title: "Request Rejected",
+                                                fcmToken: _employeeList[index]
+                                                    ['fcmToken'],
+                                                message:
+                                                    "You have been rejected as an employee. Please contact the admin");
+                                            Navigator.pop(context);
+                                          });
+                                    },
                                     child: Icon(Icons.close),
                                   ),
                                 ),
