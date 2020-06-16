@@ -6,6 +6,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:regexed_validator/regexed_validator.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/login_page.dart';
+import 'package:workbook/user.dart';
 import 'package:workbook/widget/input_field.dart';
 import 'package:workbook/widget/password.dart';
 import 'package:workbook/widget/popUpDialog.dart';
@@ -18,6 +19,7 @@ class EmployeeForm extends StatefulWidget {
 }
 
 class _EmployeeFormState extends State<EmployeeForm> {
+  final user = User();
   bool _isLoading = false;
   bool _validateName = false;
   bool _validateEmail = false;
@@ -50,7 +52,8 @@ class _EmployeeFormState extends State<EmployeeForm> {
       "grade": _selectedGrade,
       "division": _selectedDivision,
       "adharNumber": _aadharController.text,
-      "contactNumber": _phoneController.text
+      "contactNumber": _phoneController.text,
+      "fcmToken": User.userFcmToken,
     });
     setState(() {
       _isLoading = false;
@@ -68,6 +71,7 @@ class _EmployeeFormState extends State<EmployeeForm> {
           },
           title: 'Registration Successful',
           context: context,
+          buttonTitle: 'Close',
           content:
               'Your form has been submitted. Please wait for 24 hours for it to get approved');
     }
@@ -78,6 +82,7 @@ class _EmployeeFormState extends State<EmployeeForm> {
     Timer(Duration(seconds: 5), () {
       setState(() {});
     });
+    print(User.userFcmToken);
     super.initState();
   }
 

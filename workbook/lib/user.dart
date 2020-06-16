@@ -1,17 +1,18 @@
 class User {
-  String userRole;
-  String userID;
-  String userName;
-  String userEmail;
-  String instituteName;
-  String userInstituteType;
-  String instituteImage;
-  int numberOfMembers;
-  String state;
-  String city;
-  String mailAddress;
-  int contactNumber;
-  int aadharNumber;
-  String grade;
-  String division;
+  static String userRole;
+  static String userID;
+  static String userName;
+  static String userEmail;
+  static String instituteName;
+  static String userInstituteType;
+  static String instituteImage;
+  static int numberOfMembers;
+  static String state;
+  static String city;
+  static String mailAddress;
+  static int contactNumber;
+  static int aadharNumber;
+  static String grade;
+  static String division;
+  static String userFcmToken;
 }

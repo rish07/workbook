@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:regexed_validator/regexed_validator.dart';
 import 'package:workbook/constants.dart';
-import 'package:workbook/widget/dash_board.dart';
+import 'package:workbook/screens/dash_board.dart';
 import 'dart:convert';
 import 'package:workbook/widget/first.dart';
 import 'package:workbook/widget/input_field.dart';
@@ -14,6 +14,8 @@ import 'package:workbook/widget/textLogin.dart';
 import 'package:workbook/widget/verticalText.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:workbook/user.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -21,14 +23,80 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  User user = User();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   List _roles = ['Admin', 'Employee', 'Customer', 'Driver'];
   String _selectedRole;
   bool _validateRole = false;
+  String fcmToken;
   bool _loading = false;
   bool _validateEmail = false;
   bool _validatePassword = false;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  void registerNotification() {
+    firebaseMessaging.requestNotificationPermissions();
+
+    firebaseMessaging.configure(onMessage: (Map<String, dynamic> message) {
+      print('onMessage: $message');
+      showNotification(message['notification']);
+
+      return;
+    }, onResume: (Map<String, dynamic> message) {
+      print('onResume: $message');
+      return;
+    }, onLaunch: (Map<String, dynamic> message) {
+      print('onLaunch: $message');
+      return;
+    });
+  }
+
+  void configLocalNotification() {
+    var initializationSettingsAndroid =
+        new AndroidInitializationSettings('app_icon');
+    var initializationSettingsIOS = new IOSInitializationSettings();
+    var initializationSettings = new InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
+
+  void showNotification(message) async {
+    var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+      'com.rish.workbook',
+      'Workbook',
+      'your channel description',
+      playSound: true,
+      enableVibration: true,
+      importance: Importance.Max,
+      priority: Priority.High,
+    );
+    var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+    var platformChannelSpecifics = new NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+
+    print(message);
+//    print(message['body'].toString());
+//    print(json.encode(message));
+
+    await flutterLocalNotificationsPlugin.show(0, message['title'].toString(),
+        message['body'].toString(), platformChannelSpecifics,
+        payload: json.encode(message));
+
+//    await flutterLocalNotificationsPlugin.show(
+//        0, 'plain title', 'plain body', platformChannelSpecifics,
+//        payload: 'item x');
+  }
+
+  @override
+  void initState() {
+    getFCMToken();
+    super.initState();
+    registerNotification();
+    configLocalNotification();
+  }
 
   @override
   void dispose() {
@@ -37,11 +105,21 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  void getFCMToken() async {
+    fcmToken = await _firebaseMessaging.getToken();
+    setState(() {
+      User.userFcmToken = fcmToken;
+    });
+    print('fcm');
+    print(fcmToken);
+  }
+
   Future loginUser() async {
     var response = await http
         .post('https://app-workbook.herokuapp.com/$_selectedRole/login', body: {
       "email": _emailController.text,
-      "password": _passwordController.text
+      "password": _passwordController.text,
+      "fcmToken": fcmToken
     });
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
@@ -51,23 +129,23 @@ class _LoginPageState extends State<LoginPage> {
     var resp = json.decode(response.body)['payload'];
     if (resp['approved'] == true) {
       var tempo = resp[_selectedRole.toLowerCase()];
-      User user = User();
+
       setState(() {
-        user.userName = tempo['userName'] ?? null;
-        user.userID = tempo['_id'] ?? null;
-        user.userRole = tempo['role'] ?? null;
-        user.userEmail = tempo['userID'] ?? null;
-        user.instituteName = tempo['instituteName'] ?? null;
-        user.instituteImage = tempo['instituteImage'] ?? null;
-        user.userInstituteType = tempo['instituteType'] ?? null;
-        user.numberOfMembers = tempo['numberOfMembers'] ?? null;
-        user.state = tempo['state'] ?? null;
-        user.city = tempo['city'] ?? null;
-        user.mailAddress = tempo['mailAddress'] ?? null;
-        user.aadharNumber = tempo['adharNumber'] ?? null;
-        user.grade = tempo['grade'] ?? null;
-        user.division = tempo['division'] ?? null;
-        user.contactNumber = tempo['contactNumber'] ?? null;
+        User.userName = tempo['userName'] ?? null;
+        User.userID = tempo['_id'] ?? null;
+        User.userRole = tempo['role'] ?? null;
+        User.userEmail = tempo['userID'] ?? null;
+        User.instituteName = tempo['instituteName'] ?? null;
+        User.instituteImage = tempo['instituteImage'] ?? null;
+        User.userInstituteType = tempo['instituteType'] ?? null;
+        User.numberOfMembers = tempo['numberOfMembers'] ?? null;
+        User.state = tempo['state'] ?? null;
+        User.city = tempo['city'] ?? null;
+        User.mailAddress = tempo['mailAddress'] ?? null;
+        User.aadharNumber = tempo['adharNumber'] ?? null;
+        User.grade = tempo['grade'] ?? null;
+        User.division = tempo['division'] ?? null;
+        User.contactNumber = tempo['contactNumber'] ?? null;
       });
       Navigator.push(
         context,
@@ -76,12 +154,14 @@ class _LoginPageState extends State<LoginPage> {
       );
     } else {
       popDialog(
-          onPress: () {
-            Navigator.pop(context);
-          },
-          context: context,
-          title: 'Request Pending',
-          content: 'Please wait while the superadmin approves your request');
+        onPress: () {
+          Navigator.pop(context);
+        },
+        context: context,
+        title: 'Request Pending',
+        content: 'Please wait while the super-admin approves your request',
+        buttonTitle: 'Close',
+      );
     }
   }
 

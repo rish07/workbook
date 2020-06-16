@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:workbook/screens/dash_board.dart';
 import 'package:workbook/screens/landing_page.dart';
 import 'package:workbook/screens/login_page.dart';
 
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Montserrat',
       ),
-      home: LandingPage(),
+      home: DashBoard(),
     );
   }
 }

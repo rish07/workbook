@@ -4,7 +4,11 @@ import 'package:workbook/constants.dart';
 import 'package:workbook/screens/login_page.dart';
 
 void popDialog(
-    {String title, BuildContext context, String content, Function onPress}) {
+    {String title,
+    BuildContext context,
+    String content,
+    Function onPress,
+    String buttonTitle}) {
   // flutter defined function
   showDialog(
     context: context,
@@ -27,7 +31,7 @@ void popDialog(
                   borderRadius: BorderRadius.circular(30)),
               color: teal2,
               child: new Text(
-                'Close',
+                buttonTitle,
                 style: TextStyle(
                   color: Colors.white,
                 ),

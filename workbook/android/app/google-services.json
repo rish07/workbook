@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1019156438469",
+    "firebase_url": "https://workbook-612e0.firebaseio.com",
+    "project_id": "workbook-612e0",
+    "storage_bucket": "workbook-612e0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1019156438469:android:ebdc733edff361ee34ffac",
+        "android_client_info": {
+          "package_name": "com.rish.workbook"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1019156438469-0qd2fqrcb8qmvfstg216e7naceobikq7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rish.workbook",
+            "certificate_hash": "eb6a46348626e05bb36d81dce6d703aef40a4a65"
+          }
+        },
+        {
+          "client_id": "1019156438469-6p191eb0g9l2io6rj171o4d080puu3ou.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOe91CKFxtJZYK8VDYBz5h6fjRSQ5VZYs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1019156438469-6p191eb0g9l2io6rj171o4d080puu3ou.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
