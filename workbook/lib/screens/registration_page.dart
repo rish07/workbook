@@ -5,10 +5,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/employee_form.dart';
-import 'package:workbook/widget/buttonNewUser.dart';
 import 'package:workbook/screens/admin_form.dart';
-import 'package:workbook/widget/input_field.dart';
-import 'package:workbook/widget/password.dart';
 import 'package:workbook/widget/signup.dart';
 import 'package:workbook/widget/textNew.dart';
 import 'package:http/http.dart' as http;
@@ -40,6 +37,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: ModalProgressHUD(
+        progressIndicator: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(teal2),
+          backgroundColor: Colors.transparent,
+        ),
         inAsyncCall: _isLoading,
         child: Container(
           decoration: BoxDecoration(

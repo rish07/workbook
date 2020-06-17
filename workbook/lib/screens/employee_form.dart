@@ -90,6 +90,10 @@ class _EmployeeFormState extends State<EmployeeForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: ModalProgressHUD(
+        progressIndicator: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(teal2),
+          backgroundColor: Colors.transparent,
+        ),
         inAsyncCall: _isLoading,
         child: Container(
           decoration: BoxDecoration(
@@ -114,7 +118,6 @@ class _EmployeeFormState extends State<EmployeeForm> {
                   padding: EdgeInsets.only(top: 16.0),
                   child: InputField(
                     errorText: 'This field can\'t be empty',
-                    validate: _validateName,
                     controller: _nameController,
                     labelText: 'Name',
                   ),
@@ -123,20 +126,17 @@ class _EmployeeFormState extends State<EmployeeForm> {
                   captial: TextCapitalization.none,
                   controller: _emailController,
                   errorText: 'Please enter a valid email ID',
-                  validate: _validateEmail,
                   labelText: 'Email',
                   textInputType: TextInputType.emailAddress,
                 ),
                 PasswordInput(
                   controller: _passwordController,
-                  validate: _validatePassword,
                   labelText: 'Password',
                   errorText:
                       'Min Length = 8 and Max length = 15,\nShould have atleast 1 number, 1 capital letter\nand 1 Special Character',
                 ),
                 PasswordInput(
                   controller: _passwordReController,
-                  validate: _validateRePassword,
                   labelText: 'Re-enter Password',
                   errorText: 'Passwords don\'t match',
                 ),
@@ -272,7 +272,6 @@ class _EmployeeFormState extends State<EmployeeForm> {
                 ),
                 InputField(
                   controller: _aadharController,
-                  validate: _validateAadhar,
                   errorText: 'Please enter you 12 digit Aadhar Card number',
                   textInputType: TextInputType.number,
                   labelText: 'Aadhar Card Number',
@@ -280,7 +279,6 @@ class _EmployeeFormState extends State<EmployeeForm> {
                 InputField(
                   errorText: 'Please enter a valid 10 digit mobile number',
                   controller: _phoneController,
-                  validate: _validatePhoneNumber,
                   textInputType: TextInputType.phone,
                   labelText: 'Contact Number',
                 ),
@@ -291,9 +289,8 @@ class _EmployeeFormState extends State<EmployeeForm> {
                     builder: (context) => registerButton(
                       role: 'Submit',
                       context: context,
-                      onPressed: () {
+                      onPressed: () async {
                         setState(() {
-                          _isLoading = true;
                           _nameController.text.isEmpty
                               ? _validateName = true
                               : _validateName = false;
@@ -331,28 +328,30 @@ class _EmployeeFormState extends State<EmployeeForm> {
                               _passwordReController.text) {
                             _validateRePassword = true;
                           }
-
-                          if (!_validateName &&
-                              !_validateEmail &&
-                              !_validatePhoneNumber &&
-                              !_validateGrade &&
-                              !_validateInstitution &&
-                              !_validateDivision &&
-                              !_validateAadhar &&
-                              !_validatePassword &&
-                              !_validateRePassword) {
-                            _registerUser();
-                            _nameController.clear();
-                            _emailController.clear();
-                            _passwordController.clear();
-                            _passwordReController.clear();
-                            _selectedInstitution = null;
-                            _selectedGrade = null;
-                            _selectedDivision = null;
-                            _aadharController.clear();
-                            _phoneController.clear();
-                          }
                         });
+                        if (!_validateName &&
+                            !_validateEmail &&
+                            !_validatePhoneNumber &&
+                            !_validateGrade &&
+                            !_validateInstitution &&
+                            !_validateDivision &&
+                            !_validateAadhar &&
+                            !_validatePassword &&
+                            !_validateRePassword) {
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          await _registerUser();
+                          _nameController.clear();
+                          _emailController.clear();
+                          _passwordController.clear();
+                          _passwordReController.clear();
+                          _selectedInstitution = null;
+                          _selectedGrade = null;
+                          _selectedDivision = null;
+                          _aadharController.clear();
+                          _phoneController.clear();
+                        }
                       },
                     ),
                   ),

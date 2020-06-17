@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:workbook/constants.dart';
@@ -54,7 +53,7 @@ class _AdminFormState extends State<AdminForm> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _mailController = TextEditingController();
 
-  Future<String> uploadImage(filename, url) async {
+  Future<String> _registerUser(filename, url) async {
     var request = http.MultipartRequest('POST', Uri.parse(url));
     request.fields['role'] = 'Admin';
     request.fields['userName'] = _nameController.text;
@@ -109,7 +108,7 @@ class _AdminFormState extends State<AdminForm> {
   }
 
   Future upload() async {
-    var res = await uploadImage(
+    var res = await _registerUser(
         imagePath, 'https://app-workbook.herokuapp.com/admin/register');
     setState(() {
       state = res;
@@ -123,8 +122,7 @@ class _AdminFormState extends State<AdminForm> {
   @override
   void initState() {
     // TODO: implement initState
-//    upload();
-//    _registerUser();
+
     print(User.userFcmToken);
     super.initState();
   }
@@ -147,6 +145,10 @@ class _AdminFormState extends State<AdminForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: ModalProgressHUD(
+        progressIndicator: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(teal2),
+          backgroundColor: Colors.transparent,
+        ),
         inAsyncCall: _isLoading,
         child: Container(
           decoration: BoxDecoration(
@@ -171,7 +173,6 @@ class _AdminFormState extends State<AdminForm> {
                   padding: EdgeInsets.only(top: 16.0),
                   child: InputField(
                     errorText: 'This field can\'t be empty',
-                    validate: _validateName,
                     controller: _nameController,
                     labelText: 'Name',
                   ),
@@ -180,26 +181,22 @@ class _AdminFormState extends State<AdminForm> {
                   captial: TextCapitalization.none,
                   controller: _emailController,
                   errorText: 'Please enter a valid email ID',
-                  validate: _validateEmail,
                   labelText: 'Email',
                   textInputType: TextInputType.emailAddress,
                 ),
                 PasswordInput(
                   controller: _passwordController,
-                  validate: _validatePassword,
                   labelText: 'Password',
                   errorText:
                       'Min Length = 8 and Max length = 15,\nShould have atleast 1 number, 1 capital letter\nand 1 Special Character',
                 ),
                 PasswordInput(
                   controller: _passwordReController,
-                  validate: _validateRePassword,
                   labelText: 'Re-enter Password',
                   errorText: 'Passwords don\'t match',
                 ),
                 InputField(
                     controller: _organizationController,
-                    validate: _validateOrganization,
                     errorText: 'Max length is 50',
                     labelText: 'Institution Name'),
                 Padding(
@@ -284,7 +281,6 @@ class _AdminFormState extends State<AdminForm> {
                 ),
                 InputField(
                   errorText: 'Please enter the number of members',
-                  validate: _validateNumberOrganization,
                   controller: _organizationNumberController,
                   labelText: 'Number of members',
                   textInputType: TextInputType.number,
@@ -383,12 +379,10 @@ class _AdminFormState extends State<AdminForm> {
                   maxLines: 5,
                   controller: _mailController,
                   errorText: 'Please enter your mailing address',
-                  validate: _validateMail,
                   labelText: 'Mailing Address',
                 ),
                 InputField(
                   controller: _aadharController,
-                  validate: _validateAadhar,
                   errorText: 'Please enter you 12 digit Aadhar Card number',
                   textInputType: TextInputType.number,
                   labelText: 'Aadhar Card Number',
@@ -396,7 +390,6 @@ class _AdminFormState extends State<AdminForm> {
                 InputField(
                   errorText: 'Please enter a valid 10 digit mobile number',
                   controller: _phoneController,
-                  validate: _validatePhoneNumber,
                   textInputType: TextInputType.phone,
                   labelText: 'Contact Number',
                 ),
@@ -407,7 +400,7 @@ class _AdminFormState extends State<AdminForm> {
                     builder: (context) => registerButton(
                       role: 'Submit',
                       context: context,
-                      onPressed: () {
+                      onPressed: () async {
                         setState(() {
                           _nameController.text.isEmpty
                               ? _validateName = true
@@ -460,34 +453,37 @@ class _AdminFormState extends State<AdminForm> {
                                   label: 'Okay', onPressed: () {}),
                             ));
                           }
-                          if (!_validateName &&
-                              !_validateEmail &&
-                              !_validatePhoneNumber &&
-                              !_validateNumberOrganization &&
-                              !_validateMail &&
-                              !_validateCity &&
-                              !_validateState &&
-                              !_validateAadhar &&
-                              !_validateOrganization &&
-                              !_validatePassword &&
-                              !_validateRePassword &&
-                              _image != null) {
-                            _isLoading = true;
-                            upload();
-//                            _registerUser();
-                            _nameController.clear();
-                            _emailController.clear();
-                            _passwordController.clear();
-                            _passwordReController.clear();
-                            _organizationController.clear();
-                            _selectedCityLocation = null;
-                            _selectedStateLocation = null;
-                            _organizationNumberController.clear();
-                            _mailController.clear();
-                            _aadharController.clear();
-                            _phoneController.clear();
-                          }
                         });
+                        if (!_validateName &&
+                            !_validateEmail &&
+                            !_validatePhoneNumber &&
+                            !_validateNumberOrganization &&
+                            !_validateMail &&
+                            !_validateCity &&
+                            !_validateState &&
+                            !_validateAadhar &&
+                            !_validateOrganization &&
+                            !_validatePassword &&
+                            !_validateRePassword &&
+                            _image != null) {
+                          setState(() {
+                            _isLoading = true;
+                          });
+
+                          await upload();
+
+                          _nameController.clear();
+                          _emailController.clear();
+                          _passwordController.clear();
+                          _passwordReController.clear();
+                          _organizationController.clear();
+                          _selectedCityLocation = null;
+                          _selectedStateLocation = null;
+                          _organizationNumberController.clear();
+                          _mailController.clear();
+                          _aadharController.clear();
+                          _phoneController.clear();
+                        }
                       },
                     ),
                   ),

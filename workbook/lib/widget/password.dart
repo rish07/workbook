@@ -2,17 +2,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PasswordInput extends StatefulWidget {
+  var validation;
   final String labelText;
   final String errorText;
-  bool validate;
   final TextEditingController controller;
   final String helpText;
 
   PasswordInput(
       {Key key,
       this.labelText,
+      this.validation,
       this.errorText,
-      this.validate,
       this.controller,
       this.helpText})
       : super(key: key);
@@ -29,20 +29,19 @@ class _PasswordInputState extends State<PasswordInput> {
       child: Container(
         height: 60,
         width: MediaQuery.of(context).size.width,
-        child: TextField(
-          onTap: () {
-            setState(() {
-              widget.validate = false;
-            });
-          },
+        child: TextFormField(
+          validator: widget.validation,
+          cursorColor: Colors.white,
           controller: widget.controller,
           style: TextStyle(color: Colors.white, fontSize: 18),
           obscureText: !isVisible,
           decoration: InputDecoration(
+            errorBorder: OutlineInputBorder(
+              borderSide: BorderSide.none,
+            ),
             helperText: widget.helpText ?? null,
             focusedErrorBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.white, width: 2)),
-            errorText: widget.validate ? widget.errorText : null,
             suffixIcon: IconButton(
                 color: Colors.white,
                 icon: isVisible

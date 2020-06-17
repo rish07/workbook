@@ -1,5 +1,6 @@
 class User {
   static String userRole;
+  static String userPhotoData;
   static String userID;
   static String userName;
   static String userEmail;

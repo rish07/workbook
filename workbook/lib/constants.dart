@@ -54,7 +54,8 @@ var cities = {
     "Vishakhapatnam",
     "Vizianagaram",
     "West Godavari",
-    "Cudappah"
+    "Cudappah",
+    "Others",
   ],
   'Arunachal Pradesh': [
     "Anjaw",
@@ -73,7 +74,8 @@ var cities = {
     "Upper Siang",
     "Upper Subansiri",
     "West Kameng",
-    "West Siang"
+    "West Siang",
+    "Others",
   ],
   'Assam': [
     "Baksa",
@@ -102,7 +104,8 @@ var cities = {
     "Sivasagar",
     "Sonitpur",
     "Tinsukia",
-    "Udalguri"
+    "Udalguri",
+    "Others",
   ],
   'Bihar': [
     "Araria",
@@ -142,7 +145,8 @@ var cities = {
     "Siwan",
     "Supaul",
     "Vaishali",
-    "West Champaran"
+    "West Champaran",
+    "Others",
   ],
   'Chhattisgarh': [
     "Bastar",
@@ -163,10 +167,19 @@ var cities = {
     "Rajnandgaon",
     "Raipur",
     "Surajpur",
-    "Surguja"
+    "Surguja",
+    "Others",
   ],
-  'Dadra and Nagar Haveli': ["Amal", "Silvassa"],
-  'Daman and Diu': ["Daman", "Diu"],
+  'Dadra and Nagar Haveli': [
+    "Amal",
+    "Silvassa",
+    "Others",
+  ],
+  'Daman and Diu': [
+    "Daman",
+    "Diu",
+    "Others",
+  ],
   'Delhi': [
     "Delhi",
     "New Delhi",
@@ -174,7 +187,8 @@ var cities = {
     "Noida",
     "Patparganj",
     "Sonabarsa",
-    "Tughlakabad"
+    "Tughlakabad",
+    "Others",
   ],
   'Goa': [
     "Chapora",
@@ -185,7 +199,8 @@ var cities = {
     "Panjim",
     "Pellet Plant",
     "Talpona",
-    "Vasco da Gama"
+    "Vasco da Gama",
+    "Others",
   ],
   'Gujarat': [
     "Ahmedabad",
@@ -214,7 +229,8 @@ var cities = {
     "Surat",
     "Tapi",
     "Vadodara",
-    "Valsad"
+    "Valsad",
+    "Others",
   ],
   'Haryana': [
     "Ambala",
@@ -237,7 +253,8 @@ var cities = {
     "Rohtak",
     "Sirsa",
     "Sonipat",
-    "Yamuna Nagar"
+    "Yamuna Nagar",
+    "Others",
   ],
   'Himachal Pradesh': [
     "Baddi",
@@ -253,9 +270,16 @@ var cities = {
     "Simla",
     "Sirmaur",
     "Solan",
-    "Una"
+    "Una",
+    "Others",
   ],
-  'Jammu and Kashmir': ["Jammu", "Leh", "Rajouri", "Srinagar"],
+  'Jammu and Kashmir': [
+    "Jammu",
+    "Leh",
+    "Rajouri",
+    "Srinagar",
+    "Others",
+  ],
   'Jharkhand': [
     "Bokaro",
     "Chatra",
@@ -280,7 +304,8 @@ var cities = {
     "Sahibganj",
     "Seraikela Kharsawan",
     "Simdega",
-    "West Singhbhum"
+    "West Singhbhum",
+    "Others",
   ],
   'Karnataka': [
     "Bagalkot",
@@ -312,7 +337,8 @@ var cities = {
     "Udupi",
     "Uttara Kannada",
     "Ramanagara",
-    "Yadgir"
+    "Yadgir",
+    "Others",
   ],
   'Kerala': [
     "Alappuzha",
@@ -328,7 +354,8 @@ var cities = {
     "Pathanamthitta",
     "Thrissur",
     "Thiruvananthapuram",
-    "Wayanad"
+    "Wayanad",
+    "Others",
   ],
   'Madhya Pradesh': [
     "Alirajpur",
@@ -374,7 +401,8 @@ var cities = {
     "Seoni",
     "Shahdol",
     "Singrauli",
-    "Ujjain"
+    "Ujjain",
+    "Others",
   ],
   'Maharashtra': [
     "Ahmednagar",
@@ -436,7 +464,8 @@ var cities = {
     "Varsova",
     "Vengurla",
     "Virar",
-    "Wada"
+    "Wada",
+    "Others",
   ],
   'Manipur': [
     "Bishnupur",
@@ -447,7 +476,8 @@ var cities = {
     "Tamenglong",
     "Thoubal",
     "Ukhrul",
-    "Imphal West"
+    "Imphal West",
+    "Others",
   ],
   'Meghalaya': [
     "Baghamara",
@@ -461,7 +491,8 @@ var cities = {
     "Moreh",
     "Ryngku",
     "Shella Bazar",
-    "Shillong"
+    "Shillong",
+    "Others",
   ],
   'Mizoram': [
     "Aizawl",
@@ -471,7 +502,8 @@ var cities = {
     "Lunglei",
     "Mamit",
     "Saiha",
-    "Serchhip"
+    "Serchhip",
+    "Others",
   ],
   'Nagaland': [
     "Dimapur",
@@ -484,7 +516,8 @@ var cities = {
     "Phek",
     "Tuensang",
     "Wokha",
-    "Zunheboto"
+    "Zunheboto",
+    "Others",
   ],
   'Orissa': [
     "Bahabal Pur",
@@ -494,9 +527,16 @@ var cities = {
     "Jeypore",
     "Paradip Garh",
     "Puri",
-    "Rourkela"
+    "Rourkela",
+    "Others",
   ],
-  'Puducherry': ["Karaikal", "Mahe", "Pondicherry", "Yanam"],
+  'Puducherry': [
+    "Karaikal",
+    "Mahe",
+    "Pondicherry",
+    "Yanam",
+    "Others",
+  ],
   'Punjab': [
     "Amritsar",
     "Barnala",
@@ -519,7 +559,8 @@ var cities = {
     "Ajitgarh (Mohali)",
     "Sangrur",
     "Shahid Bhagat Singh Nagar",
-    "Tarn Taran"
+    "Tarn Taran",
+    "Others",
   ],
   'Rajasthan': [
     "Ajmer",
@@ -553,9 +594,14 @@ var cities = {
     "Shahdol",
     "Shimoga",
     "Tonk",
-    "Udaipur"
+    "Udaipur",
+    "Others",
   ],
-  'Sikkim': ["Chamurci", "Gangtok"],
+  'Sikkim': [
+    "Chamurci",
+    "Gangtok",
+    "Others",
+  ],
   'Tamil Nadu': [
     "Ariyalur",
     "Chennai",
@@ -590,7 +636,8 @@ var cities = {
     "Tiruvannamalai",
     "Vellore",
     "Villupuram",
-    "Viruthunagar"
+    "Viruthunagar",
+    "Others",
   ],
   'Telangana': [
     "Adilabad",
@@ -601,7 +648,8 @@ var cities = {
     "Nalgonda",
     "Nizamabad",
     "Ranga Reddy",
-    "Warangal"
+    "Warangal",
+    "Others",
   ],
   'Tripura': [
     "Agartala",
@@ -615,7 +663,8 @@ var cities = {
     "Mahurighat",
     "Old Raghna Bazar",
     "Sabroom",
-    "Srimantapur"
+    "Srimantapur",
+    "Others",
   ],
   'Uttar Pradesh': [
     "Agra",
@@ -649,7 +698,8 @@ var cities = {
     "Sonauli",
     "Surajpur",
     "Tikonia",
-    "Varanasi"
+    "Varanasi",
+    "Others",
   ],
   'Uttarakhand': [
     "Almora",
@@ -681,7 +731,8 @@ var cities = {
     "Rohni",
     "Roorkee",
     "Sama",
-    "Saur"
+    "Saur",
+    "Others",
   ],
   'West Bengal': [
     "Alipurduar",
@@ -703,7 +754,8 @@ var cities = {
     "Purba Medinipur",
     "Purulia",
     "South 24 Parganas",
-    "Uttar Dinajpur"
+    "Uttar Dinajpur",
+    "Others",
   ],
 };
 

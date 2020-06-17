@@ -5,17 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 import 'package:workbook/constants.dart';
-import 'package:workbook/user.dart';
+import 'package:workbook/widget/drawer.dart';
 import 'dart:convert';
 
 import 'package:workbook/widget/popUpDialog.dart';
 
-class DashBoard extends StatefulWidget {
+class ApproveEmployees extends StatefulWidget {
   @override
-  _DashBoardState createState() => _DashBoardState();
+  _ApproveEmployeesState createState() => _ApproveEmployeesState();
 }
 
-class _DashBoardState extends State<DashBoard> {
+class _ApproveEmployeesState extends State<ApproveEmployees> {
   int counter = 0;
   bool _loading = false;
   List _employeeList = [];
@@ -24,7 +24,7 @@ class _DashBoardState extends State<DashBoard> {
     var response = await http.post(
       "https://app-workbook.herokuapp.com/admin/viewAllEmployees",
       body: {
-        "instituteName": User.instituteName,
+        "instituteName": "IEEE",
       },
     );
     print('Response status: ${response.statusCode}');
@@ -116,10 +116,15 @@ class _DashBoardState extends State<DashBoard> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('View all employees'),
+        title: Text('Approve employees'),
         backgroundColor: teal1,
       ),
+      drawer: buildDrawer(context),
       body: ModalProgressHUD(
+        progressIndicator: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(teal2),
+          backgroundColor: Colors.transparent,
+        ),
         inAsyncCall: _loading,
         child: Center(
           child: ListView.builder(
@@ -134,9 +139,8 @@ class _DashBoardState extends State<DashBoard> {
                           boxShadow: [
                             BoxShadow(
                               color: Colors.grey,
-                              blurRadius: 2,
-                              spreadRadius: 0.2,
-                              offset: Offset(5, 5),
+                              blurRadius: 5,
+                              spreadRadius: 2,
                             )
                           ],
                           color: Colors.white,
@@ -146,34 +150,26 @@ class _DashBoardState extends State<DashBoard> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      'Name: ',
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text(
-                                      _employeeList[index]['userName'],
-                                      style: TextStyle(fontSize: 20),
-                                    ),
-                                  ],
+                                Text(
+                                  _employeeList[index]['userName'],
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 Row(
                                   children: [
                                     Text(
                                       'Division: ',
                                       style: TextStyle(
-                                          fontSize: 20,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.bold),
                                     ),
                                     Text(
                                       _employeeList[index]['division'],
-                                      style: TextStyle(fontSize: 20),
+                                      style: TextStyle(fontSize: 14),
                                     ),
                                   ],
                                 ),
@@ -182,83 +178,78 @@ class _DashBoardState extends State<DashBoard> {
                                     Text(
                                       'Grade: ',
                                       style: TextStyle(
-                                          fontSize: 20,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.bold),
                                     ),
                                     Text(
                                       _employeeList[index]['grade'],
-                                      style: TextStyle(fontSize: 20),
+                                      style: TextStyle(fontSize: 14),
                                     ),
                                   ],
                                 ),
                               ],
                             ),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: MaterialButton(
-                                    minWidth:
-                                        MediaQuery.of(context).size.width * 0.1,
-                                    color: Colors.green,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    onPressed: () {
-                                      popDialog(
-                                          title: "Approve Employee",
-                                          content:
-                                              'Do you want to approve the registration of this employee?',
-                                          context: context,
-                                          buttonTitle: 'Approve',
-                                          onPress: () {
-                                            _loading = true;
-                                            _approveEmployee(
-                                                id: _employeeList[index]
-                                                    ['_id']);
-                                            _sendNotification(
-                                                fcmToken: _employeeList[index]
-                                                    ['fcmToken'],
-                                                title: "Request Approved",
-                                                message:
-                                                    "You have been approved as an employee. Please login now");
-                                            Navigator.pop(context);
-                                          });
-                                    },
-                                    child: Icon(Icons.check),
+                                MaterialButton(
+                                  minWidth: 35,
+                                  padding: EdgeInsets.zero,
+                                  shape: CircleBorder(
+                                    side: BorderSide(color: Colors.black),
+                                  ),
+                                  onPressed: () {
+                                    popDialog(
+                                        title: "Reject Employee",
+                                        content:
+                                            'Do you want to reject the registration of this employee?',
+                                        context: context,
+                                        buttonTitle: 'Reject',
+                                        onPress: () {
+                                          _loading = true;
+                                          _rejectEmployee(
+                                              id: _employeeList[index]['_id']);
+                                          _sendNotification(
+                                              title: "Request Rejected",
+                                              fcmToken: _employeeList[index]
+                                                  ['fcmToken'],
+                                              message:
+                                                  "You have been rejected as an employee. Please contact the admin");
+                                          Navigator.pop(context);
+                                        });
+                                  },
+                                  child: Icon(
+                                    Icons.close,
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: MaterialButton(
-                                    minWidth:
-                                        MediaQuery.of(context).size.width * 0.1,
-                                    color: Colors.red,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    onPressed: () {
-                                      popDialog(
-                                          title: "Reject Employee",
-                                          content:
-                                              'Do you want to reject the registration of this employee?',
-                                          context: context,
-                                          buttonTitle: 'Reject',
-                                          onPress: () {
-                                            _loading = true;
-                                            _rejectEmployee(
-                                                id: _employeeList[index]
-                                                    ['_id']);
-                                            _sendNotification(
-                                                title: "Request Rejected",
-                                                fcmToken: _employeeList[index]
-                                                    ['fcmToken'],
-                                                message:
-                                                    "You have been rejected as an employee. Please contact the admin");
-                                            Navigator.pop(context);
-                                          });
-                                    },
-                                    child: Icon(Icons.close),
+                                MaterialButton(
+                                  minWidth: 35,
+                                  elevation: 10,
+                                  shape: CircleBorder(
+                                      side: BorderSide(color: Colors.green)),
+                                  onPressed: () {
+                                    popDialog(
+                                        title: "Approve Employee",
+                                        content:
+                                            'Do you want to approve the registration of this employee?',
+                                        context: context,
+                                        buttonTitle: 'Approve',
+                                        onPress: () {
+                                          _loading = true;
+                                          _approveEmployee(
+                                              id: _employeeList[index]['_id']);
+                                          _sendNotification(
+                                              fcmToken: _employeeList[index]
+                                                  ['fcmToken'],
+                                              title: "Request Approved",
+                                              message:
+                                                  "You have been approved as an employee. Please login now");
+                                          Navigator.pop(context);
+                                        });
+                                  },
+                                  child: Icon(
+                                    Icons.check,
+                                    color: Colors.green,
                                   ),
                                 ),
                               ],

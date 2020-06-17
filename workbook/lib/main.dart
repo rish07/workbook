@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:workbook/screens/dash_board.dart';
 import 'package:workbook/screens/landing_page.dart';
-import 'package:workbook/screens/login_page.dart';
 
 void main() {
   runApp(MyApp());

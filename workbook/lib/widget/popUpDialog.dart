@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:workbook/constants.dart';
-import 'package:workbook/screens/login_page.dart';
 
 void popDialog(
     {String title,
