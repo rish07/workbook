@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:workbook/constants.dart';
@@ -18,8 +21,17 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         actions: [
           Padding(
-            padding: const EdgeInsets.all(8),
-            child: GestureDetector(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            child: CircularProfileAvatar(
+              null,
+              child: Hero(
+                tag: "profile",
+                child: User.userPhotoData == null
+                    ? Image.asset('images/userPhoto.jpg')
+                    : Image.memory(
+                        base64Decode(User.userPhotoData),
+                      ),
+              ),
               onTap: () {
                 Navigator.push(
                   context,
@@ -27,16 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: ProfilePage(), type: PageTransitionType.fade),
                 );
               },
-              child: Hero(
-                tag: 'profile',
-                child: CircleAvatar(
-                  radius: 21,
-                  backgroundImage: User.userPhotoData == null
-                      ? AssetImage('images/userPhoto.jpg')
-                      : NetworkImage(User.userPhotoData),
-                  backgroundColor: Colors.transparent,
-                ),
-              ),
+              borderColor: teal2,
+              elevation: 5,
+              radius: 22,
             ),
           ),
         ],

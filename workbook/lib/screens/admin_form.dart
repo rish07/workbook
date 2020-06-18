@@ -172,12 +172,14 @@ class _AdminFormState extends State<AdminForm> {
                 Padding(
                   padding: EdgeInsets.only(top: 16.0),
                   child: InputField(
+                    validate: _validateName,
                     errorText: 'This field can\'t be empty',
                     controller: _nameController,
                     labelText: 'Name',
                   ),
                 ),
                 InputField(
+                  validate: _validateEmail,
                   captial: TextCapitalization.none,
                   controller: _emailController,
                   errorText: 'Please enter a valid email ID',
@@ -185,17 +187,20 @@ class _AdminFormState extends State<AdminForm> {
                   textInputType: TextInputType.emailAddress,
                 ),
                 PasswordInput(
+                  validate: _validatePassword,
                   controller: _passwordController,
                   labelText: 'Password',
                   errorText:
                       'Min Length = 8 and Max length = 15,\nShould have atleast 1 number, 1 capital letter\nand 1 Special Character',
                 ),
                 PasswordInput(
+                  validate: _validatePassword,
                   controller: _passwordReController,
                   labelText: 'Re-enter Password',
                   errorText: 'Passwords don\'t match',
                 ),
                 InputField(
+                    validate: _validateOrganization,
                     controller: _organizationController,
                     errorText: 'Max length is 50',
                     labelText: 'Institution Name'),
@@ -280,6 +285,7 @@ class _AdminFormState extends State<AdminForm> {
                   ),
                 ),
                 InputField(
+                  validate: _validateNumberOrganization,
                   errorText: 'Please enter the number of members',
                   controller: _organizationNumberController,
                   labelText: 'Number of members',
@@ -376,18 +382,21 @@ class _AdminFormState extends State<AdminForm> {
                   ),
                 ),
                 InputField(
+                  validate: _validateMail,
                   maxLines: 5,
                   controller: _mailController,
                   errorText: 'Please enter your mailing address',
                   labelText: 'Mailing Address',
                 ),
                 InputField(
+                  validate: _validateAadhar,
                   controller: _aadharController,
                   errorText: 'Please enter you 12 digit Aadhar Card number',
                   textInputType: TextInputType.number,
                   labelText: 'Aadhar Card Number',
                 ),
                 InputField(
+                  validate: _validatePhoneNumber,
                   errorText: 'Please enter a valid 10 digit mobile number',
                   controller: _phoneController,
                   textInputType: TextInputType.phone,
@@ -437,6 +446,9 @@ class _AdminFormState extends State<AdminForm> {
                               : _validatePhoneNumber = false;
                           if (_selectedStateLocation == null) {
                             _validateState = true;
+                          }
+                          if (_selectedInstitutionType == null) {
+                            _validateInstituteType = true;
                           }
                           if (_selectedCityLocation == null) {
                             _validateCity = true;

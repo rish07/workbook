@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:regexed_validator/regexed_validator.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/home_screen.dart';
 import 'dart:convert';
@@ -107,7 +108,8 @@ class _LoginPageState extends State<LoginPage> {
     print(fcmToken);
   }
 
-  Future loginUser() async {
+  Future _loginUser() async {
+    print('working');
     var response =
         await http.post('https://app-workbook.herokuapp.com/login', body: {
       "userID": _emailController.text,
@@ -122,8 +124,8 @@ class _LoginPageState extends State<LoginPage> {
     var resp = json.decode(response.body)['payload'];
     if (resp['approved'] == true) {
       var tempo = resp['user'];
-      List<int> _imageData = (tempo['instituteImage']['data']).cast<int>();
-      print(_imageData.runtimeType);
+      // List<int> _imageData = (tempo['instituteImage']['data']).cast<int>();
+//     / print(_imageData.runtimeType);
       setState(() {
 //        User.userPhotoData = base64Encode(_imageData);
         User.userName = tempo['userName'] ?? null;
@@ -196,14 +198,16 @@ class _LoginPageState extends State<LoginPage> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: InputField(
+                      validate: false,
                       validation: (String arg) {
                         if (arg.isEmpty) {
-                          return 'This can not be empty';
+                          return "This field can't  be empty";
+                        } else if (!validator.email(arg)) {
+                          return "Please enter a valid email ID";
                         } else
                           return null;
                       },
                       captial: TextCapitalization.none,
-                      errorText: 'Please enter a valid email ID',
                       controller: _emailController,
                       labelText: 'Email',
                       textInputType: TextInputType.emailAddress,
@@ -212,9 +216,14 @@ class _LoginPageState extends State<LoginPage> {
                   Padding(
                     padding: EdgeInsets.all(8),
                     child: PasswordInput(
-                      errorText: 'This field can\'t be empty',
+                      validate: false,
                       controller: _passwordController,
-                      validation: (String arg) {},
+                      validation: (String arg) {
+                        if (arg.isEmpty) {
+                          return "This field can't be empty";
+                        } else
+                          return null;
+                      },
                       labelText: 'Password',
                     ),
                   ),
@@ -245,7 +254,10 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: () async {
                           if (_formKey.currentState.validate()) {
                             print('working');
-                            await loginUser();
+                            setState(() {
+                              _loading = true;
+                            });
+                            await _loginUser();
                           }
 //                        setState(() {
 //                          (_emailController.text.isEmpty ||

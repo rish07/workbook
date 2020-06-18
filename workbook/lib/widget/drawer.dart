@@ -5,6 +5,7 @@ import 'package:workbook/screens/approve_employee.dart';
 import 'package:workbook/screens/home_screen.dart';
 import 'package:workbook/screens/login_page.dart';
 import 'package:workbook/screens/profile_page.dart';
+import 'package:workbook/user.dart';
 import 'package:workbook/widget/popUpDialog.dart';
 
 Theme buildDrawer(BuildContext context) {
@@ -37,17 +38,19 @@ Theme buildDrawer(BuildContext context) {
                         child: ProfilePage(),
                         type: PageTransitionType.rightToLeft));
               }),
-          buildDrawerItem(
-              icon: Icons.check,
-              title: 'Approve Employees',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  PageTransition(
-                      child: ApproveEmployees(),
-                      type: PageTransitionType.rightToLeft),
-                );
-              }),
+          User.userRole == 'admin'
+              ? buildDrawerItem(
+                  icon: Icons.check,
+                  title: 'Approve Employees',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                          child: ApproveEmployees(),
+                          type: PageTransitionType.rightToLeft),
+                    );
+                  })
+              : Container(),
           buildDrawerItem(
               icon: Icons.exit_to_app,
               title: 'Logout',

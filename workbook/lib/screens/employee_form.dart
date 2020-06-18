@@ -117,12 +117,14 @@ class _EmployeeFormState extends State<EmployeeForm> {
                 Padding(
                   padding: EdgeInsets.only(top: 16.0),
                   child: InputField(
+                    validate: _validateName,
                     errorText: 'This field can\'t be empty',
                     controller: _nameController,
                     labelText: 'Name',
                   ),
                 ),
                 InputField(
+                  validate: _validateEmail,
                   captial: TextCapitalization.none,
                   controller: _emailController,
                   errorText: 'Please enter a valid email ID',
@@ -130,12 +132,14 @@ class _EmployeeFormState extends State<EmployeeForm> {
                   textInputType: TextInputType.emailAddress,
                 ),
                 PasswordInput(
+                  validate: _validatePassword,
                   controller: _passwordController,
                   labelText: 'Password',
                   errorText:
                       'Min Length = 8 and Max length = 15,\nShould have atleast 1 number, 1 capital letter\nand 1 Special Character',
                 ),
                 PasswordInput(
+                  validate: _validateRePassword,
                   controller: _passwordReController,
                   labelText: 'Re-enter Password',
                   errorText: 'Passwords don\'t match',
@@ -271,12 +275,14 @@ class _EmployeeFormState extends State<EmployeeForm> {
                   ),
                 ),
                 InputField(
+                  validate: _validateAadhar,
                   controller: _aadharController,
                   errorText: 'Please enter you 12 digit Aadhar Card number',
                   textInputType: TextInputType.number,
                   labelText: 'Aadhar Card Number',
                 ),
                 InputField(
+                  validate: _validatePhoneNumber,
                   errorText: 'Please enter a valid 10 digit mobile number',
                   controller: _phoneController,
                   textInputType: TextInputType.phone,

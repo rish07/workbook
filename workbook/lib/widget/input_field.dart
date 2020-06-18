@@ -7,16 +7,17 @@ class InputField extends StatefulWidget {
   final TextCapitalization captial;
   final String errorText;
   final TextEditingController controller;
-
-  var validation;
+  Function validation;
+  bool validate;
   final String labelText;
   final TextInputType textInputType;
   InputField(
       {Key key,
       @required this.labelText,
-      this.validation,
       this.textInputType,
       this.controller,
+      this.validation,
+      this.validate,
       this.errorText,
       this.captial,
       this.maxLines})
@@ -34,13 +35,14 @@ class _InputFieldState extends State<InputField> {
         height: 60,
         width: MediaQuery.of(context).size.width,
         child: TextFormField(
-          onChanged: (value) {
-            setState(() {});
-          },
           validator: widget.validation,
-          textInputAction: TextInputAction.next,
           autocorrect: true,
           maxLines: widget.maxLines,
+          onTap: () {
+            setState(() {
+              widget.validate = false;
+            });
+          },
           cursorRadius: Radius.circular(8),
           cursorColor: Colors.white,
           keyboardType: widget.textInputType ?? TextInputType.text,
@@ -51,18 +53,15 @@ class _InputFieldState extends State<InputField> {
             color: Colors.white,
           ),
           decoration: InputDecoration(
-            isCollapsed: true,
             contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 18),
             isDense: true,
             errorMaxLines: 1,
-            errorBorder: OutlineInputBorder(
-              borderSide: BorderSide.none,
-            ),
             focusedErrorBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.white, width: 2),
             ),
             errorStyle: TextStyle(height: 0, fontSize: 10),
             floatingLabelBehavior: FloatingLabelBehavior.auto,
+            errorText: widget.validate ? widget.errorText : null,
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.white70, width: 1),
             ),
