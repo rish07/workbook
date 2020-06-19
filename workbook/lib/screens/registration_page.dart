@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:workbook/constants.dart';
-import 'package:workbook/screens/employee_form.dart';
+import 'package:workbook/screens/coming_soon.dart';
+import 'package:workbook/screens/employee_cust_form.dart';
 import 'package:workbook/screens/admin_form.dart';
 import 'package:workbook/widget/signup.dart';
 import 'package:workbook/widget/textNew.dart';
@@ -20,8 +21,7 @@ class RegistrationPage extends StatefulWidget {
 class _RegistrationPageState extends State<RegistrationPage> {
   bool _isLoading = false;
   Future getInstitutes() async {
-    var response =
-        await http.get("https://app-workbook.herokuapp.com/admin/institutes");
+    var response = await http.get("$baseUrl/admin/institutes");
     print('Response status: ${response.statusCode}');
     List temp = json.decode(response.body)['payload']['institute'];
     temp.forEach((resp) {
@@ -94,7 +94,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         Navigator.push(
                           context,
                           PageTransition(
-                              child: EmployeeForm(),
+                              child: EmployeeCustomerForm(
+                                isEmployee: true,
+                              ),
                               type: PageTransitionType.rightToLeft),
                         );
                       }),
@@ -108,7 +110,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         Navigator.push(
                           context,
                           PageTransition(
-                              child: AdminForm(),
+                              child: ComingSoon(),
                               type: PageTransitionType.rightToLeft),
                         );
                       }),
@@ -118,11 +120,17 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   registerButton(
                       role: 'Customer',
                       context: context,
-                      onPressed: () {
+                      onPressed: () async {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        await getInstitutes();
                         Navigator.push(
                           context,
                           PageTransition(
-                              child: AdminForm(),
+                              child: EmployeeCustomerForm(
+                                isEmployee: false,
+                              ),
                               type: PageTransitionType.rightToLeft),
                         );
                       }),

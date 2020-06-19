@@ -1,3 +1,5 @@
+import 'package:workbook/constants.dart';
+
 class User {
   static String userRole;
   static String userPhotoData;

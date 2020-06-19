@@ -35,7 +35,7 @@ class _ProfilePageState extends State<ProfilePage> {
     print('update image');
     print(User.userID);
     var request = http.MultipartRequest('POST', Uri.parse(url));
-    request.fields['userID'] = User.userID;
+    request.fields['userID'] = User.userEmail;
     request.files.add(
       await http.MultipartFile.fromPath('profilePicture', filename),
     );
@@ -52,8 +52,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future _update() async {
     print('update working');
-    var res = await _updateImage(
-        imagePath, 'https://app-workbook.herokuapp.com/uploadPicture');
+    var res = await _updateImage(imagePath, '$baseUrl/uploadPicture');
     setState(() {
       state = res;
       _isLoading = false;
@@ -63,6 +62,15 @@ class _ProfilePageState extends State<ProfilePage> {
 
   String state = "";
   bool _isEdit = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print(User.userID);
+    print(User.userPhotoData);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ModalProgressHUD(
@@ -119,7 +127,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 20.0, left: 50),
+                      padding:
+                          EdgeInsets.only(bottom: 20.0, left: _isEdit ? 50 : 0),
                       child: Center(
                         child: Hero(
                           tag: "profile",
@@ -127,8 +136,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             radius: 50,
                             backgroundImage: User.userPhotoData == null
                                 ? AssetImage('images/userPhoto.jpg')
-                                : Image.memory(
-                                    base64Decode(User.userPhotoData)),
+                                : NetworkImage((User.userPhotoData)),
                           ),
                         ),
                       ),

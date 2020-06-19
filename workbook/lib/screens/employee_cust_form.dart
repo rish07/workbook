@@ -13,13 +13,15 @@ import 'package:workbook/widget/popUpDialog.dart';
 import 'package:workbook/widget/registerButton.dart';
 import 'package:http/http.dart' as http;
 
-class EmployeeForm extends StatefulWidget {
+class EmployeeCustomerForm extends StatefulWidget {
+  final bool isEmployee;
+
+  const EmployeeCustomerForm({Key key, this.isEmployee}) : super(key: key);
   @override
-  _EmployeeFormState createState() => _EmployeeFormState();
+  _EmployeeCustomerFormState createState() => _EmployeeCustomerFormState();
 }
 
-class _EmployeeFormState extends State<EmployeeForm> {
-  final user = User();
+class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
   bool _isLoading = false;
   bool _validateName = false;
   bool _validateEmail = false;
@@ -42,19 +44,22 @@ class _EmployeeFormState extends State<EmployeeForm> {
 
   Future _registerUser() async {
     print('working');
-    var response = await http
-        .post('https://app-workbook.herokuapp.com/employee/register', body: {
-      "role": "Employee",
-      "userName": _nameController.text,
-      "userID": _emailController.text,
-      "password": _passwordController.text,
-      "instituteName": _selectedInstitution,
-      "grade": _selectedGrade,
-      "division": _selectedDivision,
-      "adharNumber": _aadharController.text,
-      "contactNumber": _phoneController.text,
-      "fcmToken": User.userFcmToken,
-    });
+    var response = await http.post(
+        widget.isEmployee
+            ? '$baseUrl/employee/register'
+            : '$baseUrl/customer/register',
+        body: {
+          "role": "Employee",
+          "userName": _nameController.text,
+          "userID": _emailController.text,
+          "password": _passwordController.text,
+          "instituteName": _selectedInstitution,
+          "grade": _selectedGrade,
+          "division": _selectedDivision,
+          "adharNumber": _aadharController.text,
+          "contactNumber": _phoneController.text,
+          "fcmToken": User.userFcmToken,
+        });
     setState(() {
       _isLoading = false;
     });
@@ -107,7 +112,9 @@ class _EmployeeFormState extends State<EmployeeForm> {
             child: ListView(
               children: [
                 Text(
-                  'Employee Registration',
+                  widget.isEmployee
+                      ? 'Employee Registration'
+                      : 'Customer Registration',
                   style: TextStyle(
                     fontSize: 28,
                     color: Colors.white,

@@ -13,22 +13,28 @@ import 'dart:convert';
 
 import 'package:workbook/widget/popUpDialog.dart';
 
-class ApproveEmployees extends StatefulWidget {
+class AllUsers extends StatefulWidget {
   @override
-  _ApproveEmployeesState createState() => _ApproveEmployeesState();
+  _AllUsersState createState() => _AllUsersState();
 }
 
-class _ApproveEmployeesState extends State<ApproveEmployees> {
+class _AllUsersState extends State<AllUsers> {
   int counter = 0;
   bool _loading = false;
   List _employeeList = [];
 
-  Future _getEmployees() async {
+  Future _getUsers() async {
     var response = await http.post(
-      "https://app-workbook.herokuapp.com/admin/viewAllEmployees",
-      body: {
-        "instituteName": User.instituteName,
-      },
+      User.userRole == 'admin'
+          ? "$baseUrl/admin/viewAllEmployees"
+          : "$baseUrl/employee/activeCustomer",
+      body: User.userRole == 'admin'
+          ? {
+              "instituteName": User.instituteName,
+            }
+          : {
+              "employeeID": User.userEmail,
+            },
     );
     print('Response status: ${response.statusCode}');
 
@@ -36,7 +42,9 @@ class _ApproveEmployeesState extends State<ApproveEmployees> {
       setState(() {
         _loading = false;
       });
-      var employees = json.decode(response.body)['payload']['employees'];
+      var employees = User.userRole == 'admin'
+          ? json.decode(response.body)['payload']['employees']
+          : json.decode(response.body)['payload']['customer'];
       for (var employee in employees) {
         _employeeList.add(employee);
       }
@@ -46,63 +54,14 @@ class _ApproveEmployeesState extends State<ApproveEmployees> {
     }
   }
 
-  Future _approveEmployee({String id}) async {
-    print('working');
-    var response = await http.post(
-        'https://app-workbook.herokuapp.com/admin/approveEmployee',
-        body: {"id": id});
-    print('Response status: ${response.statusCode}');
+  Future<bool> _checkExist({String role, String id}) async {
+    var response = await http.get('$baseUrl/getUserProfile/$role/$id');
+    print('$baseUrl/getUserProfile/$role/$id');
     print(response.body);
-    setState(() {
-      _loading = false;
-    });
-    if (response.statusCode == 200) {
-      setState(() {
-        _loading = true;
-        _employeeList.clear();
-      });
-      _getEmployees();
-    } else {
-      throw Exception('Failed to load the employees');
-    }
-  }
-
-  Future _rejectEmployee({String id}) async {
-    print('working');
-    var response = await http.post(
-        'https://app-workbook.herokuapp.com/admin/rejectEmployee',
-        body: {"id": id});
-    print('Response status: ${response.statusCode}');
-    print(response.body);
-    setState(() {
-      _loading = false;
-    });
-    if (response.statusCode == 200) {
-      setState(() {
-        _loading = true;
-        _employeeList.clear();
-      });
-      _getEmployees();
-    } else {
-      throw Exception('Failed to load the employees');
-    }
-  }
-
-  Future _sendNotification(
-      {String fcmToken, String message, String title}) async {
-    var response = await http.post(
-        'https://app-workbook.herokuapp.com/sendNotification',
-        body: {"fcmToken": fcmToken, "message": message, "title": title});
-    print('Response status: ${response.statusCode}');
-    print(response.body);
-    setState(() {
-      _loading = false;
-    });
-    if (response.statusCode == 200) {
-      print('Notification Sent');
-    } else {
-      throw Exception('Failed to load the employees');
-    }
+    if (response.body.isNotEmpty) {
+      return true;
+    } else
+      return false;
   }
 
   @override
@@ -110,7 +69,7 @@ class _ApproveEmployeesState extends State<ApproveEmployees> {
     setState(() {
       _loading = true;
     });
-    _getEmployees();
+    _getUsers();
     super.initState();
   }
 
@@ -122,7 +81,7 @@ class _ApproveEmployeesState extends State<ApproveEmployees> {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'Approve employees',
+          User.userRole == 'admin' ? 'Active Employees' : 'Active Customers',
           style: TextStyle(color: teal2, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
@@ -139,15 +98,22 @@ class _ApproveEmployeesState extends State<ApproveEmployees> {
           child: ListView.builder(
               itemCount: _employeeList.length,
               itemBuilder: (context, index) {
-                if (_employeeList[index]['approved'] == false) {
+                if (_employeeList[index]['approved'] == true) {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
-                      onTap: () {
+                      onTap: () async {
+                        var res = await _checkExist(
+                            role: _employeeList[index]['role'],
+                            id: _employeeList[index]['_id']);
+                        print('hereeeeeeeeeeeeeeeeee $res');
+
                         Navigator.push(
                             context,
                             PageTransition(
                                 child: RequestProfilePage(
+                                  exists: res,
+                                  id: _employeeList[index]['_id'],
                                   role: _employeeList[index]['role'],
                                   userName: _employeeList[index]['userName'],
                                   aadharNumber: _employeeList[index]
@@ -171,7 +137,7 @@ class _ApproveEmployeesState extends State<ApproveEmployees> {
                               BoxShadow(
                                 color: Colors.grey,
                                 blurRadius: 5,
-                                spreadRadius: 2,
+                                spreadRadius: 0.5,
                               )
                             ],
                             color: Colors.white,
@@ -221,73 +187,7 @@ class _ApproveEmployeesState extends State<ApproveEmployees> {
                                   ),
                                 ],
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  MaterialButton(
-                                    minWidth: 35,
-                                    padding: EdgeInsets.zero,
-                                    shape: CircleBorder(
-                                      side: BorderSide(color: Colors.black),
-                                    ),
-                                    onPressed: () {
-                                      popDialog(
-                                          title: "Reject Employee",
-                                          content:
-                                              'Do you want to reject the registration of this employee?',
-                                          context: context,
-                                          buttonTitle: 'Reject',
-                                          onPress: () {
-                                            _loading = true;
-                                            _rejectEmployee(
-                                                id: _employeeList[index]
-                                                    ['_id']);
-                                            _sendNotification(
-                                                title: "Request Rejected",
-                                                fcmToken: _employeeList[index]
-                                                    ['fcmToken'],
-                                                message:
-                                                    "You have been rejected as an employee. Please contact the admin");
-                                            Navigator.pop(context);
-                                          });
-                                    },
-                                    child: Icon(
-                                      Icons.close,
-                                    ),
-                                  ),
-                                  MaterialButton(
-                                    minWidth: 35,
-                                    elevation: 10,
-                                    shape: CircleBorder(
-                                        side: BorderSide(color: Colors.green)),
-                                    onPressed: () {
-                                      popDialog(
-                                          title: "Approve Employee",
-                                          content:
-                                              'Do you want to approve the registration of this employee?',
-                                          context: context,
-                                          buttonTitle: 'Approve',
-                                          onPress: () {
-                                            _loading = true;
-                                            _approveEmployee(
-                                                id: _employeeList[index]
-                                                    ['_id']);
-                                            _sendNotification(
-                                                fcmToken: _employeeList[index]
-                                                    ['fcmToken'],
-                                                title: "Request Approved",
-                                                message:
-                                                    "You have been approved as an employee. Please login now");
-                                            Navigator.pop(context);
-                                          });
-                                    },
-                                    child: Icon(
-                                      Icons.check,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                ],
-                              )
+                              Icon(Icons.navigate_next),
                             ],
                           )),
                     ),

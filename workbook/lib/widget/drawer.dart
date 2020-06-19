@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workbook/constants.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:workbook/screens/approve_employee.dart';
-import 'package:workbook/screens/home_screen.dart';
+
+import 'package:workbook/screens/approve_user.dart';
+import 'package:workbook/screens/approved_users.dart';
+import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/screens/login_page.dart';
 import 'package:workbook/screens/profile_page.dart';
 import 'package:workbook/user.dart';
@@ -16,7 +19,20 @@ Theme buildDrawer(BuildContext context) {
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            child: Stack(),
+            child: Center(
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.35,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  image: DecorationImage(
+                    fit: BoxFit.fill,
+                    image: AssetImage(
+                      'images/company.jpg',
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
           buildDrawerItem(
               icon: Icons.home,
@@ -25,7 +41,7 @@ Theme buildDrawer(BuildContext context) {
                 Navigator.push(
                     context,
                     PageTransition(
-                        child: HomeScreen(),
+                        child: DashBoard(),
                         type: PageTransitionType.rightToLeft));
               }),
           buildDrawerItem(
@@ -38,19 +54,31 @@ Theme buildDrawer(BuildContext context) {
                         child: ProfilePage(),
                         type: PageTransitionType.rightToLeft));
               }),
-          User.userRole == 'admin'
-              ? buildDrawerItem(
-                  icon: Icons.check,
-                  title: 'Approve Employees',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      PageTransition(
-                          child: ApproveEmployees(),
-                          type: PageTransitionType.rightToLeft),
-                    );
-                  })
-              : Container(),
+          buildDrawerItem(
+              icon: Icons.check,
+              title: User.userRole == 'admin'
+                  ? "Approve Employees"
+                  : 'Approve Customers',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  PageTransition(
+                      child: ApproveUser(),
+                      type: PageTransitionType.rightToLeft),
+                );
+              }),
+          buildDrawerItem(
+              icon: Icons.visibility,
+              title: User.userRole == 'admin'
+                  ? 'Active Employees'
+                  : "Active Customers",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  PageTransition(
+                      child: AllUsers(), type: PageTransitionType.rightToLeft),
+                );
+              }),
           buildDrawerItem(
               icon: Icons.exit_to_app,
               title: 'Logout',
@@ -60,7 +88,24 @@ Theme buildDrawer(BuildContext context) {
                     title: 'Logout?',
                     context: context,
                     content: 'Do you want to logout from your profile?',
-                    onPress: () {
+                    onPress: () async {
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      prefs.remove('userName');
+                      prefs.remove('userEmail');
+                      prefs.remove('userID');
+                      prefs.remove('userRole');
+                      prefs.remove('instituteName');
+                      prefs.remove('instituteImage');
+                      prefs.remove('userInstituteType');
+                      prefs.remove('numberOfMembers');
+                      prefs.remove('state');
+                      prefs.remove('city');
+                      prefs.remove('mailAddress');
+                      prefs.remove('aadharNumber');
+                      prefs.remove('grade');
+                      prefs.remove('division');
+                      prefs.remove('contactNumber');
                       Navigator.pushAndRemoveUntil(
                           context,
                           PageTransition(

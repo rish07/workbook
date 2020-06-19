@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:regexed_validator/regexed_validator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workbook/constants.dart';
-import 'package:workbook/screens/home_screen.dart';
+import 'package:workbook/screens/coming_soon.dart';
+import 'package:workbook/screens/dashboard.dart';
 import 'dart:convert';
 import 'package:workbook/widget/first.dart';
 import 'package:workbook/widget/input_field.dart';
@@ -110,8 +112,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future _loginUser() async {
     print('working');
-    var response =
-        await http.post('https://app-workbook.herokuapp.com/login', body: {
+    var response = await http.post('$baseUrl/login', body: {
       "userID": _emailController.text,
       "password": _passwordController.text,
       "fcmToken": fcmToken
@@ -124,10 +125,8 @@ class _LoginPageState extends State<LoginPage> {
     var resp = json.decode(response.body)['payload'];
     if (resp['approved'] == true) {
       var tempo = resp['user'];
-      // List<int> _imageData = (tempo['instituteImage']['data']).cast<int>();
-//     / print(_imageData.runtimeType);
+
       setState(() {
-//        User.userPhotoData = base64Encode(_imageData);
         User.userName = tempo['userName'] ?? null;
         User.userID = tempo['_id'] ?? null;
         User.userRole = tempo['role'] ?? null;
@@ -143,11 +142,31 @@ class _LoginPageState extends State<LoginPage> {
         User.grade = tempo['grade'] ?? null;
         User.division = tempo['division'] ?? null;
         User.contactNumber = tempo['contactNumber'] ?? null;
+//        User.userPhotoData =
+//            "$baseUrl/getUserProfile/${User.userRole}/${User.userID}";
       });
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('userName', User.userName);
+      prefs.setString('userEmail', User.userEmail);
+      prefs.setString('userID', User.userID);
+      prefs.setString('userRole', User.userRole);
+      //prefs.setString('instituteImage', User.instituteImage);
+      prefs.setString('instituteName', User.instituteName);
+      prefs.setString('userInstituteType', User.userInstituteType);
+      prefs.setInt('numberOfMembers', User.numberOfMembers);
+      prefs.setString('state', User.state);
+      prefs.setString('city', User.city);
+      prefs.setString('mailAddress', User.mailAddress);
+      prefs.setInt('aadharNumber', User.aadharNumber);
+      prefs.setString('grade', User.grade);
+      prefs.setString('division', User.division);
+      prefs.setInt('contactNumber', User.contactNumber);
+
       Navigator.push(
         context,
         PageTransition(
-            child: HomeScreen(), type: PageTransitionType.rightToLeft),
+            child: User.userRole == 'customer' ? ComingSoon() : DashBoard(),
+            type: PageTransitionType.rightToLeft),
       );
     } else {
       popDialog(

@@ -1,12 +1,14 @@
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';
 
 class RequestProfilePage extends StatefulWidget {
+  final bool exists;
+  final String id;
   final String role;
   final String profilePicture;
   final String userName;
@@ -25,13 +27,22 @@ class RequestProfilePage extends StatefulWidget {
       this.division,
       this.aadharNumber,
       this.contactNumber,
-      this.profilePicture})
+      this.profilePicture,
+      this.id,
+      this.exists})
       : super(key: key);
   @override
   _RequestProfilePageState createState() => _RequestProfilePageState();
 }
 
 class _RequestProfilePageState extends State<RequestProfilePage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,25 +60,19 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-//              Padding(
-//                padding: const EdgeInsets.only(bottom: 20.0),
-//                child: Center(
-//                  child: CircularProfileAvatar(
-//                    null,
-//                    child: Hero(
-//                      tag: "profile",
-//                      child: User.userPhotoData == null
-//                          ? Image.asset('images/userPhoto.jpg')
-//                          : Image.memory(
-//                              base64Decode(User.userPhotoData),
-//                            ),
-//                    ),
-//                    borderColor: teal2,
-//                    elevation: 5,
-//                    radius: 22,
-//                  ),
-//                ),
-//              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20.0),
+                child: Center(
+                  child: CircleAvatar(
+                    radius: 50,
+//                    backgroundImage: !widget.exists
+//                        ? AssetImage('images/userPhoto.jpg')
+//                        : NetworkImage(
+//                            ("$baseUrl/getUserProfile/${widget.role}/${widget.role}")),
+                    backgroundImage: AssetImage('images/userPhoto.jpg'),
+                  ),
+                ),
+              ),
               buildFieldEntry(
                 label: 'Name',
                 value: widget.userName ?? "-",

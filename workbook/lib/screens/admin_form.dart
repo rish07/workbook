@@ -108,8 +108,7 @@ class _AdminFormState extends State<AdminForm> {
   }
 
   Future upload() async {
-    var res = await _registerUser(
-        imagePath, 'https://app-workbook.herokuapp.com/admin/register');
+    var res = await _registerUser(imagePath, '$baseUrl/admin/register');
     setState(() {
       state = res;
       _isLoading = false;
@@ -121,8 +120,6 @@ class _AdminFormState extends State<AdminForm> {
 
   @override
   void initState() {
-    // TODO: implement initState
-
     print(User.userFcmToken);
     super.initState();
   }

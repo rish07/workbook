@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workbook/constants.dart';
+import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/screens/login_page.dart';
 
 class LandingPage extends StatefulWidget {
@@ -11,14 +13,22 @@ class LandingPage extends StatefulWidget {
 }
 
 class _LandingPageState extends State<LandingPage> {
+  Future<void> _loginExists() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var email = prefs.getString('userEmail');
+
+    print(email);
+    Navigator.push(
+        context,
+        PageTransition(
+            child: email == null ? LoginPage() : DashBoard(), type: null));
+  }
+
   @override
   void initState() {
     Timer(Duration(seconds: 4), () {
-      Navigator.push(
-          context,
-          PageTransition(
-              child: LoginPage(),
-              type: PageTransitionType.rightToLeftWithFade));
+      _loginExists();
     });
     super.initState();
   }
