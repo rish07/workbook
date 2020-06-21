@@ -142,8 +142,9 @@ class _LoginPageState extends State<LoginPage> {
         User.grade = tempo['grade'] ?? null;
         User.division = tempo['division'] ?? null;
         User.contactNumber = tempo['contactNumber'] ?? null;
-//        User.userPhotoData =
-//            "$baseUrl/getUserProfile/${User.userRole}/${User.userID}";
+        User.userPhotoData =
+            "$baseUrl/getUserProfile/${User.userRole}/${User.userID}";
+        User.profilePicExists = tempo['profilePicture'] == null ? false : true;
       });
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('userName', User.userName);
@@ -161,11 +162,15 @@ class _LoginPageState extends State<LoginPage> {
       prefs.setString('grade', User.grade);
       prefs.setString('division', User.division);
       prefs.setInt('contactNumber', User.contactNumber);
+      prefs.setString('userPhotoData', User.userPhotoData);
+      prefs.setBool('profilePicExists', User.profilePicExists);
 
       Navigator.push(
         context,
         PageTransition(
-            child: User.userRole == 'customer' ? ComingSoon() : DashBoard(),
+            child: User.userRole == 'customer' || User.userRole == 'driver'
+                ? ComingSoon()
+                : DashBoard(),
             type: PageTransitionType.rightToLeft),
       );
     } else {

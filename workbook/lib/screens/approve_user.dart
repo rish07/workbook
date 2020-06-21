@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -14,6 +15,9 @@ import 'dart:convert';
 import 'package:workbook/widget/popUpDialog.dart';
 
 class ApproveUser extends StatefulWidget {
+  final bool isDriver;
+
+  const ApproveUser({Key key, this.isDriver}) : super(key: key);
   @override
   _ApproveUserState createState() => _ApproveUserState();
 }
@@ -24,23 +28,31 @@ class _ApproveUserState extends State<ApproveUser> {
   List _employeeList = [];
 
   Future _getUsers() async {
-    var response = await http.post(
-      User.userRole == 'admin'
-          ? "$baseUrl/admin/viewAllEmployees"
-          : "$baseUrl/employee/viewAllCustomers",
-      body: {
-        "instituteName": User.instituteName,
-      },
-    );
+    var response = User.userRole != 'superAdmin'
+        ? await http.post(
+            User.userRole == 'admin' && !widget.isDriver
+                ? "$baseUrl/admin/viewAllEmployees"
+                : (User.userRole == 'admin' && widget.isDriver)
+                    ? "$baseUrl/admin/viewAllDrivers"
+                    : "$baseUrl/employee/viewAllCustomers",
+            body: {
+              "instituteName": User.instituteName,
+            },
+          )
+        : await http.get('$baseUrl/superAdmin/viewAllAdmin');
     print('Response status: ${response.statusCode}');
 
     if (response.statusCode == 200) {
       setState(() {
         _loading = false;
       });
-      var employees = User.userRole == 'admin'
+      var employees = User.userRole == 'admin' && !widget.isDriver
           ? json.decode(response.body)['payload']['employees']
-          : json.decode(response.body)['payload']['customer'];
+          : (User.userRole == 'admin' && widget.isDriver)
+              ? json.decode(response.body)['payload']['drivers']
+              : (User.userRole == 'employee')
+                  ? json.decode(response.body)['payload']['customer']
+                  : json.decode(response.body)['payload']['admin'];
       for (var employee in employees) {
         _employeeList.add(employee);
       }
@@ -53,10 +65,14 @@ class _ApproveUserState extends State<ApproveUser> {
   Future _approveUser({String id}) async {
     print('working');
     var response = await http.post(
-        User.userRole == 'admin'
+        User.userRole == 'admin' && !widget.isDriver
             ? "$baseUrl/admin/approveEmployee"
-            : "$baseUrl/employee/approveCustomer",
-        body: User.userRole == 'admin'
+            : (User.userRole == 'admin' && widget.isDriver)
+                ? "$baseUrl/admin/approveDriver"
+                : (User.userRole == 'employee')
+                    ? "$baseUrl/employee/approveCustomer"
+                    : "$baseUrl/superAdmin/approveAdmin",
+        body: User.userRole != 'employee'
             ? {"id": id}
             : {
                 "id": id,
@@ -78,13 +94,17 @@ class _ApproveUserState extends State<ApproveUser> {
     }
   }
 
-  Future _rejectEmployee({String id}) async {
+  Future _rejectUser({String id}) async {
     print('working');
     var response = await http.post(
-        User.userRole == 'admin'
+        User.userRole == 'admin' && !widget.isDriver
             ? "$baseUrl/admin/rejectEmployee"
-            : "$baseUrl/employee/rejectCustomer",
-        body: User.userRole == 'admin'
+            : (User.userRole == 'admin' && widget.isDriver)
+                ? "$baseUrl/admin/rejectDriver"
+                : (User.userRole == 'employee')
+                    ? "$baseUrl/employee/rejectCustomer"
+                    : "$baseUrl/superAdmin/rejectAdmin",
+        body: User.userRole != 'employee'
             ? {"id": id}
             : {
                 "id": id,
@@ -122,16 +142,6 @@ class _ApproveUserState extends State<ApproveUser> {
     }
   }
 
-  Future<bool> _checkExist({String role, String id}) async {
-    var response = await http.get('$baseUrl/getUserProfile/$role/$id');
-    print('$baseUrl/getUserProfile/$role/$id');
-    print(response.body);
-    if (response.body.isNotEmpty) {
-      return true;
-    } else
-      return false;
-  }
-
   @override
   void initState() {
     setState(() {
@@ -150,7 +160,13 @@ class _ApproveUserState extends State<ApproveUser> {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          User.userRole == 'admin' ? 'Approve Employees' : 'Approve Customers',
+          User.userRole == 'admin' && !widget.isDriver
+              ? 'Approve Employees'
+              : (User.userRole == 'admin' && widget.isDriver)
+                  ? "Approve Driver"
+                  : (User.userRole == 'employee')
+                      ? 'Approve Customers'
+                      : 'Approve Admins',
           style: TextStyle(color: teal2, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
@@ -177,14 +193,21 @@ class _ApproveUserState extends State<ApproveUser> {
                         padding: const EdgeInsets.all(8.0),
                         child: GestureDetector(
                           onTap: () async {
-//                            var res = await _checkExist(
-//                                role: _employeeList[index]['role'],
-//                                id: _employeeList[index]['_id']);
-//                            print('hereeeeeeeeeeeeeeeeee $res');
                             Navigator.push(
                                 context,
                                 PageTransition(
                                     child: RequestProfilePage(
+                                      carNumber: _employeeList[index]
+                                          ['carNumber'],
+                                      isDriver: widget.isDriver ? true : false,
+                                      instituteName: _employeeList[index]
+                                          ['instituteName'],
+                                      isActive: false,
+                                      exists: _employeeList[index]
+                                                  ['profilePicture'] ==
+                                              null
+                                          ? false
+                                          : true,
                                       id: _employeeList[index]['_id'],
                                       role: _employeeList[index]['role'],
                                       userName: _employeeList[index]
@@ -192,12 +215,17 @@ class _ApproveUserState extends State<ApproveUser> {
                                       aadharNumber: _employeeList[index]
                                               ['adharNumber']
                                           .toString(),
+                                      instituteType: _employeeList[index]
+                                          ['instituteType'],
                                       contactNumber: _employeeList[index]
                                               ['contactNumber']
                                           .toString(),
-                                      division: _employeeList[index]
-                                          ['division'],
-                                      grade: _employeeList[index]['grade'],
+                                      division: User.userRole != 'superAdmin'
+                                          ? _employeeList[index]['division']
+                                          : null,
+                                      grade: User.userRole != 'superAdmin'
+                                          ? _employeeList[index]['grade']
+                                          : null,
                                       emailID: _employeeList[index]['userID'],
 //                                  profilePicture: _employeeList[index]
 //                                      ['profilePicture'],
@@ -233,34 +261,95 @@ class _ApproveUserState extends State<ApproveUser> {
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold),
                                       ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'Division: ',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          Text(
-                                            _employeeList[index]['division'],
-                                            style: TextStyle(fontSize: 14),
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'Grade: ',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          Text(
-                                            _employeeList[index]['grade'],
-                                            style: TextStyle(fontSize: 14),
-                                          ),
-                                        ],
-                                      ),
+                                      User.userRole != 'superAdmin' &&
+                                              !widget.isDriver
+                                          ? Row(
+                                              children: [
+                                                Text(
+                                                  'Division: ',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  _employeeList[index]
+                                                      ['division'],
+                                                  style:
+                                                      TextStyle(fontSize: 14),
+                                                ),
+                                              ],
+                                            )
+                                          : Row(
+                                              children: [
+                                                Text(
+                                                  'Institute Name: ',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  _employeeList[index]
+                                                      ['instituteName'],
+                                                  style:
+                                                      TextStyle(fontSize: 14),
+                                                )
+                                              ],
+                                            ),
+                                      User.userRole != 'superAdmin' &&
+                                              !widget.isDriver
+                                          ? Row(
+                                              children: [
+                                                Text(
+                                                  'Grade: ',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  _employeeList[index]['grade'],
+                                                  style:
+                                                      TextStyle(fontSize: 14),
+                                                ),
+                                              ],
+                                            )
+                                          : !widget.isDriver
+                                              ? Row(
+                                                  children: [
+                                                    Text(
+                                                      'Institute Type: ',
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    Text(
+                                                      _employeeList[index]
+                                                          ['instituteType'],
+                                                      style: TextStyle(
+                                                          fontSize: 14),
+                                                    )
+                                                  ],
+                                                )
+                                              : Row(
+                                                  children: [
+                                                    Text(
+                                                      'Car Number: ',
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    Text(
+                                                      _employeeList[index]
+                                                          ['carNumber'],
+                                                      style: TextStyle(
+                                                          fontSize: 14),
+                                                    )
+                                                  ],
+                                                ),
                                     ],
                                   ),
                                   Row(
@@ -274,16 +363,27 @@ class _ApproveUserState extends State<ApproveUser> {
                                         ),
                                         onPressed: () {
                                           popDialog(
-                                              title: User.userRole == 'admin'
+                                              title: User.userRole == 'admin' &&
+                                                      !widget.isDriver
                                                   ? "Reject Employee"
-                                                  : "Reject Customer",
+                                                  : (User.userRole == 'admin' &&
+                                                          widget.isDriver)
+                                                      ? "Reject Driver"
+                                                      : (User
+                                                                  .userRole ==
+                                                              'employee')
+                                                          ? "Reject Customer"
+                                                          : "Reject Admin",
                                               content:
                                                   'Do you want to reject this registration?',
                                               context: context,
                                               buttonTitle: 'Reject',
                                               onPress: () {
-                                                _loading = true;
-                                                _rejectEmployee(
+                                                setState(() {
+                                                  _loading = true;
+                                                });
+
+                                                _rejectUser(
                                                     id: _employeeList[index]
                                                         ['_id']);
                                                 _sendNotification(
@@ -292,9 +392,17 @@ class _ApproveUserState extends State<ApproveUser> {
                                                         _employeeList[index]
                                                             ['fcmToken'],
                                                     message: User.userRole ==
-                                                            'admin'
+                                                                'admin' &&
+                                                            !widget.isDriver
                                                         ? "You have been rejected as an employee. Please login now"
-                                                        : "You have been rejected as a customer. Please contact admin");
+                                                        : (User.userRole ==
+                                                                    'admin' &&
+                                                                widget.isDriver)
+                                                            ? "You have been rejected as a driver. Please contact admin"
+                                                            : (User.userRole ==
+                                                                    'employee')
+                                                                ? "You have been rejected as a customer. Please contact admin"
+                                                                : "You have been rejected as an admin. Please contact superadmin");
                                                 Navigator.pop(context);
                                               });
                                         },
@@ -310,32 +418,46 @@ class _ApproveUserState extends State<ApproveUser> {
                                                 color: Colors.green)),
                                         onPressed: () {
                                           popDialog(
-                                              title: User.userRole == 'admin'
+                                              title: User.userRole == 'admin' &&
+                                                      !widget.isDriver
                                                   ? "Approve Employee"
-                                                  : "Approve Customer",
+                                                  : (User.userRole == 'admin' &&
+                                                          widget.isDriver)
+                                                      ? "Approve Driver"
+                                                      : (User
+                                                                  .userRole ==
+                                                              'employee')
+                                                          ? "Approve Customer"
+                                                          : "Approve Admin",
                                               content:
                                                   'Do you want to approve this registration?',
                                               context: context,
                                               buttonTitle: 'Approve',
                                               onPress: () {
-                                                _loading = true;
-                                                User.userRole == 'admin'
-                                                    ? _approveUser(
-                                                        id: _employeeList[index]
-                                                            ['_id'])
-                                                    : _approveUser(
-                                                        id: _employeeList[index]
-                                                            ['_id'],
-                                                      );
+                                                setState(() {
+                                                  _loading = true;
+                                                });
+                                                _approveUser(
+                                                  id: _employeeList[index]
+                                                      ['_id'],
+                                                );
                                                 _sendNotification(
                                                     fcmToken:
                                                         _employeeList[index]
                                                             ['fcmToken'],
                                                     title: "Request Approved",
                                                     message: User.userRole ==
-                                                            'admin'
+                                                                'admin' &&
+                                                            !widget.isDriver
                                                         ? "You have been approved as an employee. Please login now"
-                                                        : "You have been approved as a customer. Please contact admin");
+                                                        : (User.userRole ==
+                                                                    'admin' &&
+                                                                widget.isDriver)
+                                                            ? "You have been approved as a driver. Please login now"
+                                                            : (User.userRole ==
+                                                                    'employee')
+                                                                ? "You have been approved as a customer. Please login"
+                                                                : "You have been approved as an admin. Please login");
                                                 Navigator.pop(context);
                                               });
                                         },

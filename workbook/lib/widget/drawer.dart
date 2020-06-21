@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_image/network.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workbook/constants.dart';
 import 'package:page_transition/page_transition.dart';
 
 import 'package:workbook/screens/approve_user.dart';
-import 'package:workbook/screens/approved_users.dart';
+import 'package:workbook/screens/active_users.dart';
 import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/screens/login_page.dart';
 import 'package:workbook/screens/profile_page.dart';
@@ -18,22 +19,26 @@ Theme buildDrawer(BuildContext context) {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          DrawerHeader(
-            child: Center(
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.35,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: AssetImage(
-                      'images/company.jpg',
+          User.userRole != 'superAdmin'
+              ? DrawerHeader(
+                  child: Center(
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.35,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        image: DecorationImage(
+                          fit: BoxFit.fill,
+                          image: NetworkImageWithRetry(
+                            '$baseUrl/getInstituteProfile/${User.instituteName}',
+                          ),
+                        ),
+                      ),
                     ),
                   ),
+                )
+              : DrawerHeader(
+                  child: Container(),
                 ),
-              ),
-            ),
-          ),
           buildDrawerItem(
               icon: Icons.home,
               title: "Home",
@@ -44,26 +49,32 @@ Theme buildDrawer(BuildContext context) {
                         child: DashBoard(),
                         type: PageTransitionType.rightToLeft));
               }),
-          buildDrawerItem(
-              icon: Icons.account_circle,
-              title: "Profile",
-              onTap: () {
-                Navigator.push(
-                    context,
-                    PageTransition(
-                        child: ProfilePage(),
-                        type: PageTransitionType.rightToLeft));
-              }),
+          User.userRole != 'superAdmin'
+              ? buildDrawerItem(
+                  icon: Icons.account_circle,
+                  title: "Profile",
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        PageTransition(
+                            child: ProfilePage(),
+                            type: PageTransitionType.rightToLeft));
+                  })
+              : Container(),
           buildDrawerItem(
               icon: Icons.check,
               title: User.userRole == 'admin'
                   ? "Approve Employees"
-                  : 'Approve Customers',
+                  : (User.userRole == 'employee')
+                      ? 'Approve Customers'
+                      : 'Approve Admins',
               onTap: () {
                 Navigator.push(
                   context,
                   PageTransition(
-                      child: ApproveUser(),
+                      child: ApproveUser(
+                        isDriver: false,
+                      ),
                       type: PageTransitionType.rightToLeft),
                 );
               }),
@@ -71,14 +82,49 @@ Theme buildDrawer(BuildContext context) {
               icon: Icons.visibility,
               title: User.userRole == 'admin'
                   ? 'Active Employees'
-                  : "Active Customers",
+                  : (User.userRole == 'employee')
+                      ? "Active Customers"
+                      : "Active Admins",
               onTap: () {
                 Navigator.push(
                   context,
                   PageTransition(
-                      child: AllUsers(), type: PageTransitionType.rightToLeft),
+                      child: ActiveUsers(
+                        isDriver: false,
+                      ),
+                      type: PageTransitionType.rightToLeft),
                 );
               }),
+          User.userRole == 'admin'
+              ? buildDrawerItem(
+                  icon: Icons.check,
+                  title: 'Approve Drivers',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                          child: ApproveUser(
+                            isDriver: true,
+                          ),
+                          type: PageTransitionType.rightToLeft),
+                    );
+                  })
+              : Container(),
+          User.userRole == 'admin'
+              ? buildDrawerItem(
+                  icon: Icons.visibility,
+                  title: 'Active Drivers',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                          child: ActiveUsers(
+                            isDriver: true,
+                          ),
+                          type: PageTransitionType.rightToLeft),
+                    );
+                  })
+              : Container(),
           buildDrawerItem(
               icon: Icons.exit_to_app,
               title: 'Logout',
@@ -106,6 +152,8 @@ Theme buildDrawer(BuildContext context) {
                       prefs.remove('grade');
                       prefs.remove('division');
                       prefs.remove('contactNumber');
+                      prefs.remove('userPhotoData');
+
                       Navigator.pushAndRemoveUntil(
                           context,
                           PageTransition(

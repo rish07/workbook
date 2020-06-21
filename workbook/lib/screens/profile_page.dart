@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_image/network.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/user.dart';
@@ -67,6 +68,8 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    print(User.profilePicExists);
+
     print(User.userID);
     print(User.userPhotoData);
   }
@@ -82,39 +85,42 @@ class _ProfilePageState extends State<ProfilePage> {
             color: teal2,
           ),
           backgroundColor: Colors.transparent,
-          actions: [
-            _isEdit
-                ? Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                    child: MaterialButton(
-                        minWidth: 80,
-                        color: teal2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(32),
-                        ),
-                        child: Text(
-                          'Update',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        onPressed: () async {
-                          setState(() {
-                            _isLoading = true;
-                            _isEdit = false;
-                          });
-                          await _update();
-                        }),
-                  )
-                : IconButton(
-                    icon: Icon(
-                      Icons.edit,
-                      color: teal2,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _isEdit = !_isEdit;
-                      });
-                    })
-          ],
+          actions: User.userRole != 'superAdmin'
+              ? [
+                  _isEdit
+                      ? Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                          child: MaterialButton(
+                              minWidth: 80,
+                              color: teal2,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(32),
+                              ),
+                              child: Text(
+                                'Update',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              onPressed: () async {
+                                setState(() {
+                                  _isLoading = true;
+                                  _isEdit = false;
+                                });
+                                await _update();
+                              }),
+                        )
+                      : IconButton(
+                          icon: Icon(
+                            Icons.edit,
+                            color: teal2,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isEdit = !_isEdit;
+                            });
+                          })
+                ]
+              : null,
           elevation: 0,
         ),
         drawer: buildDrawer(context),
@@ -134,7 +140,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           tag: "profile",
                           child: CircleAvatar(
                             radius: 50,
-                            backgroundImage: User.userPhotoData == null
+                            backgroundImage: !User.profilePicExists
                                 ? AssetImage('images/userPhoto.jpg')
                                 : NetworkImage((User.userPhotoData)),
                           ),
@@ -161,36 +167,48 @@ class _ProfilePageState extends State<ProfilePage> {
                   label: 'Email ID',
                   value: User.userEmail ?? "-",
                 ),
-                buildFieldEntry(
-                  label: 'Institute Name',
-                  value: User.instituteName ?? "-",
-                ),
+                User.userRole != 'superAdmin'
+                    ? buildFieldEntry(
+                        label: 'Institute Name',
+                        value: User.instituteName ?? "-",
+                      )
+                    : Container(),
                 User.userRole == 'admin'
                     ? buildFieldEntry(
                         label: 'Institute Type',
                         value: User.userInstituteType ?? "-",
                       )
                     : Container(),
-                buildFieldEntry(
-                  label: 'State',
-                  value: User.state ?? "-",
-                ),
-                buildFieldEntry(
-                  label: 'City',
-                  value: User.city ?? "-",
-                ),
-                buildFieldEntry(
-                  label: 'Contact Number',
-                  value: User.contactNumber.toString() ?? "-",
-                ),
-                buildFieldEntry(
-                  label: 'Aadhar Number',
-                  value: User.aadharNumber.toString() ?? "-",
-                ),
-                buildFieldEntry(
-                  label: 'Mail Address',
-                  value: User.mailAddress ?? "-",
-                ),
+                User.userRole != 'superAdmin'
+                    ? buildFieldEntry(
+                        label: 'State',
+                        value: User.state ?? "-",
+                      )
+                    : Container(),
+                User.userRole != 'superAdmin'
+                    ? buildFieldEntry(
+                        label: 'City',
+                        value: User.city ?? "-",
+                      )
+                    : Container(),
+                User.userRole != 'superAdmin'
+                    ? buildFieldEntry(
+                        label: 'Contact Number',
+                        value: User.contactNumber.toString() ?? "-",
+                      )
+                    : Container(),
+                User.userRole != 'superAdmin'
+                    ? buildFieldEntry(
+                        label: 'Aadhar Number',
+                        value: User.aadharNumber.toString() ?? "-",
+                      )
+                    : Container(),
+                User.userRole != 'superAdmin'
+                    ? buildFieldEntry(
+                        label: 'Mail Address',
+                        value: User.mailAddress ?? "-",
+                      )
+                    : Container(),
               ],
             ),
           ),

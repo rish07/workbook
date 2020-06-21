@@ -1,6 +1,7 @@
 import 'package:workbook/constants.dart';
 
 class User {
+  static bool profilePicExists;
   static String userRole;
   static String userPhotoData;
   static String userID;

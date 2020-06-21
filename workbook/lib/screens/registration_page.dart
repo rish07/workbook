@@ -5,6 +5,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/coming_soon.dart';
+import 'package:workbook/screens/driver_form.dart';
 import 'package:workbook/screens/employee_cust_form.dart';
 import 'package:workbook/screens/admin_form.dart';
 import 'package:workbook/widget/signup.dart';
@@ -106,11 +107,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   registerButton(
                       role: 'Driver',
                       context: context,
-                      onPressed: () {
+                      onPressed: () async {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        await getInstitutes();
                         Navigator.push(
                           context,
                           PageTransition(
-                              child: ComingSoon(),
+                              child: DriverForm(),
                               type: PageTransitionType.rightToLeft),
                         );
                       }),

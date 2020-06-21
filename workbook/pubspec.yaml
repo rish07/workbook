@@ -37,7 +37,8 @@ dependencies:
   firebase_messaging: ^6.0.16
   flutter_local_notifications: ^1.4.4+1
   shared_preferences:
-
+  flutter_image:
+  basic_utils:
 
 
 dev_dependencies:

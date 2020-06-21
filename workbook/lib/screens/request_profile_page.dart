@@ -1,16 +1,26 @@
 import 'dart:convert';
+import 'package:basic_utils/basic_utils.dart';
+import 'package:flutter_image/network.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:workbook/constants.dart';
+import 'package:workbook/screens/active_users.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';
+import 'package:workbook/widget/registerButton.dart';
 
 class RequestProfilePage extends StatefulWidget {
+  final String carNumber;
+  final bool isDriver;
+  final String instituteName;
+  final String instituteType;
   final bool exists;
   final String id;
   final String role;
-  final String profilePicture;
+  final bool isActive;
   final String userName;
   final String emailID;
   final String grade;
@@ -27,77 +37,155 @@ class RequestProfilePage extends StatefulWidget {
       this.division,
       this.aadharNumber,
       this.contactNumber,
-      this.profilePicture,
       this.id,
-      this.exists})
+      this.exists,
+      this.isActive,
+      this.instituteName,
+      this.instituteType,
+      this.isDriver,
+      this.carNumber})
       : super(key: key);
   @override
   _RequestProfilePageState createState() => _RequestProfilePageState();
 }
 
 class _RequestProfilePageState extends State<RequestProfilePage> {
+  bool _loading = false;
+
+  Future _deleteUser() async {
+    print('working');
+    var response = await http.post(
+        '$baseUrl/${User.userRole}/delete${StringUtils.capitalize(widget.role)}',
+        body: {
+          "id": widget.id,
+        });
+
+    print('Response status: ${response.statusCode}');
+    print(response.body);
+    setState(() {
+      _loading = false;
+    });
+    if (response.statusCode == 200) {
+      print('Notification Sent');
+    } else {
+      throw Exception('Failed to load the employees');
+    }
+  }
+
+  String photoUrl;
   @override
   void initState() {
     // TODO: implement initState
-
+    setState(() {
+      photoUrl = "$baseUrl/getUserProfile/${widget.role}/${widget.id}";
+    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text('${widget.role.toUpperCase()} details'),
-        iconTheme: IconThemeData(
-          color: teal2,
+    return ModalProgressHUD(
+      inAsyncCall: _loading,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          title: Text('${widget.role.toUpperCase()} details'),
+          iconTheme: IconThemeData(
+            color: teal2,
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: Container(
-        padding: EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: Center(
-                  child: CircleAvatar(
-                    radius: 50,
-//                    backgroundImage: !widget.exists
-//                        ? AssetImage('images/userPhoto.jpg')
-//                        : NetworkImage(
-//                            ("$baseUrl/getUserProfile/${widget.role}/${widget.role}")),
-                    backgroundImage: AssetImage('images/userPhoto.jpg'),
+        body: Container(
+          padding: EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: Center(
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundImage: !widget.exists
+                          ? AssetImage('images/userPhoto.jpg')
+                          : NetworkImageWithRetry(
+                              ("https://app-workbook.herokuapp.com/getUserProfile/employee/5eeccd1737d07600172c6064")),
+                    ),
                   ),
                 ),
-              ),
-              buildFieldEntry(
-                label: 'Name',
-                value: widget.userName ?? "-",
-              ),
-              buildFieldEntry(
-                label: 'Email ID',
-                value: widget.emailID ?? "-",
-              ),
-              buildFieldEntry(
-                label: 'Grade',
-                value: widget.grade ?? "-",
-              ),
-              buildFieldEntry(
-                label: 'Division',
-                value: widget.division ?? "-",
-              ),
-              buildFieldEntry(
-                label: 'Contact Number',
-                value: widget.contactNumber.toString() ?? "-",
-              ),
-              buildFieldEntry(
-                label: 'Aadhar Number',
-                value: widget.aadharNumber.toString() ?? "-",
-              ),
-            ],
+                buildFieldEntry(
+                  label: 'Name',
+                  value: widget.userName ?? "-",
+                ),
+                buildFieldEntry(
+                  label: 'Email ID',
+                  value: widget.emailID ?? "-",
+                ),
+                buildFieldEntry(
+                  label: User.userRole != 'superAdmin' && !widget.isDriver
+                      ? 'Grade'
+                      : (User.userRole != 'superAdmin' && widget.isDriver)
+                          ? "Car Number"
+                          : 'Institute Name',
+                  value: User.userRole != 'superAdmin' && !widget.isDriver
+                      ? widget.grade ?? "-"
+                      : (User.userRole != 'superAdmin' && widget.isDriver)
+                          ? widget.carNumber ?? '-'
+                          : widget.instituteName ?? '-',
+                ),
+                User.userRole != 'superAdmin' && !widget.isDriver
+                    ? buildFieldEntry(
+                        label: User.userRole != 'superAdmin'
+                            ? 'Division'
+                            : 'Institute Type',
+                        value: User.userRole != 'superAdmin'
+                            ? widget.division ?? "-"
+                            : widget.instituteType ?? '-',
+                      )
+                    : Container(),
+                buildFieldEntry(
+                  label: 'Contact Number',
+                  value: widget.contactNumber.toString() ?? "-",
+                ),
+                buildFieldEntry(
+                  label: 'Aadhar Number',
+                  value: widget.aadharNumber.toString() ?? "-",
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.1,
+                ),
+                widget.isActive
+                    ? MaterialButton(
+                        padding: EdgeInsets.all(8),
+                        minWidth: 150,
+                        color: Colors.red,
+                        child: Text(
+                          'DELETE',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 18),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        onPressed: () async {
+                          setState(() {
+                            _loading = true;
+                          });
+                          await _deleteUser();
+                          Navigator.push(
+                              context,
+                              PageTransition(
+                                  child: ActiveUsers(
+                                    isDriver: widget.isDriver ? true : false,
+                                  ),
+                                  type: PageTransitionType.rightToLeft));
+                        },
+                      )
+                    : Container(),
+              ],
+            ),
           ),
         ),
       ),

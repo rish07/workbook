@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:auto_size_text/auto_size_text.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_image/network.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workbook/constants.dart';
@@ -41,6 +42,8 @@ class _DashBoardState extends State<DashBoard> {
       User.grade = prefs.getString('grade');
       User.division = prefs.getString('division');
       User.contactNumber = prefs.getInt('contactNumber');
+      User.userPhotoData = prefs.getString('userPhotoData');
+      User.profilePicExists = prefs.getBool('profilePicExists');
     });
   }
 
@@ -63,9 +66,9 @@ class _DashBoardState extends State<DashBoard> {
                 tag: "profile",
                 child: CircleAvatar(
                   radius: 23,
-                  backgroundImage: User.userPhotoData == null
+                  backgroundImage: !User.profilePicExists
                       ? AssetImage('images/userPhoto.jpg')
-                      : NetworkImage((User.userPhotoData)),
+                      : NetworkImageWithRetry((User.userPhotoData)),
                 ),
               ),
             ),
@@ -88,8 +91,9 @@ class _DashBoardState extends State<DashBoard> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 8.0, vertical: 64),
               child: AutoSizeText(
-//              'Welcome,\n${User.userName.split(" ")[0]}!',
-                'Welcome to ${User.instituteName},\n${User.userName?.split(" ")[0]}!',
+                User.userRole != "superAdmin"
+                    ? 'Welcome to ${User.instituteName},\n${User.userName?.split(" ")[0]}!'
+                    : "Welcome,\n${User.userName}",
                 maxLines: 2,
                 style: TextStyle(color: teal2, fontSize: 50),
               ),
