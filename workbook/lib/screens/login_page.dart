@@ -145,6 +145,7 @@ class _LoginPageState extends State<LoginPage> {
         User.userPhotoData =
             "$baseUrl/getUserProfile/${User.userRole}/${User.userID}";
         User.profilePicExists = tempo['profilePicture'] == null ? false : true;
+        User.carNumber = tempo['carNumber'] ?? null;
       });
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('userName', User.userName);
@@ -172,6 +173,26 @@ class _LoginPageState extends State<LoginPage> {
                 ? ComingSoon()
                 : DashBoard(),
             type: PageTransitionType.rightToLeft),
+      );
+    } else if (json.decode(response.body)['statusCode'] == 401) {
+      popDialog(
+        onPress: () {
+          Navigator.pop(context);
+        },
+        context: context,
+        title: 'Incorrect Password',
+        content: 'Please re-check your password and try again',
+        buttonTitle: 'Close',
+      );
+    } else if (json.decode(response.body)['statusCode'] == 500) {
+      popDialog(
+        onPress: () {
+          Navigator.pop(context);
+        },
+        context: context,
+        title: "User Not Found",
+        content: 'Please register first and try again.',
+        buttonTitle: 'Close',
       );
     } else {
       popDialog(

@@ -39,7 +39,7 @@ dependencies:
   shared_preferences:
   flutter_image:
   basic_utils:
-
+  dropdown_formfield:
 
 dev_dependencies:
   flutter_test:

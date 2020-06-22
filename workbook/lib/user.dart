@@ -6,6 +6,7 @@ class User {
   static String userPhotoData;
   static String userID;
   static String userName;
+  static String carNumber;
   static String userEmail;
   static String instituteName;
   static String userInstituteType;

@@ -1,13 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image/network.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:workbook/constants.dart';
+import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:workbook/widget/popUpDialog.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -51,7 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return res.reasonPhrase;
   }
 
-  Future _update() async {
+  Future _updatePhoto() async {
     print('update working');
     var res = await _updateImage(imagePath, '$baseUrl/uploadPicture');
     setState(() {
@@ -59,6 +63,68 @@ class _ProfilePageState extends State<ProfilePage> {
       _isLoading = false;
       print(res);
     });
+  }
+
+  Future _updateProfile() async {
+    print('working');
+    var response = await http.post('$baseUrl/${User.userRole}/update',
+        body: (User.userRole == 'admin')
+            ? {
+                "id": User.userID,
+                "userName": User.userName,
+                "instituteType": User.userInstituteType,
+                "state": User.state,
+                "city": User.city,
+                "mailAddress": User.mailAddress,
+                "adharNumber": User.aadharNumber,
+                "contactNumber": User.contactNumber,
+                "fcmToken": User.userFcmToken,
+              }
+            : (User.userRole == 'customer')
+                ? {
+                    "userName": User.userName,
+                    "state": User.state,
+                    "grade": User.grade,
+                    "division": User.division,
+                    "adharNumber": User.aadharNumber,
+                    "contactNumber": User.contactNumber,
+                    "fcmToken": User.userFcmToken
+                  }
+                : (User.userRole == 'driver')
+                    ? {
+                        "userName": User.userName,
+                        'carNumber': User.carNumber,
+                        "adharNumber": User.aadharNumber,
+                        "contactNumber": User.contactNumber,
+                        "fcmToken": User.userFcmToken,
+                      }
+                    : {
+                        "userName": User.userName,
+                        "grade": User.grade,
+                        "division": User.division,
+                        "adharNumber": User.aadharNumber,
+                        "contactNumber": User.contactNumber,
+                        "fcmToken": User.userFcmToken
+                      });
+    setState(() {
+      _isLoading = false;
+    });
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+    if (response.statusCode == 200) {
+      popDialog(
+          onPress: () {
+            Navigator.push(
+              context,
+              PageTransition(
+                  child: DashBoard(), type: PageTransitionType.rightToLeft),
+            );
+          },
+          title: 'Update Successful',
+          context: context,
+          buttonTitle: 'Close',
+          content: 'Your details have been updated');
+    }
   }
 
   String state = "";
@@ -102,11 +168,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                 style: TextStyle(color: Colors.white),
                               ),
                               onPressed: () async {
-                                setState(() {
-                                  _isLoading = true;
-                                  _isEdit = false;
-                                });
-                                await _update();
+                                if (_image != null) {
+                                  setState(() {
+                                    _isLoading = true;
+                                    _isEdit = false;
+                                  });
+
+                                  await _updatePhoto();
+                                }
                               }),
                         )
                       : IconButton(
@@ -179,18 +248,112 @@ class _ProfilePageState extends State<ProfilePage> {
                         value: User.userInstituteType ?? "-",
                       )
                     : Container(),
-                User.userRole != 'superAdmin'
-                    ? buildFieldEntry(
-                        label: 'State',
-                        value: User.state ?? "-",
+                (_isEdit
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              padding: EdgeInsets.only(
+                                  left:
+                                      MediaQuery.of(context).size.width * 0.04),
+                              child: Text(
+                                'State: ',
+                                style: TextStyle(fontSize: 20, color: teal2),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: DropdownButtonFormField(
+                              hint: Text(
+                                'Select State',
+                                style: TextStyle(color: teal1, fontSize: 18),
+                              ),
+                              decoration: InputDecoration(
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.white70),
+                                ),
+                              ),
+                              items: cities[User.state].map((location) {
+                                return DropdownMenuItem(
+                                  child: AutoSizeText(
+                                    location,
+                                    maxLines: 1,
+                                  ),
+                                  value: location,
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  User.state = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
                       )
-                    : Container(),
-                User.userRole != 'superAdmin'
-                    ? buildFieldEntry(
-                        label: 'City',
-                        value: User.city ?? "-",
+                    : (User.userRole != 'superAdmin')
+                        ? buildFieldEntry(
+                            label: 'State',
+                            value: User.state ?? "-",
+                          )
+                        : Container()),
+                (_isEdit
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              padding: EdgeInsets.only(
+                                  left:
+                                      MediaQuery.of(context).size.width * 0.04),
+                              child: Text(
+                                'City: ',
+                                style: TextStyle(fontSize: 20, color: teal2),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: DropdownButtonFormField(
+                              hint: Text(
+                                'Select City',
+                                style: TextStyle(color: teal1, fontSize: 18),
+                              ),
+                              decoration: InputDecoration(
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.white70),
+                                ),
+                              ),
+                              items: cities[User.state].map((location) {
+                                return DropdownMenuItem(
+                                  child: AutoSizeText(
+                                    location,
+                                    maxLines: 1,
+                                  ),
+                                  value: location,
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  User.city = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
                       )
-                    : Container(),
+                    : (User.userRole != 'superAdmin')
+                        ? buildFieldEntry(
+                            label: 'City',
+                            value: User.city ?? "-",
+                          )
+                        : Container()),
                 User.userRole != 'superAdmin'
                     ? buildFieldEntry(
                         label: 'Contact Number',
@@ -217,7 +380,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Padding buildFieldEntry({String label, String value}) {
+  Padding buildFieldEntry({String label, String value, Function onSaved}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
       child: Row(
@@ -236,6 +399,7 @@ class _ProfilePageState extends State<ProfilePage> {
             flex: 2,
             child: Container(
               child: TextFormField(
+                onSaved: onSaved,
                 textInputAction: TextInputAction.next,
                 style: TextStyle(color: teal1),
                 decoration: InputDecoration(

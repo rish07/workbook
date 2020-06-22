@@ -29,6 +29,7 @@ class _AdminFormState extends State<AdminForm> {
   String _selectedStateLocation;
   String _selectedCityLocation;
   String _selectedInstitutionType;
+  bool _validateCityName = false;
   bool _validateName = false;
   bool _validateEmail = false;
   bool _validatePassword = false;
@@ -43,6 +44,7 @@ class _AdminFormState extends State<AdminForm> {
   bool _validateInstituteType = false;
   String imagePath;
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _cityNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordReController = TextEditingController();
@@ -63,7 +65,9 @@ class _AdminFormState extends State<AdminForm> {
     request.fields['instituteType'] = _selectedInstitutionType;
     request.fields['numberOfMembers'] = _organizationNumberController.text;
     request.fields['state'] = _selectedStateLocation;
-    request.fields['city'] = _selectedCityLocation;
+    request.fields['city'] = _selectedCityLocation == 'Others'
+        ? _cityNameController.text
+        : _selectedCityLocation;
     request.fields['mailAddress'] = _mailController.text;
     request.fields['adharNumber'] = _aadharController.text;
     request.fields['contactNumber'] = _phoneController.text;
@@ -378,6 +382,14 @@ class _AdminFormState extends State<AdminForm> {
                     }).toList(),
                   ),
                 ),
+                _selectedCityLocation == 'Others'
+                    ? InputField(
+                        validate: _validateCityName,
+                        controller: _cityNameController,
+                        errorText: 'Please enter your city name',
+                        labelText: 'City Name',
+                      )
+                    : Container(),
                 InputField(
                   validate: _validateMail,
                   maxLines: 5,
@@ -411,6 +423,11 @@ class _AdminFormState extends State<AdminForm> {
                           _nameController.text.isEmpty
                               ? _validateName = true
                               : _validateName = false;
+                          _selectedCityLocation == 'Others'
+                              ? _cityNameController.text.isEmpty
+                                  ? _validateCityName = true
+                                  : _validateCityName = false
+                              : Container();
                           (_emailController.text.isEmpty ||
                                   !validator.email(_emailController.text))
                               ? _validateEmail = true
@@ -464,17 +481,20 @@ class _AdminFormState extends State<AdminForm> {
                           }
                         });
                         if (!_validateName &&
-                            !_validateEmail &&
-                            !_validatePhoneNumber &&
-                            !_validateNumberOrganization &&
-                            !_validateMail &&
-                            !_validateCity &&
-                            !_validateState &&
-                            !_validateAadhar &&
-                            !_validateOrganization &&
-                            !_validatePassword &&
-                            !_validateRePassword &&
-                            _image != null) {
+                                !_validateEmail &&
+                                !_validatePhoneNumber &&
+                                !_validateNumberOrganization &&
+                                !_validateMail &&
+                                _selectedCityLocation == 'Other'
+                            ? _validateCityName
+                            : true &&
+                                !_validateCity &&
+                                !_validateState &&
+                                !_validateAadhar &&
+                                !_validateOrganization &&
+                                !_validatePassword &&
+                                !_validateRePassword &&
+                                _image != null) {
                           setState(() {
                             _isLoading = true;
                           });
@@ -486,6 +506,7 @@ class _AdminFormState extends State<AdminForm> {
                           _passwordController.clear();
                           _passwordReController.clear();
                           _organizationController.clear();
+                          _cityNameController.clear();
                           _selectedCityLocation = null;
                           _selectedStateLocation = null;
                           _organizationNumberController.clear();
