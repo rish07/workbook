@@ -77,10 +77,8 @@ Theme buildDrawer(BuildContext context) {
           buildDrawerItem(
               icon: Icons.person,
               title: User.userRole == 'admin'
-                  ? "Approve Employees"
-                  : (User.userRole == 'employee')
-                      ? 'Approve Customers'
-                      : 'Approve Admins',
+                  ? "Employees"
+                  : (User.userRole == 'employee') ? 'Customers' : 'Admins',
               onTap: () {
                 Navigator.push(
                   context,
