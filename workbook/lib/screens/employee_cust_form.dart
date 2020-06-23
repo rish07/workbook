@@ -12,6 +12,7 @@ import 'package:workbook/widget/password.dart';
 import 'package:workbook/widget/popUpDialog.dart';
 import 'package:workbook/widget/registerButton.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class EmployeeCustomerForm extends StatefulWidget {
   final bool isEmployee;
@@ -80,6 +81,32 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
           content:
               'Your form has been submitted. Please wait for 24 hours for it to get approved');
     }
+  }
+
+  Future getGrades({String instituteName}) async {
+    var response = await http.get("$baseUrl/fetchGrade/$instituteName");
+    print('Response status: ${response.statusCode}');
+    List temp = json.decode(response.body)['payload']['grades'];
+    temp.forEach((resp) {
+      grades.add(resp);
+    });
+    grades = Set.of(grades).toList();
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future getDivision({String instituteName}) async {
+    var response = await http.get("$baseUrl/fetchDivision/$instituteName");
+    print('Response status: ${response.statusCode}');
+    List temp = json.decode(response.body)['payload']['divisions'];
+    temp.forEach((resp) {
+      divisions.add(resp);
+    });
+    divisions = Set.of(divisions).toList();
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -182,10 +209,13 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                       style: TextStyle(color: Colors.white70),
                     ),
                     value: _selectedInstitution,
-                    onChanged: (newValue) {
+                    onChanged: (newValue) async {
                       setState(() {
+                        _isLoading = true;
                         _selectedInstitution = newValue;
                       });
+                      await getGrades(instituteName: newValue);
+                      await getDivision(instituteName: newValue);
                     },
                     items: institutes.map((type) {
                       return DropdownMenuItem(
