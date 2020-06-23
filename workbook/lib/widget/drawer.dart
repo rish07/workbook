@@ -3,6 +3,7 @@ import 'package:flutter_image/network.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workbook/constants.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:workbook/screens/add_GD.dart';
 
 import 'package:workbook/screens/approve_user.dart';
 import 'package:workbook/screens/active_users.dart';
@@ -58,6 +59,18 @@ Theme buildDrawer(BuildContext context) {
                         context,
                         PageTransition(
                             child: ProfilePage(),
+                            type: PageTransitionType.rightToLeft));
+                  })
+              : Container(),
+          User.userRole == 'admin'
+              ? buildDrawerItem(
+                  icon: Icons.arrow_downward,
+                  title: 'Grades and Divisions',
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        PageTransition(
+                            child: AddGD(),
                             type: PageTransitionType.rightToLeft));
                   })
               : Container(),
