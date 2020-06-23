@@ -75,7 +75,7 @@ Theme buildDrawer(BuildContext context) {
                   })
               : Container(),
           buildDrawerItem(
-              icon: Icons.check,
+              icon: Icons.person,
               title: User.userRole == 'admin'
                   ? "Approve Employees"
                   : (User.userRole == 'employee')
@@ -91,47 +91,15 @@ Theme buildDrawer(BuildContext context) {
                       type: PageTransitionType.rightToLeft),
                 );
               }),
-          buildDrawerItem(
-              icon: Icons.visibility,
-              title: User.userRole == 'admin'
-                  ? 'Active Employees'
-                  : (User.userRole == 'employee')
-                      ? "Active Customers"
-                      : "Active Admins",
-              onTap: () {
-                Navigator.push(
-                  context,
-                  PageTransition(
-                      child: ActiveUsers(
-                        isDriver: false,
-                      ),
-                      type: PageTransitionType.rightToLeft),
-                );
-              }),
           User.userRole == 'admin'
               ? buildDrawerItem(
-                  icon: Icons.check,
-                  title: 'Approve Drivers',
+                  icon: Icons.directions_car,
+                  title: 'Drivers',
                   onTap: () {
                     Navigator.push(
                       context,
                       PageTransition(
                           child: ApproveUser(
-                            isDriver: true,
-                          ),
-                          type: PageTransitionType.rightToLeft),
-                    );
-                  })
-              : Container(),
-          User.userRole == 'admin'
-              ? buildDrawerItem(
-                  icon: Icons.visibility,
-                  title: 'Active Drivers',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      PageTransition(
-                          child: ActiveUsers(
                             isDriver: true,
                           ),
                           type: PageTransitionType.rightToLeft),

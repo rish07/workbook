@@ -7,6 +7,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 
 import 'package:workbook/constants.dart';
+import 'package:workbook/screens/active_users.dart';
 import 'package:workbook/screens/request_profile_page.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';
@@ -173,6 +174,40 @@ class _ApproveUserState extends State<ApproveUser> {
         iconTheme: IconThemeData(color: teal2),
       ),
       drawer: buildDrawer(context),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: teal2,
+          onPressed: () {
+            Navigator.push(
+              context,
+              PageTransition(
+                  child: !widget.isDriver
+                      ? ActiveUsers(
+                          isDriver: false,
+                        )
+                      : ActiveUsers(
+                          isDriver: true,
+                        ),
+                  type: PageTransitionType.rightToLeft),
+            );
+          },
+          label: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: Icon(Icons.visibility),
+              ),
+              Text(
+                User.userRole == 'admin' && !widget.isDriver
+                    ? 'Active Employees'
+                    : (User.userRole == 'admin' && widget.isDriver)
+                        ? "Active Drivers"
+                        : (User.userRole == 'employee')
+                            ? 'Active Customers'
+                            : 'Active Admins',
+              ),
+            ],
+          )),
       body: ModalProgressHUD(
         progressIndicator: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(teal2),

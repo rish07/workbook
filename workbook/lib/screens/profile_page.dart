@@ -67,6 +67,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future _updateProfile() async {
     print('working');
+    print(User.userRole);
     var response = await http.post('$baseUrl/${User.userRole}/update',
         body: (User.userRole == 'admin')
             ? {
@@ -76,8 +77,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 "state": User.state,
                 "city": User.city,
                 "mailAddress": User.mailAddress,
-                "adharNumber": User.aadharNumber,
-                "contactNumber": User.contactNumber,
+                "adharNumber": User.aadharNumber.toString(),
+                "contactNumber": User.contactNumber.toString(),
                 "fcmToken": User.userFcmToken,
               }
             : (User.userRole == 'customer')
@@ -86,24 +87,24 @@ class _ProfilePageState extends State<ProfilePage> {
                     "state": User.state,
                     "grade": User.grade,
                     "division": User.division,
-                    "adharNumber": User.aadharNumber,
-                    "contactNumber": User.contactNumber,
+                    "adharNumber": User.aadharNumber.toString(),
+                    "contactNumber": User.contactNumber.toString(),
                     "fcmToken": User.userFcmToken
                   }
                 : (User.userRole == 'driver')
                     ? {
                         "userName": User.userName,
                         'carNumber': User.carNumber,
-                        "adharNumber": User.aadharNumber,
-                        "contactNumber": User.contactNumber,
+                        "adharNumber": User.aadharNumber.toString(),
+                        "contactNumber": User.contactNumber.toString(),
                         "fcmToken": User.userFcmToken,
                       }
                     : {
                         "userName": User.userName,
                         "grade": User.grade,
                         "division": User.division,
-                        "adharNumber": User.aadharNumber,
-                        "contactNumber": User.contactNumber,
+                        "adharNumber": User.aadharNumber.toString(),
+                        "contactNumber": User.contactNumber.toString(),
                         "fcmToken": User.userFcmToken
                       });
     setState(() {
@@ -168,14 +169,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                 style: TextStyle(color: Colors.white),
                               ),
                               onPressed: () async {
+                                setState(() {
+                                  _isLoading = true;
+                                  _isEdit = false;
+                                });
                                 if (_image != null) {
-                                  setState(() {
-                                    _isLoading = true;
-                                    _isEdit = false;
-                                  });
-
                                   await _updatePhoto();
                                 }
+                                await _updateProfile();
                               }),
                         )
                       : IconButton(

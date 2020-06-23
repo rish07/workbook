@@ -42,8 +42,6 @@ class _AddGDState extends State<AddGD> {
     grades.forEach((gra) {
       toBeUploadedGrade.add({"grade": gra});
     });
-    print(toBeUploadedGrade);
-    print(tobeUploadedDivision);
 
     var data = {
       "instituteName": User.instituteName,
