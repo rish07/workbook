@@ -8,6 +8,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/add_GD.dart';
+import 'package:workbook/screens/add_post.dart';
 import 'package:workbook/screens/approve_user.dart';
 import 'package:workbook/screens/login_page.dart';
 import 'package:workbook/screens/profile_page.dart';
@@ -116,7 +117,15 @@ class _DashBoardState extends State<DashBoard> {
         child: User.userRole == 'superAdmin'
             ? Icon(Icons.add)
             : Icon(Icons.refresh),
-        onPressed: User.userRole == 'superAdmin' ? () {} : () {},
+        onPressed: User.userRole == 'superAdmin'
+            ? () {
+                Navigator.push(
+                  context,
+                  PageTransition(
+                      child: AddPost(), type: PageTransitionType.downToUp),
+                );
+              }
+            : () {},
       ),
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),
