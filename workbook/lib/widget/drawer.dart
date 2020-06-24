@@ -38,7 +38,9 @@ Theme buildDrawer(BuildContext context) {
                   ),
                 )
               : DrawerHeader(
-                  child: Container(),
+                  child: Container(
+                    height: 0,
+                  ),
                 ),
           buildDrawerItem(
               icon: Icons.home,
