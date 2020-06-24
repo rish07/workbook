@@ -41,6 +41,7 @@ dependencies:
   basic_utils:
   dropdown_formfield:
   fluttertoast:
+  animated_text_kit:
 
 dev_dependencies:
   flutter_test:

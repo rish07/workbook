@@ -1,9 +1,12 @@
 import 'dart:convert';
 
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_image/network.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workbook/constants.dart';
@@ -22,6 +25,7 @@ class DashBoard extends StatefulWidget {
 }
 
 class _DashBoardState extends State<DashBoard> {
+  bool _isLoading = false;
   @override
   void initState() {
     _setData();
@@ -54,97 +58,263 @@ class _DashBoardState extends State<DashBoard> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Feed',
-          style: TextStyle(
-              color: teal2, fontSize: 30, fontWeight: FontWeight.bold),
-        ),
-        automaticallyImplyLeading: false,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    PageTransition(
-                        child: ProfilePage(),
-                        type: PageTransitionType.rightToLeft));
-              },
-              child: Hero(
-                tag: "profile",
-                child: CircleAvatar(
-                  radius: 23,
-                  backgroundImage: !User.profilePicExists
-                      ? AssetImage('images/userPhoto.jpg')
-                      : NetworkImageWithRetry((User.userPhotoData)),
+    return ModalProgressHUD(
+      progressIndicator: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(teal2),
+        backgroundColor: Colors.transparent,
+      ),
+      inAsyncCall: _isLoading,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Feed',
+            style: TextStyle(
+                color: teal2, fontSize: 30, fontWeight: FontWeight.bold),
+          ),
+          automaticallyImplyLeading: false,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      PageTransition(
+                          child: ProfilePage(),
+                          type: PageTransitionType.rightToLeft));
+                },
+                child: Hero(
+                  tag: "profile",
+                  child: CircleAvatar(
+                    radius: 23,
+                    backgroundImage: !User.profilePicExists
+                        ? AssetImage('images/userPhoto.jpg')
+                        : NetworkImageWithRetry((User.userPhotoData)),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        iconTheme: IconThemeData(color: teal2),
-      ),
-      body: Container(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.3,
-            ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 64),
-              child: AutoSizeText(
-                User.userRole != "superAdmin"
-                    ? 'Welcome to ${User.instituteName},\n${User.userName?.split(" ")[0]}!'
-                    : "Welcome,\n${User.userName}",
-                maxLines: 2,
-                style: TextStyle(color: teal2, fontSize: 50),
-              ),
-            ),
           ],
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          iconTheme: IconThemeData(color: teal2),
         ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: teal2,
-        child: User.userRole == 'superAdmin'
-            ? Icon(Icons.add)
-            : Icon(Icons.refresh),
-        onPressed: User.userRole == 'superAdmin'
-            ? () {
-                Navigator.push(
-                  context,
-                  PageTransition(
-                      child: AddPost(), type: PageTransitionType.downToUp),
-                );
-              }
-            : () {},
-      ),
-      bottomNavigationBar: BottomAppBar(
-        shape: CircularNotchedRectangle(),
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-                icon: Icon(Icons.menu),
-                onPressed: () {
-                  return showModalBottomSheet<Null>(
-                    backgroundColor: Colors.transparent,
-                    context: context,
-                    builder: (BuildContext context) =>
-                        openBottomDrawer(context),
+        body: Container(
+          padding: EdgeInsets.all(16),
+          child: _isLoading
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.2,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 64),
+                      child: AutoSizeText(
+                        User.userRole != "superAdmin"
+                            ? 'Welcome to ${User.instituteName},\n${User.userName?.split(" ")[0]}!'
+                            : "Welcome,\n${User.userName}",
+                        maxLines: 2,
+                        style: TextStyle(color: teal2, fontSize: 50),
+                      ),
+                    ),
+                    TyperAnimatedTextKit(
+                      speed: Duration(seconds: 3),
+                      text: ['Loading...'],
+                      textStyle: TextStyle(fontSize: 25, color: teal1),
+                      onFinished: () {
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      },
+                    ),
+                  ],
+                )
+              : ListView(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        elevation: 10,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(8),
+                                child: Image.network(
+                                    'https://media.sproutsocial.com/uploads/2017/05/Social-Media-Character-Counter-Feature.png'),
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(8),
+                                child: Text(
+                                  'LCum xiphias messis, omnes contencioes talem camerarius, gratis capioes LCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioes',
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 10),
+                                    child: Row(
+                                      children: [
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.thumb_up,
+                                            color: teal2,
+                                          ),
+                                          onPressed: () {},
+                                        ),
+                                        Text('24'),
+                                      ],
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.show_chart,
+                                        color: teal2,
+                                      ),
+                                      Text(
+                                        '224',
+                                        style: TextStyle(color: teal1),
+                                      )
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 8.0),
+                                    child: IconButton(
+                                        icon: Icon(
+                                          Icons.share,
+                                          color: teal2,
+                                        ),
+                                        onPressed: () {}),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        elevation: 10,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(8),
+                                child: Image.network(
+                                    "https://images.newindianexpress.com/uploads/user/imagelibrary/2019/3/7/w900X450/Take_in_the_Scenery.jpg"),
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(8),
+                                child: Text(
+                                  'LCum xiphias messis, omnes contencioes talem camerarius, gratis capioes LCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioes',
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 10),
+                                    child: Row(
+                                      children: [
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.thumb_up,
+                                            color: teal2,
+                                          ),
+                                          onPressed: () {},
+                                        ),
+                                        Text('24'),
+                                      ],
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.show_chart,
+                                        color: teal2,
+                                      ),
+                                      Text(
+                                        '224',
+                                        style: TextStyle(color: teal1),
+                                      )
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 8.0),
+                                    child: IconButton(
+                                        icon: Icon(
+                                          Icons.share,
+                                          color: teal2,
+                                        ),
+                                        onPressed: () {}),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: teal2,
+          child: User.userRole == 'superAdmin'
+              ? Icon(Icons.add)
+              : Icon(Icons.refresh),
+          onPressed: User.userRole == 'superAdmin'
+              ? () {
+                  Navigator.push(
+                    context,
+                    PageTransition(
+                        child: AddPost(), type: PageTransitionType.downToUp),
                   );
-                }),
-            IconButton(icon: Icon(Icons.search), onPressed: () {}),
-          ],
+                }
+              : () {},
+        ),
+        bottomNavigationBar: BottomAppBar(
+          shape: CircularNotchedRectangle(),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                  icon: Icon(Icons.menu),
+                  onPressed: () {
+                    return showModalBottomSheet<Null>(
+                      backgroundColor: Colors.transparent,
+                      context: context,
+                      builder: (BuildContext context) =>
+                          openBottomDrawer(context),
+                    );
+                  }),
+              IconButton(icon: Icon(Icons.search), onPressed: () {}),
+            ],
+          ),
         ),
       ),
     );
@@ -175,8 +345,7 @@ Widget openBottomDrawer(BuildContext context) {
                     Navigator.push(
                         context,
                         PageTransition(
-                            child: DashBoard(),
-                            type: PageTransitionType.rightToLeft));
+                            child: DashBoard(), type: PageTransitionType.fade));
                   }),
               User.userRole != 'superAdmin'
                   ? buildDrawerItemDashboard(
@@ -187,7 +356,7 @@ Widget openBottomDrawer(BuildContext context) {
                             context,
                             PageTransition(
                                 child: ProfilePage(),
-                                type: PageTransitionType.rightToLeft));
+                                type: PageTransitionType.fade));
                       })
                   : Container(),
               User.userRole == 'admin'
@@ -198,8 +367,7 @@ Widget openBottomDrawer(BuildContext context) {
                         Navigator.push(
                             context,
                             PageTransition(
-                                child: AddGD(),
-                                type: PageTransitionType.rightToLeft));
+                                child: AddGD(), type: PageTransitionType.fade));
                       })
                   : Container(),
               buildDrawerItemDashboard(
@@ -214,7 +382,7 @@ Widget openBottomDrawer(BuildContext context) {
                           child: ApproveUser(
                             isDriver: false,
                           ),
-                          type: PageTransitionType.rightToLeft),
+                          type: PageTransitionType.fade),
                     );
                   }),
               User.userRole == 'admin'
@@ -228,7 +396,7 @@ Widget openBottomDrawer(BuildContext context) {
                               child: ApproveUser(
                                 isDriver: true,
                               ),
-                              type: PageTransitionType.rightToLeft),
+                              type: PageTransitionType.fade),
                         );
                       })
                   : Container(),
@@ -265,7 +433,7 @@ Widget openBottomDrawer(BuildContext context) {
                               context,
                               PageTransition(
                                   child: LoginPage(),
-                                  type: PageTransitionType.rightToLeft),
+                                  type: PageTransitionType.fade),
                               (route) => false);
                         });
                   })
