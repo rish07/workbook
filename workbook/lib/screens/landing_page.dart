@@ -8,6 +8,9 @@ import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/screens/login_page.dart';
 
 class LandingPage extends StatefulWidget {
+  final TargetPlatform platform;
+
+  const LandingPage({Key key, this.platform}) : super(key: key);
   @override
   _LandingPageState createState() => _LandingPageState();
 }
@@ -22,7 +25,12 @@ class _LandingPageState extends State<LandingPage> {
     Navigator.push(
         context,
         PageTransition(
-            child: email == null ? LoginPage() : DashBoard(), type: null));
+            child: email == null
+                ? LoginPage()
+                : DashBoard(
+                    platform: widget.platform,
+                  ),
+            type: null));
   }
 
   @override

@@ -10,12 +10,15 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final platform = Theme.of(context).platform;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Montserrat',
       ),
-      home: LandingPage(),
+      home: LandingPage(
+        platform: platform,
+      ),
     );
   }
 }
