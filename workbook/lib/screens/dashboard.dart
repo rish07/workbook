@@ -2,10 +2,12 @@ import 'dart:convert';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:basic_utils/basic_utils.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_image/network.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,6 +20,7 @@ import 'package:workbook/screens/profile_page.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';
 import 'package:workbook/widget/popUpDialog.dart';
+import 'package:http/http.dart' as http;
 
 class DashBoard extends StatefulWidget {
   @override
@@ -26,9 +29,11 @@ class DashBoard extends StatefulWidget {
 
 class _DashBoardState extends State<DashBoard> {
   bool _isLoading = false;
+  List posts = [];
   @override
   void initState() {
     _setData();
+    _getAllPosts();
     // TODO: implement initState
     super.initState();
   }
@@ -53,6 +58,37 @@ class _DashBoardState extends State<DashBoard> {
       User.contactNumber = prefs.getInt('contactNumber');
       User.userPhotoData = prefs.getString('userPhotoData');
       User.profilePicExists = prefs.getBool('profilePicExists');
+    });
+  }
+
+  Future _getAllPosts() async {
+    var response = await http.get('$baseUrl/post/viewAllPost');
+    print(response.statusCode);
+    print(response.body);
+    setState(() {
+      posts = json.decode(response.body)['payload']['post'];
+      posts = posts.reversed.toList();
+    });
+  }
+
+  Future _likePost({String postId, String userName}) async {
+    var response = await http.post("$baseUrl/post/like", body: {
+      "id": postId,
+      "userName": User.userName,
+      "userID": User.userEmail
+    });
+    print(json.decode(response.body)['statusCode']);
+    print(response.body);
+  }
+
+  Future<bool> isLiked(List likedBy) {
+    print('wokring');
+    likedBy.forEach((element) {
+      if (element['userID'] == User.userEmail) {
+        return Future<bool>.value(true);
+      } else {
+        return Future<bool>.value(false);
+      }
     });
   }
 
@@ -101,7 +137,7 @@ class _DashBoardState extends State<DashBoard> {
         ),
         body: Container(
           padding: EdgeInsets.all(16),
-          child: _isLoading
+          child: _isLoading || posts.isEmpty
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -119,165 +155,280 @@ class _DashBoardState extends State<DashBoard> {
                         style: TextStyle(color: teal2, fontSize: 50),
                       ),
                     ),
-                    TyperAnimatedTextKit(
-                      speed: Duration(seconds: 3),
-                      text: ['Loading...'],
-                      textStyle: TextStyle(fontSize: 25, color: teal1),
-                      onFinished: () {
-                        setState(() {
-                          _isLoading = false;
-                        });
-                      },
-                    ),
+                    posts.isEmpty
+                        ? Text('No Posts')
+                        : TyperAnimatedTextKit(
+                            speed: Duration(milliseconds: 200),
+                            text: ['Loading...'],
+                            textStyle: TextStyle(fontSize: 25, color: teal1),
+                            onFinished: () {
+                              setState(() {
+                                _isLoading = false;
+                              });
+                            },
+                          ),
                   ],
                 )
-              : ListView(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        elevation: 10,
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(8),
-                                child: Image.network(
-                                    'https://media.sproutsocial.com/uploads/2017/05/Social-Media-Character-Counter-Feature.png'),
-                              ),
-                              Container(
-                                padding: EdgeInsets.all(8),
-                                child: Text(
-                                  'LCum xiphias messis, omnes contencioes talem camerarius, gratis capioes LCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioes',
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 10),
-                                    child: Row(
+              : ListView.builder(
+                  itemCount: posts.length,
+                  itemBuilder: ((context, index) {
+                    isLiked(posts[index]['likedBy']);
+                    return (posts[index]['enabled'] == true ||
+                            User.userRole == 'superAdmin')
+                        ? Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16.0),
+                            child: Stack(
+                              children: [
+                                Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  elevation: 10,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
                                       children: [
-                                        IconButton(
-                                          icon: Icon(
-                                            Icons.thumb_up,
-                                            color: teal2,
+                                        (posts[index]['mediaUrl'] != "null" &&
+                                                posts[index]['mediaType'] ==
+                                                    'image')
+                                            ? Container(
+                                                padding: EdgeInsets.all(8),
+                                                child: Image.network(
+                                                    posts[index]['mediaUrl']),
+                                              )
+                                            : (posts[index]['mediaUrl'] !=
+                                                        "null" &&
+                                                    posts[index]['mediaType'] ==
+                                                        'pdf')
+                                                ? Container()
+                                                : Container(),
+                                        Container(
+                                          padding: EdgeInsets.all(8),
+                                          child: Text(
+                                            posts[index]['content'],
+                                            style: TextStyle(fontSize: 14),
+                                            textAlign: TextAlign.left,
                                           ),
-                                          onPressed: () {},
                                         ),
-                                        Text('24'),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 8, vertical: 10),
+                                              child: Row(
+                                                children: [
+                                                  IconButton(
+                                                      icon: Icon(
+                                                        Icons.favorite,
+                                                        color: teal2,
+                                                      ),
+                                                      onPressed: () async {
+//                                                      if(){}
+//                                                    else {
+                                                        await _likePost(
+                                                            postId: posts[index]
+                                                                ['_id'],
+                                                            userName:
+                                                                User.userName);
+                                                        await _getAllPosts();
+                                                        setState(() {});
+                                                      }
+//                                                    },
+                                                      ),
+                                                  Text(
+                                                    posts[index]['likes']
+                                                        .toString(),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.show_chart,
+                                                  color: teal2,
+                                                ),
+                                                Text(
+                                                  '224',
+                                                  style:
+                                                      TextStyle(color: teal1),
+                                                )
+                                              ],
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 8.0),
+                                              child: IconButton(
+                                                  icon: Icon(
+                                                    Icons.share,
+                                                    color: teal2,
+                                                  ),
+                                                  onPressed: () {}),
+                                            ),
+                                          ],
+                                        ),
+                                        posts[index]['commentEnabled']
+                                            ? Container(
+                                                height: posts[index]['comments']
+                                                            .length !=
+                                                        0
+                                                    ? 200
+                                                    : 20,
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.8,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment
+                                                          .stretch,
+                                                  children: [
+                                                    Text(posts[index]
+                                                                    ['comments']
+                                                                .length !=
+                                                            0
+                                                        ? 'Comments'
+                                                        : 'No Comments'),
+                                                    posts[index]['comments']
+                                                                .length !=
+                                                            0
+                                                        ? Container(
+                                                            height: 180,
+                                                            child: ListView
+                                                                .builder(
+                                                              shrinkWrap: true,
+                                                              itemCount: posts[
+                                                                          index]
+                                                                      [
+                                                                      'comments']
+                                                                  .length,
+                                                              itemBuilder:
+                                                                  (context, i) {
+                                                                return Column(
+                                                                  children: [
+                                                                    ListTile(
+                                                                      title:
+                                                                          Text(
+                                                                        posts[index]['comments'][i]
+                                                                            [
+                                                                            'userName'],
+                                                                      ),
+                                                                      subtitle:
+                                                                          Text(
+                                                                        posts[index]['comments'][i]
+                                                                            [
+                                                                            'comment'],
+                                                                      ),
+                                                                    ),
+                                                                    Divider(),
+                                                                  ],
+                                                                );
+                                                              },
+                                                            ),
+                                                          )
+                                                        : Container(),
+                                                  ],
+                                                ),
+                                              )
+                                            : Container(),
                                       ],
                                     ),
                                   ),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.show_chart,
-                                        color: teal2,
-                                      ),
-                                      Text(
-                                        '224',
-                                        style: TextStyle(color: teal1),
-                                      )
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: IconButton(
-                                        icon: Icon(
-                                          Icons.share,
-                                          color: teal2,
-                                        ),
-                                        onPressed: () {}),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        elevation: 10,
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(8),
-                                child: Image.network(
-                                    "https://images.newindianexpress.com/uploads/user/imagelibrary/2019/3/7/w900X450/Take_in_the_Scenery.jpg"),
-                              ),
-                              Container(
-                                padding: EdgeInsets.all(8),
-                                child: Text(
-                                  'LCum xiphias messis, omnes contencioes talem camerarius, gratis capioes LCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioesLCum xiphias messis, omnes contencioes talem camerarius, gratis capioes',
-                                  style: TextStyle(fontSize: 14),
                                 ),
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 10),
-                                    child: Row(
-                                      children: [
-                                        IconButton(
-                                          icon: Icon(
-                                            Icons.thumb_up,
-                                            color: teal2,
-                                          ),
-                                          onPressed: () {},
-                                        ),
-                                        Text('24'),
-                                      ],
-                                    ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.show_chart,
-                                        color: teal2,
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                      top: 8.0,
+                                      left: MediaQuery.of(context).size.width *
+                                          0.83),
+                                  child: PopupMenuButton(
+                                    onSelected: (value) async {
+                                      setState(() {
+                                        _isLoading = true;
+                                      });
+                                      if (value == 1) {
+                                        var response = await http.post(
+                                            posts[index]['enabled'] == true
+                                                ? '$baseUrl/post/disablePost'
+                                                : '$baseUrl/post/enablePost',
+                                            body: {
+                                              "id": posts[index]['_id'],
+                                            });
+                                        print(response.body);
+                                        setState(() {
+                                          _getAllPosts();
+                                          _isLoading = false;
+                                        });
+                                      } else if (value == 2) {
+                                        var response = await http.post(
+                                            posts[index]['commentEnabled'] ==
+                                                    true
+                                                ? '$baseUrl/post/disableComment'
+                                                : '$baseUrl/post/enableComment',
+                                            body: {
+                                              "id": posts[index]['_id'],
+                                            });
+                                        print(response.body);
+                                        setState(() {
+                                          _getAllPosts();
+                                          _isLoading = false;
+                                        });
+                                      }
+                                    },
+                                    itemBuilder: (context) => [
+                                      PopupMenuItem(
+                                        value: 1,
+                                        child: Text(
+                                            posts[index]['enabled'] == true
+                                                ? 'Disable Post'
+                                                : 'Enable Post'),
                                       ),
-                                      Text(
-                                        '224',
-                                        style: TextStyle(color: teal1),
-                                      )
+                                      PopupMenuItem(
+                                        value: 2,
+                                        child: Text(posts[index]
+                                                    ['commentEnabled'] ==
+                                                true
+                                            ? 'Disable Comments'
+                                            : 'Enable Comments'),
+                                      ),
                                     ],
                                   ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: IconButton(
-                                        icon: Icon(
-                                          Icons.share,
-                                          color: teal2,
+                                ),
+                                posts[index]['enabled']
+                                    ? Container()
+                                    : Container(
+                                        decoration: BoxDecoration(
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey,
+                                              blurRadius: 2,
+                                            ),
+                                          ],
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
                                         ),
-                                        onPressed: () {}),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                                        child: Text(
+                                          'DISABLED',
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              color: Colors.red,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        padding: EdgeInsets.all(8),
+                                      ),
+                              ],
+                            ),
+                          )
+                        : Container();
+                  }),
                 ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

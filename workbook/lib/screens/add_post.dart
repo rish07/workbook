@@ -28,17 +28,26 @@ class _AddPostState extends State<AddPost> {
   String mediaUrl = '';
 
   Future createPost() async {
-    if (_controller.text.isEmpty || mediaUrl.isEmpty) {
+    if (_controller.text.isEmpty && mediaUrl.isEmpty) {
       Fluttertoast.showToast(msg: 'The post can not be empty!');
       setState(() {
         _loading = false;
       });
     } else {
-      var response = await http.post('$baseUrl/post/createPost', body: {
-        "createdBy": User.userRole,
-        "mediaUrl": mediaUrl,
-        "content": _controller.text,
-      });
+      var response = await http.post(
+        '$baseUrl/post/createPost',
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+        },
+        body: json.encode(
+          {
+            "createdBy": User.userRole,
+            "mediaUrl": mediaUrl.isEmpty ? 'null' : mediaUrl,
+            "content": _controller.text,
+            "mediaType": fileType
+          },
+        ),
+      );
 
       print(response.statusCode);
       print(response.body);
@@ -92,7 +101,7 @@ class _AddPostState extends State<AddPost> {
     StorageReference storageReference;
     if (fileType == 'image') {
       storageReference =
-          FirebaseStorage.instance.ref().child("images/$filename");
+          FirebaseStorage.instance.ref().child("images/something");
     }
 
     if (fileType == 'pdf') {
