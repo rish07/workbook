@@ -10,6 +10,7 @@ import 'package:flutter_image/network.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/add_GD.dart';
@@ -79,17 +80,6 @@ class _DashBoardState extends State<DashBoard> {
     });
     print(json.decode(response.body)['statusCode']);
     print(response.body);
-  }
-
-  Future<bool> isLiked(List likedBy) {
-    print('wokring');
-    likedBy.forEach((element) {
-      if (element['userID'] == User.userEmail) {
-        return Future<bool>.value(true);
-      } else {
-        return Future<bool>.value(false);
-      }
-    });
   }
 
   @override
@@ -172,7 +162,12 @@ class _DashBoardState extends State<DashBoard> {
               : ListView.builder(
                   itemCount: posts.length,
                   itemBuilder: ((context, index) {
-                    isLiked(posts[index]['likedBy']);
+                    final TextEditingController contro =
+                        TextEditingController();
+                    List temp = [];
+                    posts[index]['likedBy'].forEach((element) {
+                      temp.add(element['userID']);
+                    });
                     return (posts[index]['enabled'] == true ||
                             User.userRole == 'superAdmin')
                         ? Padding(
@@ -224,13 +219,21 @@ class _DashBoardState extends State<DashBoard> {
                                               child: Row(
                                                 children: [
                                                   IconButton(
-                                                      icon: Icon(
-                                                        Icons.favorite,
-                                                        color: teal2,
-                                                      ),
-                                                      onPressed: () async {
-//                                                      if(){}
-//                                                    else {
+                                                    icon: Icon(
+                                                      temp.contains(
+                                                              User.userEmail)
+                                                          ? Icons.favorite
+                                                          : Icons
+                                                              .favorite_border,
+                                                      color: teal2,
+                                                    ),
+                                                    onPressed: () async {
+                                                      if (temp.contains(
+                                                          User.userEmail)) {
+                                                        Fluttertoast.showToast(
+                                                            msg:
+                                                                'Liked already!');
+                                                      } else {
                                                         await _likePost(
                                                             postId: posts[index]
                                                                 ['_id'],
@@ -239,8 +242,8 @@ class _DashBoardState extends State<DashBoard> {
                                                         await _getAllPosts();
                                                         setState(() {});
                                                       }
-//                                                    },
-                                                      ),
+                                                    },
+                                                  ),
                                                   Text(
                                                     posts[index]['likes']
                                                         .toString(),
@@ -269,7 +272,11 @@ class _DashBoardState extends State<DashBoard> {
                                                     Icons.share,
                                                     color: teal2,
                                                   ),
-                                                  onPressed: () {}),
+                                                  onPressed: () {
+                                                    Share.share(
+                                                      posts[index]['content'],
+                                                    );
+                                                  }),
                                             ),
                                           ],
                                         ),
@@ -296,7 +303,7 @@ class _DashBoardState extends State<DashBoard> {
                                                                 .length !=
                                                             0
                                                         ? 'Comments'
-                                                        : 'No Comments'),
+                                                        : ''),
                                                     posts[index]['comments']
                                                                 .length !=
                                                             0
@@ -320,12 +327,20 @@ class _DashBoardState extends State<DashBoard> {
                                                                         posts[index]['comments'][i]
                                                                             [
                                                                             'userName'],
+                                                                        style: TextStyle(
+                                                                            color:
+                                                                                teal2,
+                                                                            fontWeight:
+                                                                                FontWeight.bold),
                                                                       ),
                                                                       subtitle:
                                                                           Text(
                                                                         posts[index]['comments'][i]
                                                                             [
                                                                             'comment'],
+                                                                        style: TextStyle(
+                                                                            color:
+                                                                                Colors.black),
                                                                       ),
                                                                     ),
                                                                     Divider(),
@@ -336,6 +351,64 @@ class _DashBoardState extends State<DashBoard> {
                                                           )
                                                         : Container(),
                                                   ],
+                                                ),
+                                              )
+                                            : Container(),
+                                        posts[index]['commentEnabled']
+                                            ? TextFormField(
+                                                style: TextStyle(
+                                                    color: Colors.black),
+                                                maxLines: 1,
+                                                controller: contro,
+                                                cursorRadius:
+                                                    Radius.circular(8),
+                                                cursorColor: Colors.black,
+                                                decoration: InputDecoration(
+                                                  enabledBorder:
+                                                      OutlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide(
+                                                    color: Colors.grey,
+                                                  )),
+                                                  isDense: true,
+                                                  focusedBorder:
+                                                      OutlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: Colors.grey,
+                                                        width: 2),
+                                                  ),
+                                                  hintText: 'Add a comment',
+                                                  suffixIcon: IconButton(
+                                                      icon: Icon(Icons.send),
+                                                      color: teal2,
+                                                      onPressed: () async {
+                                                        print(contro.text);
+                                                        var response =
+                                                            await http.post(
+                                                                '$baseUrl/post/comment',
+                                                                body: {
+                                                              "id": posts[index]
+                                                                  ['_id'],
+                                                              "comment": contro
+                                                                  .text
+                                                                  .toString(),
+                                                              "userName":
+                                                                  User.userName
+                                                            });
+
+                                                        print(response.body);
+                                                        if (json.decode(response
+                                                                    .body)[
+                                                                'statusCode'] ==
+                                                            200) {
+                                                          Fluttertoast.showToast(
+                                                              msg:
+                                                                  'Comment posted');
+                                                          setState(() {
+                                                            _getAllPosts();
+                                                          });
+                                                        }
+                                                      }),
                                                 ),
                                               )
                                             : Container(),

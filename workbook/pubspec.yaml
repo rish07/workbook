@@ -44,6 +44,7 @@ dependencies:
   animated_text_kit:
   firebase_storage:
   file_picker:
+  share:
 
 dev_dependencies:
   flutter_test:
