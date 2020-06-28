@@ -11,8 +11,6 @@ import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';
 import 'dart:convert';
 
-import 'package:workbook/widget/popUpDialog.dart';
-
 class ActiveUsers extends StatefulWidget {
   final bool isDriver;
 

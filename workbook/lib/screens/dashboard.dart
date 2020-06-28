@@ -5,10 +5,7 @@ import 'dart:io';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:basic_utils/basic_utils.dart';
-import 'package:dio/dio.dart';
-import 'package:file_utils/file_utils.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:permission_handler/permission_handler.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_image/network.dart';
@@ -16,10 +13,11 @@ import 'package:flutter_image/network.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:path_provider/path_provider.dart';
+
 import 'dart:math';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/add_GD.dart';
@@ -50,15 +48,13 @@ class _DashBoardState extends State<DashBoard> {
   @override
   void initState() {
     _setData();
-    getLoc();
+
     _getAllPosts();
     // TODO: implement initState
     super.initState();
   }
 
-  final Permission _permission = Permission.storage;
   Future _setData() async {
-    await FlutterDownloader.initialize(debug: true);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       User.userName = prefs.getString('userName');
@@ -81,17 +77,6 @@ class _DashBoardState extends State<DashBoard> {
     });
   }
 
-  Future getLoc() async {
-    dirloc = (await getApplicationDocumentsDirectory()).path;
-    _localPath = (await _findLocalPath()) + Platform.pathSeparator + 'Download';
-
-    final savedDir = Directory(_localPath);
-    bool hasExisted = await savedDir.exists();
-    if (!hasExisted) {
-      savedDir.create();
-    }
-  }
-
   Future _getAllPosts() async {
     var response = await http.get('$baseUrl/post/viewAllPost');
     print(response.statusCode);
@@ -110,13 +95,6 @@ class _DashBoardState extends State<DashBoard> {
     });
     print(json.decode(response.body)['statusCode']);
     print(response.body);
-  }
-
-  Future<String> _findLocalPath() async {
-    final directory = widget.platform == TargetPlatform.android
-        ? await getExternalStorageDirectory()
-        : await getApplicationDocumentsDirectory();
-    return directory.path;
   }
 
   @override
@@ -278,41 +256,10 @@ class _DashBoardState extends State<DashBoard> {
                                                                   color: teal2,
                                                                   onPressed:
                                                                       () async {
-                                                                    print(
-                                                                        dirloc);
-                                                                    FileUtils
-                                                                        .mkdir([
-                                                                      dirloc
-                                                                    ]);
-                                                                    await _permission
-                                                                        .request();
-//                                                                Dio dio =
-//                                                                    new Dio();
-//                                                                await dio.download(
-//                                                                    posts[index]
-//                                                                        [
-//                                                                        'mediaUrl'],
-//                                                                    dirloc +
-//                                                                        randid
-//                                                                            .toString() +
-//                                                                        '.pdf');
-
-                                                                    final taskId =
-                                                                        await FlutterDownloader
-                                                                            .enqueue(
-                                                                      url: posts[
-                                                                              index]
-                                                                          [
-                                                                          'mediaUrl'],
-                                                                      savedDir: dirloc +
-                                                                          randid
-                                                                              .toString() +
-                                                                          '.pdf',
-                                                                      showNotification:
-                                                                          true, // show download progress in status bar (for Android)
-                                                                      openFileFromNotification:
-                                                                          true, // click on notification to open downloaded file (for Android)
-                                                                    );
+                                                                    await launch(
+                                                                        posts[index]
+                                                                            [
+                                                                            'mediaUrl']);
                                                                   })
                                                             ],
                                                           ),

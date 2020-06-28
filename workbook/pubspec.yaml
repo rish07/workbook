@@ -45,17 +45,18 @@ dependencies:
   firebase_storage:
   file_picker: ^1.12.0
   share:
-  path_provider: ^1.6.11
-  permission_handler: ^5.0.1+1
-  file_utils: ^0.1.4
-  flutter_downloader: ^1.4.4
+
+
+
+
   visibility_detector: ^0.1.5
+  url_launcher:
 
 
 
 
 
-  dio:
+
 
 
 dev_dependencies:

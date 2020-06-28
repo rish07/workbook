@@ -10,6 +10,7 @@ import 'package:workbook/screens/active_users.dart';
 import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/screens/login_page.dart';
 import 'package:workbook/screens/profile_page.dart';
+import 'package:workbook/screens/settings.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/popUpDialog.dart';
 
@@ -106,6 +107,16 @@ Theme buildDrawer(BuildContext context) {
                     );
                   })
               : Container(),
+          buildDrawerItem(
+              icon: Icons.settings,
+              title: 'Settings',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  PageTransition(
+                      child: Settings(), type: PageTransitionType.rightToLeft),
+                );
+              }),
           buildDrawerItem(
               icon: Icons.exit_to_app,
               title: 'Logout',
