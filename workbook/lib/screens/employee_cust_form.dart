@@ -16,13 +16,19 @@ import 'dart:convert';
 
 class EmployeeCustomerForm extends StatefulWidget {
   final bool isEmployee;
+  final List admins;
 
-  const EmployeeCustomerForm({Key key, this.isEmployee}) : super(key: key);
+  const EmployeeCustomerForm({
+    Key key,
+    this.isEmployee,
+    this.admins,
+  }) : super(key: key);
   @override
   _EmployeeCustomerFormState createState() => _EmployeeCustomerFormState();
 }
 
 class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
+  List employees = [];
   bool _isLoading = false;
   bool _validateName = false;
   bool _validateEmail = false;
@@ -67,6 +73,12 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
     if (response.statusCode == 200) {
+      if (widget.isEmployee) {
+        sendNotificationAdmin(_nameController.text);
+      } else {
+        await getEmployee();
+        sendNotificationEmployee(_nameController.text);
+      }
       popDialog(
           onPress: () {
             Navigator.push(
@@ -94,6 +106,55 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future getEmployee() async {
+    var response = await http.post(
+      "$baseUrl/admin/viewAllEmployees",
+      body: {
+        "instituteName": _selectedInstitution,
+      },
+    );
+    print(response.body);
+    if (json.decode(response.body)['statusCode'] == 200) {
+      List temp = json.decode(response.body)['payload']['employees'];
+      temp.forEach((element) {
+        if (element['approved'] == true) {
+          setState(() {
+            employees.add(element);
+          });
+        }
+      });
+    }
+    print(employees);
+  }
+
+  Future sendNotificationEmployee(String name) async {
+    employees.forEach((element) async {
+      var response = await http.post("$baseUrl/sendNotification", body: {
+        "fcmToken": element['fcmToken'],
+        "message": "New employee request from $name. Please login now",
+        "title": "New Registration"
+      });
+      print(response.body);
+    });
+  }
+
+  Future sendNotificationAdmin(String name) async {
+    String adminFcm = "";
+    widget.admins.forEach((element) {
+      if (element['instituteName'] == _selectedInstitution) {
+        setState(() {
+          adminFcm = element['fcmToken'];
+        });
+      }
+    });
+    var response = await http.post('$baseUrl/sendNotification', body: {
+      "fcmToken": adminFcm,
+      "message": "New employee request from $name. Please login now",
+      "title": "New Registration"
+    });
+    print(response.body);
   }
 
   Future getDivision({String instituteName}) async {

@@ -72,7 +72,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   registerButton(
                       role: 'Admin',
                       context: context,
-                      onPressed: () {
+                      onPressed: () async {
                         Navigator.push(
                           context,
                           PageTransition(
@@ -90,11 +90,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         setState(() {
                           _isLoading = true;
                         });
+                        var response =
+                            await http.get('$baseUrl/superAdmin/viewAllAdmin');
+
                         await getInstitutes();
                         Navigator.push(
                           context,
                           PageTransition(
                               child: EmployeeCustomerForm(
+                                admins: json.decode(response.body)['payload']
+                                    ['admin'],
                                 isEmployee: true,
                               ),
                               type: PageTransitionType.rightToLeft),
