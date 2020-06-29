@@ -351,36 +351,40 @@ class _DashBoardState extends State<DashBoard> {
           },
           child: Container(
             child: _isLoading || posts.isEmpty
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.2,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0, vertical: 64),
-                        child: AutoSizeText(
-                          User.userRole != "superAdmin"
-                              ? 'Welcome to ${User.instituteName},\n${User.userName?.split(" ")[0]}!'
-                              : "Welcome,\n${User.userName}",
-                          maxLines: 2,
-                          style: TextStyle(color: teal2, fontSize: 50),
+                ? Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.2,
                         ),
-                      ),
-                      posts.isEmpty
-                          ? Text('No Posts')
-                          : TyperAnimatedTextKit(
-                              speed: Duration(milliseconds: 200),
-                              text: ['Loading...'],
-                              textStyle: TextStyle(fontSize: 25, color: teal1),
-                              onFinished: () {
-                                setState(() {
-                                  _isLoading = false;
-                                });
-                              },
-                            ),
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0, vertical: 64),
+                          child: AutoSizeText(
+                            User.userRole != "superAdmin"
+                                ? 'Welcome to ${User.instituteName},\n${User.userName?.split(" ")[0]}!'
+                                : "Welcome,\n${User.userName}",
+                            maxLines: 2,
+                            style: TextStyle(color: teal2, fontSize: 50),
+                          ),
+                        ),
+                        posts.isEmpty
+                            ? Text('No Posts')
+                            : TyperAnimatedTextKit(
+                                speed: Duration(milliseconds: 200),
+                                text: ['Loading...'],
+                                textStyle:
+                                    TextStyle(fontSize: 25, color: teal1),
+                                onFinished: () {
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+                                },
+                              ),
+                      ],
+                    ),
                   )
                 : ListView.builder(
                     itemCount: posts.length,
