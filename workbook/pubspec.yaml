@@ -45,7 +45,7 @@ dependencies:
   firebase_storage:
   file_picker: ^1.12.0
   share:
-
+  flutter_speed_dial:
 
 
 

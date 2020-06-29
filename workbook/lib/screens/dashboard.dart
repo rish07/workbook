@@ -9,6 +9,7 @@ import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_image/network.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -25,6 +26,7 @@ import 'package:workbook/screens/add_post.dart';
 import 'package:workbook/screens/approve_user.dart';
 import 'package:workbook/screens/login_page.dart';
 import 'package:workbook/screens/profile_page.dart';
+import 'package:workbook/screens/settings.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';
 import 'package:workbook/widget/popUpDialog.dart';
@@ -99,6 +101,209 @@ class _DashBoardState extends State<DashBoard> {
 
   @override
   Widget build(BuildContext context) {
+    List<SpeedDialChild> _superAdmin = [
+      SpeedDialChild(
+        child: Icon(
+          Icons.person,
+          color: teal2,
+        ),
+        label: 'Admins',
+        labelStyle: TextStyle(color: teal2),
+        backgroundColor: Colors.white,
+        onTap: () {
+          Navigator.push(
+            context,
+            PageTransition(
+                child: ApproveUser(
+                  isDriver: false,
+                ),
+                type: PageTransitionType.fade),
+          );
+        },
+      ),
+      SpeedDialChild(
+        child: Icon(
+          Icons.settings,
+          color: teal2,
+        ),
+        label: 'Settings',
+        labelStyle: TextStyle(color: teal2),
+        backgroundColor: Colors.white,
+        onTap: () {
+          Navigator.push(
+            context,
+            PageTransition(child: Settings(), type: PageTransitionType.fade),
+          );
+        },
+      ),
+      SpeedDialChild(
+        child: Icon(
+          Icons.edit,
+          color: teal2,
+        ),
+        label: 'Create Post',
+        labelStyle: TextStyle(color: teal2),
+        backgroundColor: Colors.white,
+        onTap: () {
+          Navigator.push(
+            context,
+            PageTransition(child: AddPost(), type: PageTransitionType.fade),
+          );
+        },
+      ),
+    ];
+    List<SpeedDialChild> _admin = [
+      SpeedDialChild(
+        child: Icon(
+          Icons.arrow_downward,
+          color: teal2,
+        ),
+        labelWidget: Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(color: Colors.grey, blurRadius: 1, offset: Offset(1, 1))
+            ],
+          ),
+          child: Text(
+            'Grades & Divisions',
+            style: TextStyle(color: teal2),
+          ),
+        ),
+        backgroundColor: Colors.white,
+        onTap: () {
+          Navigator.push(
+            context,
+            PageTransition(child: AddGD(), type: PageTransitionType.fade),
+          );
+        },
+      ),
+      SpeedDialChild(
+        child: Icon(
+          Icons.person,
+          color: teal2,
+        ),
+        label: 'Employees',
+        labelStyle: TextStyle(color: teal2),
+        backgroundColor: Colors.white,
+        onTap: () {
+          Navigator.push(
+            context,
+            PageTransition(
+                child: ApproveUser(
+                  isDriver: false,
+                ),
+                type: PageTransitionType.fade),
+          );
+        },
+      ),
+      SpeedDialChild(
+        child: Icon(
+          Icons.directions_car,
+          color: teal2,
+        ),
+        label: 'Drivers',
+        labelStyle: TextStyle(color: teal2),
+        backgroundColor: Colors.white,
+        onTap: () {
+          Navigator.push(
+            context,
+            PageTransition(
+                child: ApproveUser(
+                  isDriver: true,
+                ),
+                type: PageTransitionType.fade),
+          );
+        },
+      ),
+      SpeedDialChild(
+        child: Icon(
+          Icons.settings,
+          color: teal2,
+        ),
+        label: 'Settings',
+        labelStyle: TextStyle(color: teal2),
+        backgroundColor: Colors.white,
+        onTap: () {
+          Navigator.push(
+            context,
+            PageTransition(child: Settings(), type: PageTransitionType.fade),
+          );
+        },
+      ),
+    ];
+    List<SpeedDialChild> _employee = [
+      SpeedDialChild(
+        child: Icon(
+          Icons.person,
+          color: teal2,
+        ),
+        label: 'Customers',
+        labelStyle: TextStyle(color: teal2),
+        backgroundColor: Colors.white,
+        onTap: () {
+          Navigator.push(
+            context,
+            PageTransition(
+                child: ApproveUser(
+                  isDriver: false,
+                ),
+                type: PageTransitionType.fade),
+          );
+        },
+      ),
+      SpeedDialChild(
+        child: Icon(
+          Icons.settings,
+          color: teal2,
+        ),
+        label: 'Settings',
+        labelStyle: TextStyle(color: teal2),
+        backgroundColor: Colors.white,
+        onTap: () {
+          Navigator.push(
+            context,
+            PageTransition(child: Settings(), type: PageTransitionType.fade),
+          );
+        },
+      ),
+    ];
+    List<SpeedDialChild> _customer = [
+      SpeedDialChild(
+        child: Icon(
+          Icons.settings,
+          color: teal2,
+        ),
+        label: 'Settings',
+        labelStyle: TextStyle(color: teal2),
+        backgroundColor: Colors.white,
+        onTap: () {
+          Navigator.push(
+            context,
+            PageTransition(child: Settings(), type: PageTransitionType.fade),
+          );
+        },
+      ),
+    ];
+    List<SpeedDialChild> _driver = [
+      SpeedDialChild(
+        child: Icon(
+          Icons.settings,
+          color: teal2,
+        ),
+        label: 'Settings',
+        labelStyle: TextStyle(color: teal2),
+        backgroundColor: Colors.white,
+        onTap: () {
+          Navigator.push(
+            context,
+            PageTransition(child: Settings(), type: PageTransitionType.fade),
+          );
+        },
+      ),
+    ];
     return ModalProgressHUD(
       progressIndicator: CircularProgressIndicator(
         valueColor: AlwaysStoppedAnimation<Color>(teal2),
@@ -145,7 +350,6 @@ class _DashBoardState extends State<DashBoard> {
             return _getAllPosts();
           },
           child: Container(
-            padding: EdgeInsets.all(16),
             child: _isLoading || posts.isEmpty
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -202,7 +406,8 @@ class _DashBoardState extends State<DashBoard> {
                               },
                               key: Key(index.toString()),
                               child: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 16.0),
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 16.0, horizontal: 16),
                                 child: Stack(
                                   children: [
                                     Card(
@@ -330,7 +535,7 @@ class _DashBoardState extends State<DashBoard> {
                                                           .toString(),
                                                       style: TextStyle(
                                                           color: teal1),
-                                                    )
+                                                    ),
                                                   ],
                                                 ),
                                                 Padding(
@@ -451,34 +656,41 @@ class _DashBoardState extends State<DashBoard> {
                                                           color: teal2,
                                                           onPressed: () async {
                                                             print(contro.text);
-                                                            var response =
-                                                                await http.post(
-                                                                    '$baseUrl/post/comment',
-                                                                    body: {
-                                                                  "id": posts[
-                                                                          index]
-                                                                      ['_id'],
-                                                                  "comment": contro
-                                                                      .text
-                                                                      .toString(),
-                                                                  "userName": User
-                                                                      .userName
-                                                                });
+                                                            if (contro.text
+                                                                .isNotEmpty) {
+                                                              var response =
+                                                                  await http.post(
+                                                                      '$baseUrl/post/comment',
+                                                                      body: {
+                                                                    "id": posts[
+                                                                            index]
+                                                                        ['_id'],
+                                                                    "comment": contro
+                                                                        .text
+                                                                        .toString(),
+                                                                    "userName":
+                                                                        User.userName
+                                                                  });
 
-                                                            print(
-                                                                response.body);
-                                                            if (json.decode(
-                                                                        response
-                                                                            .body)[
-                                                                    'statusCode'] ==
-                                                                200) {
+                                                              print(response
+                                                                  .body);
+                                                              if (json.decode(response
+                                                                          .body)[
+                                                                      'statusCode'] ==
+                                                                  200) {
+                                                                Fluttertoast
+                                                                    .showToast(
+                                                                        msg:
+                                                                            'Comment posted');
+                                                                setState(() {
+                                                                  _getAllPosts();
+                                                                });
+                                                              }
+                                                            } else {
                                                               Fluttertoast
                                                                   .showToast(
                                                                       msg:
-                                                                          'Comment posted');
-                                                              setState(() {
-                                                                _getAllPosts();
-                                                              });
+                                                                          'Comment can\'t be empty');
                                                             }
                                                           }),
                                                     ),
@@ -488,67 +700,73 @@ class _DashBoardState extends State<DashBoard> {
                                         ),
                                       ),
                                     ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          top: 8.0,
-                                          left: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.83),
-                                      child: PopupMenuButton(
-                                        onSelected: (value) async {
-                                          setState(() {
-                                            _isLoading = true;
-                                          });
-                                          if (value == 1) {
-                                            var response = await http.post(
-                                                posts[index]['enabled'] == true
-                                                    ? '$baseUrl/post/disablePost'
-                                                    : '$baseUrl/post/enablePost',
-                                                body: {
-                                                  "id": posts[index]['_id'],
+                                    User.userRole == 'superAdmin'
+                                        ? Padding(
+                                            padding: EdgeInsets.only(
+                                                top: 8.0,
+                                                left: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.83),
+                                            child: PopupMenuButton(
+                                              onSelected: (value) async {
+                                                setState(() {
+                                                  _isLoading = true;
                                                 });
-                                            print(response.body);
-                                            setState(() {
-                                              _getAllPosts();
-                                              _isLoading = false;
-                                            });
-                                          } else if (value == 2) {
-                                            var response = await http.post(
-                                                posts[index][
-                                                            'commentEnabled'] ==
-                                                        true
-                                                    ? '$baseUrl/post/disableComment'
-                                                    : '$baseUrl/post/enableComment',
-                                                body: {
-                                                  "id": posts[index]['_id'],
-                                                });
-                                            print(response.body);
-                                            setState(() {
-                                              _getAllPosts();
-                                              _isLoading = false;
-                                            });
-                                          }
-                                        },
-                                        itemBuilder: (context) => [
-                                          PopupMenuItem(
-                                            value: 1,
-                                            child: Text(
-                                                posts[index]['enabled'] == true
-                                                    ? 'Disable Post'
-                                                    : 'Enable Post'),
-                                          ),
-                                          PopupMenuItem(
-                                            value: 2,
-                                            child: Text(posts[index]
-                                                        ['commentEnabled'] ==
-                                                    true
-                                                ? 'Disable Comments'
-                                                : 'Enable Comments'),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                                                if (value == 1) {
+                                                  var response = await http.post(
+                                                      posts[index]['enabled'] ==
+                                                              true
+                                                          ? '$baseUrl/post/disablePost'
+                                                          : '$baseUrl/post/enablePost',
+                                                      body: {
+                                                        "id": posts[index]
+                                                            ['_id'],
+                                                      });
+                                                  print(response.body);
+                                                  setState(() {
+                                                    _getAllPosts();
+                                                    _isLoading = false;
+                                                  });
+                                                } else if (value == 2) {
+                                                  var response = await http.post(
+                                                      posts[index][
+                                                                  'commentEnabled'] ==
+                                                              true
+                                                          ? '$baseUrl/post/disableComment'
+                                                          : '$baseUrl/post/enableComment',
+                                                      body: {
+                                                        "id": posts[index]
+                                                            ['_id'],
+                                                      });
+                                                  print(response.body);
+                                                  setState(() {
+                                                    _getAllPosts();
+                                                    _isLoading = false;
+                                                  });
+                                                }
+                                              },
+                                              itemBuilder: (context) => [
+                                                PopupMenuItem(
+                                                  value: 1,
+                                                  child: Text(posts[index]
+                                                              ['enabled'] ==
+                                                          true
+                                                      ? 'Disable Post'
+                                                      : 'Enable Post'),
+                                                ),
+                                                PopupMenuItem(
+                                                  value: 2,
+                                                  child: Text(posts[index][
+                                                              'commentEnabled'] ==
+                                                          true
+                                                      ? 'Disable Comments'
+                                                      : 'Enable Comments'),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : Container(),
                                     posts[index]['enabled']
                                         ? Container()
                                         : Container(
@@ -581,190 +799,126 @@ class _DashBoardState extends State<DashBoard> {
                   ),
           ),
         ),
+        floatingActionButton: buildSpeedDial(
+            superAdmin: _superAdmin,
+            admin: _admin,
+            customer: _customer,
+            employee: _employee,
+            driver: _driver),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: teal2,
-          child: User.userRole == 'superAdmin'
-              ? Icon(Icons.add)
-              : Icon(Icons.refresh),
-          onPressed: User.userRole == 'superAdmin'
-              ? () {
-                  Navigator.push(
-                    context,
-                    PageTransition(
-                        child: AddPost(), type: PageTransitionType.downToUp),
-                  );
-                }
-              : () {},
-        ),
-        bottomNavigationBar: BottomAppBar(
-          shape: CircularNotchedRectangle(),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                  icon: Icon(Icons.menu),
-                  onPressed: () {
-                    return showModalBottomSheet<Null>(
-                      backgroundColor: Colors.transparent,
-                      context: context,
-                      builder: (BuildContext context) =>
-                          openBottomDrawer(context),
-                    );
-                  }),
-              IconButton(icon: Icon(Icons.search), onPressed: () {}),
-            ],
-          ),
-        ),
       ),
     );
   }
-}
 
-Widget openBottomDrawer(BuildContext context) {
-  return Container(
-    height: MediaQuery.of(context).size.height * 0.4,
-    child: Theme(
-      data: Theme.of(context).copyWith(
-        canvasColor: Colors.transparent,
-      ),
-      child: Drawer(
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(32),
-            color: Colors.white,
-          ),
-          child: ListView(
-            shrinkWrap: true,
-            padding: EdgeInsets.symmetric(vertical: 40, horizontal: 8),
-            children: [
-              buildDrawerItemDashboard(
-                  icon: Icons.home,
-                  title: "Home",
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        PageTransition(
-                            child: DashBoard(), type: PageTransitionType.fade));
-                  }),
-              User.userRole != 'superAdmin'
-                  ? buildDrawerItemDashboard(
-                      icon: Icons.account_circle,
-                      title: "Profile",
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            PageTransition(
-                                child: ProfilePage(),
-                                type: PageTransitionType.fade));
-                      })
-                  : Container(),
-              User.userRole == 'admin'
-                  ? buildDrawerItemDashboard(
-                      icon: Icons.arrow_downward,
-                      title: 'Grades and Divisions',
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            PageTransition(
-                                child: AddGD(), type: PageTransitionType.fade));
-                      })
-                  : Container(),
-              buildDrawerItemDashboard(
-                  icon: Icons.person,
-                  title: User.userRole == 'admin'
-                      ? "Employees"
-                      : (User.userRole == 'employee') ? 'Customers' : 'Admins',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      PageTransition(
-                          child: ApproveUser(
-                            isDriver: false,
-                          ),
-                          type: PageTransitionType.fade),
-                    );
-                  }),
-              User.userRole == 'admin'
-                  ? buildDrawerItemDashboard(
-                      icon: Icons.directions_car,
-                      title: 'Drivers',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          PageTransition(
-                              child: ApproveUser(
-                                isDriver: true,
-                              ),
-                              type: PageTransitionType.fade),
-                        );
-                      })
-                  : Container(),
-              buildDrawerItemDashboard(
-                  icon: Icons.exit_to_app,
-                  title: 'Logout',
-                  onTap: () {
-                    popDialog(
-                        buttonTitle: 'Logout',
-                        title: 'Logout?',
-                        context: context,
-                        content: 'Do you want to logout from your profile?',
-                        onPress: () async {
-                          SharedPreferences prefs =
-                              await SharedPreferences.getInstance();
-                          prefs.remove('userName');
-                          prefs.remove('userEmail');
-                          prefs.remove('userID');
-                          prefs.remove('userRole');
-                          prefs.remove('instituteName');
-                          prefs.remove('instituteImage');
-                          prefs.remove('userInstituteType');
-                          prefs.remove('numberOfMembers');
-                          prefs.remove('state');
-                          prefs.remove('city');
-                          prefs.remove('mailAddress');
-                          prefs.remove('aadharNumber');
-                          prefs.remove('grade');
-                          prefs.remove('division');
-                          prefs.remove('contactNumber');
-                          prefs.remove('userPhotoData');
+  SpeedDial buildSpeedDial(
+      {List<SpeedDialChild> superAdmin,
+      List<SpeedDialChild> admin,
+      List<SpeedDialChild> employee,
+      List<SpeedDialChild> customer,
+      List<SpeedDialChild> driver}) {
+    return SpeedDial(
+        marginBottom: 30,
+        marginRight: MediaQuery.of(context).size.width * 0.46,
+        animatedIcon: AnimatedIcons.menu_close,
+        animatedIconTheme: IconThemeData(size: 22.0),
+        // child: Icon(Icons.add),
+        backgroundColor: teal2,
+        onOpen: () => print('OPENING DIAL'),
+        onClose: () => print('DIAL CLOSED'),
+        curve: Curves.bounceIn,
+        children: User.userRole == 'superAdmin'
+            ? superAdmin
+            : (User.userRole == 'admin')
+                ? admin
+                : (User.userRole == 'employee')
+                    ? employee
+                    : (User.userRole == 'customer') ? customer : driver);
+  }
 
-                          Navigator.pushAndRemoveUntil(
-                              context,
-                              PageTransition(
-                                  child: LoginPage(),
-                                  type: PageTransitionType.fade),
-                              (route) => false);
-                        });
-                  })
-            ],
-          ),
-        ),
-      ),
-    ),
-  );
-}
-
-ListTile buildDrawerItemDashboard(
-    {IconData icon, String title, Function onTap}) {
-  return ListTile(
-    onTap: onTap,
-    title: Row(
-      children: [
-        Icon(
-          icon,
-          size: 24,
-          color: teal2,
-        ),
-        Padding(
-          padding: EdgeInsets.only(left: 12),
-          child: Text(
-            title,
-            style: TextStyle(color: teal2, fontSize: 18),
-          ),
-        ),
-      ],
-    ),
-  );
+//Widget openBottomDrawer(BuildContext context) {
+//  return Container(
+//    height: MediaQuery.of(context).size.height * 0.4,
+//    child: Theme(
+//      data: Theme.of(context).copyWith(
+//        canvasColor: Colors.transparent,
+//      ),
+//      child: Drawer(
+//        child: Container(
+//          decoration: BoxDecoration(
+//            borderRadius: BorderRadius.circular(32),
+//            color: Colors.white,
+//          ),
+//          child: ListView(
+//            shrinkWrap: true,
+//            padding: EdgeInsets.symmetric(vertical: 40, horizontal: 8),
+//            children: [
+//              buildDrawerItemDashboard(
+//                  icon: Icons.home,
+//                  title: "Home",
+//                  onTap: () {
+//                    Navigator.push(
+//                        context,
+//                        PageTransition(
+//                            child: DashBoard(), type: PageTransitionType.fade));
+//                  }),
+//              User.userRole != 'superAdmin'
+//                  ? buildDrawerItemDashboard(
+//                      icon: Icons.account_circle,
+//                      title: "Profile",
+//                      onTap: () {
+//                        Navigator.push(
+//                            context,
+//                            PageTransition(
+//                                child: ProfilePage(),
+//                                type: PageTransitionType.fade));
+//                      })
+//                  : Container(),
+//              User.userRole == 'admin'
+//                  ? buildDrawerItemDashboard(
+//                      icon: Icons.arrow_downward,
+//                      title: 'Grades and Divisions',
+//                      onTap: () {
+//                        Navigator.push(
+//                            context,
+//                            PageTransition(
+//                                child: AddGD(), type: PageTransitionType.fade));
+//                      })
+//                  : Container(),
+//              buildDrawerItemDashboard(
+//                  icon: Icons.person,
+//                  title: User.userRole == 'admin'
+//                      ? "Employees"
+//                      : (User.userRole == 'employee') ? 'Customers' : 'Admins',
+//                  onTap: () {
+//                    Navigator.push(
+//                      context,
+//                      PageTransition(
+//                          child: ApproveUser(
+//                            isDriver: false,
+//                          ),
+//                          type: PageTransitionType.fade),
+//                    );
+//                  }),
+//              User.userRole == 'admin'
+//                  ? buildDrawerItemDashboard(
+//                      icon: Icons.directions_car,
+//                      title: 'Drivers',
+//                      onTap: () {
+//                        Navigator.push(
+//                          context,
+//                          PageTransition(
+//                              child: ApproveUser(
+//                                isDriver: true,
+//                              ),
+//                              type: PageTransitionType.fade),
+//                        );
+//                      })
+//                  : Container(),
+//            ],
+//          ),
+//        ),
+//      ),
+//    ),
+//  );
+//}
 }

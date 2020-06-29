@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workbook/constants.dart';
+import 'package:workbook/screens/login_page.dart';
+import 'package:workbook/widget/popUpDialog.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -74,6 +78,40 @@ class _SettingsState extends State<Settings> {
                 style:
                     TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
               ),
+              onTap: () {
+                popDialog(
+                    buttonTitle: 'Logout',
+                    title: 'Logout?',
+                    context: context,
+                    content: 'Do you want to logout from your profile?',
+                    onPress: () async {
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      prefs.remove('userName');
+                      prefs.remove('userEmail');
+                      prefs.remove('userID');
+                      prefs.remove('userRole');
+                      prefs.remove('instituteName');
+                      prefs.remove('instituteImage');
+                      prefs.remove('userInstituteType');
+                      prefs.remove('numberOfMembers');
+                      prefs.remove('state');
+                      prefs.remove('city');
+                      prefs.remove('mailAddress');
+                      prefs.remove('aadharNumber');
+                      prefs.remove('grade');
+                      prefs.remove('division');
+                      prefs.remove('contactNumber');
+                      prefs.remove('userPhotoData');
+
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          PageTransition(
+                              child: LoginPage(),
+                              type: PageTransitionType.rightToLeft),
+                          (route) => false);
+                    });
+              },
             ),
             Divider(
               thickness: 2,
