@@ -24,8 +24,31 @@ class _AddPostState extends State<AddPost> {
   String fileType = '';
   File file;
   String fileName = '';
-
+  List notificationList = [];
   String mediaUrl = '';
+
+  Future getRoles() async {
+    var response = await http.get('$baseUrl/getRoles');
+    print(response.body);
+    List temp = json.decode(response.body)['payload']['roles'];
+    temp.forEach((element) {
+      if (element['approved'] == true) {
+        notificationList.add(element['fcmToken']);
+      }
+    });
+    print(notificationList);
+  }
+
+  Future sendNotification() async {
+    notificationList.forEach((element) async {
+      var response = await http.post('$baseUrl/sendNotification', body: {
+        "title": "New Post!",
+        "message": "Click here to check out the latest post.",
+        "fcmToken": element.toString(),
+      });
+      print(response.body);
+    });
+  }
 
   Future createPost() async {
     if (_controller.text.isEmpty && mediaUrl.isEmpty) {
@@ -54,6 +77,7 @@ class _AddPostState extends State<AddPost> {
 
       if (json.decode(response.body)['statusCode'] == 200) {
         Fluttertoast.showToast(msg: 'Post uploaded successfully');
+        sendNotification();
         Navigator.push(
           context,
           PageTransition(
@@ -120,6 +144,13 @@ class _AddPostState extends State<AddPost> {
       Fluttertoast.showToast(msg: 'File attached successfully');
     });
     print("URL is $url");
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getRoles();
   }
 
   @override

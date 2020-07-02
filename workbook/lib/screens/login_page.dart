@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/coming_soon.dart';
 import 'package:workbook/screens/dashboard.dart';
+import 'package:workbook/screens/guest_ticket.dart';
 import 'dart:convert';
 import 'package:workbook/widget/first.dart';
 import 'package:workbook/widget/input_field.dart';
@@ -87,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     getFCMToken();
-
+    getInstitutes();
     super.initState();
     registerNotification();
     configLocalNotification();
@@ -107,6 +108,18 @@ class _LoginPageState extends State<LoginPage> {
     });
     print('fcm');
     print(fcmToken);
+  }
+
+  Future getInstitutes() async {
+    print('working');
+    var response = await http.get("$baseUrl/admin/institutes");
+    print('Response status: ${response.statusCode}');
+    List temp = json.decode(response.body)['payload']['institute'];
+    temp.forEach((resp) {
+      institutes.add(resp['instituteName']);
+    });
+    institutes = Set.of(institutes).toList();
+    print(institutes);
   }
 
   Future _loginUser() async {
@@ -285,24 +298,42 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   Padding(
                     padding:
-                        const EdgeInsets.only(top: 40, right: 20, left: 250),
-                    child: Container(
-                      alignment: Alignment.bottomRight,
-                      height: 50,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: FlatButton(
-                        onPressed: () async {
-                          if (_formKey.currentState.validate()) {
-                            print('working');
-                            setState(() {
-                              _loading = true;
-                            });
-                            await _loginUser();
-                          }
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 25),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        FlatButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                PageTransition(
+                                    child: GenerateTicket(),
+                                    type: PageTransitionType.rightToLeft),
+                              );
+                            },
+                            child: Text(
+                              'Guest user?',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            )),
+                        Container(
+                          alignment: Alignment.bottomRight,
+                          height: 50,
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: FlatButton(
+                            onPressed: () async {
+                              if (_formKey.currentState.validate()) {
+                                print('working');
+                                setState(() {
+                                  _loading = true;
+                                });
+                                await _loginUser();
+                              }
 //                        setState(() {
 //                          (_emailController.text.isEmpty ||
 //                                  !validator.email(_emailController.text))
@@ -322,18 +353,20 @@ class _LoginPageState extends State<LoginPage> {
 //                          _emailController.clear();
 //                          _selectedRole = null;
 //                        }
-                        },
-                        child: Center(
-                          child: Text(
-                            'Login',
-                            style: TextStyle(
-                              color: Colors.teal,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
+                            },
+                            child: Center(
+                              child: Text(
+                                'Login',
+                                style: TextStyle(
+                                  color: Colors.teal,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                   FirstTime(),

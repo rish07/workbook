@@ -20,18 +20,6 @@ class RegistrationPage extends StatefulWidget {
 
 class _RegistrationPageState extends State<RegistrationPage> {
   bool _isLoading = false;
-  Future getInstitutes() async {
-    var response = await http.get("$baseUrl/admin/institutes");
-    print('Response status: ${response.statusCode}');
-    List temp = json.decode(response.body)['payload']['institute'];
-    temp.forEach((resp) {
-      institutes.add(resp['instituteName']);
-    });
-    institutes = Set.of(institutes).toList();
-    setState(() {
-      _isLoading = false;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +81,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         var response =
                             await http.get('$baseUrl/superAdmin/viewAllAdmin');
 
-                        await getInstitutes();
                         Navigator.push(
                           context,
                           PageTransition(
@@ -115,7 +102,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         setState(() {
                           _isLoading = true;
                         });
-                        await getInstitutes();
+
                         Navigator.push(
                           context,
                           PageTransition(
@@ -133,7 +120,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         setState(() {
                           _isLoading = true;
                         });
-                        await getInstitutes();
+
                         Navigator.push(
                           context,
                           PageTransition(
