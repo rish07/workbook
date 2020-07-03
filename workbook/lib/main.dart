@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:workbook/screens/landing_page.dart';
+import 'package:workbook/screens/query_data.dart';
 
 void main() {
   runApp(MyApp());
@@ -15,9 +16,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Montserrat',
       ),
-      home: LandingPage(
-        platform: platform,
-      ),
+//      home: LandingPage(
+//        platform: platform,
+//      ),
+      home: QueryData(),
     );
   }
 }
