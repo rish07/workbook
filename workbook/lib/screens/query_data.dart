@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/query_dashboard.dart';
+import 'package:workbook/screens/query_status.dart';
 
 class QueryData extends StatefulWidget {
   @override
@@ -47,8 +48,12 @@ class _QueryDataState extends State<QueryData> {
             unRegistered: 30,
             registered: 20,
           ),
-          QueryDashboard(),
-          QueryDashboard()
+          QueryStatus(
+            isPending: true,
+          ),
+          QueryStatus(
+            isPending: false,
+          ),
         ]),
       ),
     );

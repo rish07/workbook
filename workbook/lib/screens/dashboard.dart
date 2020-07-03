@@ -26,6 +26,7 @@ import 'package:workbook/screens/add_post.dart';
 import 'package:workbook/screens/approve_user.dart';
 import 'package:workbook/screens/login_page.dart';
 import 'package:workbook/screens/profile_page.dart';
+import 'package:workbook/screens/query_data.dart';
 import 'package:workbook/screens/settings.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';
@@ -230,6 +231,21 @@ class _DashBoardState extends State<DashBoard> {
           Navigator.push(
             context,
             PageTransition(child: Settings(), type: PageTransitionType.fade),
+          );
+        },
+      ),
+      SpeedDialChild(
+        child: Icon(
+          Icons.question_answer,
+          color: teal2,
+        ),
+        label: 'Queries',
+        labelStyle: TextStyle(color: teal2),
+        backgroundColor: Colors.white,
+        onTap: () {
+          Navigator.push(
+            context,
+            PageTransition(child: QueryData(), type: PageTransitionType.fade),
           );
         },
       ),

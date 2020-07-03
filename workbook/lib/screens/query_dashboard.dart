@@ -24,15 +24,14 @@ class _QueryDashboardState extends State<QueryDashboard> {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16),
         child: PieChart(
+          legendTextSize: 14,
           sliceFillColors: [Colors.tealAccent, Colors.red, Colors.cyan],
           legendItemPadding: EdgeInsets.all(8),
           legendIconShape: LegendIconShape.Circle,
-          separatedValueType: SeparatedValue.Min,
-          separateFocusedValue: true,
           size: Size(MediaQuery.of(context).size.height * 0.3,
               MediaQuery.of(context).size.width * 0.9),
           values: [widget.total, widget.unRegistered, widget.registered],
-          labels: ['Registered', 'Unregistered', 'Total'],
+          labels: ['Registered', 'Unregistered', 'Pending'],
           legendPosition: LegendPosition.Bottom,
         ),
       ),
