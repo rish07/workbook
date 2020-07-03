@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/query_dashboard.dart';
 import 'package:workbook/screens/query_status.dart';
+import 'package:http/http.dart' as http;
+import 'package:workbook/user.dart';
 
 class QueryData extends StatefulWidget {
   @override
@@ -9,6 +13,28 @@ class QueryData extends StatefulWidget {
 }
 
 class _QueryDataState extends State<QueryData> {
+  Future generateTickets() async {
+    print('working');
+    for (int i = 0; i < 10; i++) {
+      var response = await http.post('$baseUrl/guest/createQuery', body: {
+        "userName": "Test $i",
+        "userID": "test$i@test.com",
+        "message":
+            "sacbiucbabcoudscodbcadbc. UDCSDIUCBSDUCHSDCiubic ui.soduchsdocsacbiucbabcoudscodbcadbc. UDCSDIUCBSDUCHSDCiubic ui.soduchsdocsacbiucbabcoudscodbcadbc. UDCSDIUCBSDUCHSDCiubic ui.soduchsdocsacbiucbabcoudscodbcadbc. UDCSDIUCBSDUCHSDCiubic ui.soduchsdocsacbiucbabcoudscodbcadbc. UDCSDIUCBSDUCHSDCiubic ui.soduchsdocsacbiucbabcoudscodbcadbc. UDCSDIUCBSDUCHSDCiubic ui.soduchsdocsacbiucbabcoudscodbcadbc. UDCSDIUCBSDUCHSDCiubic ui.soduchsdocsacbiucbabcoudscodbcadbc. UDCSDIUCBSDUCHSDCiubic ui.soduchsdoc",
+        "fcmToken": User.userFcmToken,
+        "instituteName": "IEEE",
+        "contactNumber": 217228736483.toString()
+      });
+      print(response.body);
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -26,8 +52,12 @@ class _QueryDataState extends State<QueryData> {
           ),
           backgroundColor: teal2,
           centerTitle: true,
-          title: Text('Queries'),
-          bottom: TabBar(tabs: [
+          title: GestureDetector(
+              onDoubleTap: () {
+                generateTickets();
+              },
+              child: Text('Queries')),
+          bottom: TabBar(indicatorColor: Colors.white, tabs: [
             Tab(
               icon: Icon(Icons.pie_chart),
               text: 'Dashboard',
@@ -43,11 +73,7 @@ class _QueryDataState extends State<QueryData> {
           ]),
         ),
         body: TabBarView(children: [
-          QueryDashboard(
-            total: 50,
-            unRegistered: 30,
-            registered: 20,
-          ),
+          QueryDashboard(),
           QueryStatus(
             isPending: true,
           ),

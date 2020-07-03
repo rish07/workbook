@@ -37,7 +37,9 @@ class _ApproveUserState extends State<ApproveUser> {
                     ? "$baseUrl/admin/viewAllDrivers"
                     : "$baseUrl/employee/viewAllCustomers",
             body: {
+              "userID": User.userEmail,
               "instituteName": User.instituteName,
+              "jwtToken": User.userJwtToken
             },
           )
         : await http.get('$baseUrl/superAdmin/viewAllAdmin');
@@ -74,9 +76,15 @@ class _ApproveUserState extends State<ApproveUser> {
                     ? "$baseUrl/employee/approveCustomer"
                     : "$baseUrl/superAdmin/approveAdmin",
         body: User.userRole != 'employee'
-            ? {"id": id}
-            : {
+            ? {
+                "userID": User.userEmail,
                 "id": id,
+                "jwtToken": User.userJwtToken,
+              }
+            : {
+                "userID": User.userEmail,
+                "id": id,
+                "jwtToken": User.userJwtToken,
                 "employeeID": User.userEmail,
               });
     print('Response status: ${response.statusCode}');
@@ -106,8 +114,13 @@ class _ApproveUserState extends State<ApproveUser> {
                     ? "$baseUrl/employee/rejectCustomer"
                     : "$baseUrl/superAdmin/rejectAdmin",
         body: User.userRole != 'employee'
-            ? {"id": id}
+            ? {
+                "id": id,
+                "jwtToken": User.userJwtToken,
+                "userID": User.userEmail
+              }
             : {
+                "jwtToken": User.userJwtToken,
                 "id": id,
                 "employeeID": User.userEmail,
               });

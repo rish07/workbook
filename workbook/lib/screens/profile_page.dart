@@ -71,6 +71,7 @@ class _ProfilePageState extends State<ProfilePage> {
     var response = await http.post('$baseUrl/${User.userRole}/update',
         body: (User.userRole == 'admin')
             ? {
+                "jwtToken": User.userJwtToken,
                 "id": User.userID,
                 "userName": User.userName,
                 "instituteType": User.userInstituteType,
@@ -83,6 +84,7 @@ class _ProfilePageState extends State<ProfilePage> {
               }
             : (User.userRole == 'customer')
                 ? {
+                    "jwtToken": User.userJwtToken,
                     "userName": User.userName,
                     "state": User.state,
                     "grade": User.grade,
@@ -93,6 +95,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   }
                 : (User.userRole == 'driver')
                     ? {
+                        "jwtToken": User.userJwtToken,
                         "userName": User.userName,
                         'carNumber': User.carNumber,
                         "adharNumber": User.aadharNumber.toString(),
@@ -100,6 +103,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         "fcmToken": User.userFcmToken,
                       }
                     : {
+                        "jwtToken": User.userJwtToken,
                         "userName": User.userName,
                         "grade": User.grade,
                         "division": User.division,

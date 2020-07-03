@@ -44,7 +44,9 @@ class _AddGDState extends State<AddGD> {
     });
 
     var data = {
+      "userID": User.userEmail,
       "instituteName": User.instituteName,
+      "jwtToken": User.userJwtToken,
       "grade": toBeUploadedGrade,
       "division": tobeUploadedDivision
     };

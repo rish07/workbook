@@ -57,6 +57,8 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
     var response = await http.post(
         '$baseUrl/${User.userRole}/delete${StringUtils.capitalize(widget.role)}',
         body: {
+          "jwtToken": User.userJwtToken,
+          "userID": User.userEmail,
           "id": widget.id,
         });
 

@@ -10,6 +10,7 @@ import 'package:workbook/screens/active_users.dart';
 import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/screens/login_page.dart';
 import 'package:workbook/screens/profile_page.dart';
+import 'package:workbook/screens/query_data.dart';
 import 'package:workbook/screens/settings.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/popUpDialog.dart';
@@ -103,6 +104,19 @@ Theme buildDrawer(BuildContext context) {
                           child: ApproveUser(
                             isDriver: true,
                           ),
+                          type: PageTransitionType.rightToLeft),
+                    );
+                  })
+              : Container(),
+          User.userRole == 'admin'
+              ? buildDrawerItem(
+                  icon: Icons.question_answer,
+                  title: 'Queries',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                          child: QueryData(),
                           type: PageTransitionType.rightToLeft),
                     );
                   })

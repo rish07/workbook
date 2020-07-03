@@ -20,4 +20,5 @@ class User {
   static String grade;
   static String division;
   static String userFcmToken;
+  static String userJwtToken;
 }

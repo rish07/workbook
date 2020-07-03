@@ -22,8 +22,10 @@ class _GenerateTicketState extends State<GenerateTicket> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   bool _validateName = false;
   bool _validateEmail = false;
+  bool _validatePhoneNumber = false;
   bool _validateDescription = false;
   bool _validateInstitution = false;
   String _selectedInstitution;
@@ -35,6 +37,7 @@ class _GenerateTicketState extends State<GenerateTicket> {
       "message": _descriptionController.text.toString(),
       "fcmToken": User.userFcmToken,
       "instituteName": _selectedInstitution,
+      "contactNumber": _phoneController.text
     });
 
     print(response.body);
@@ -113,6 +116,13 @@ class _GenerateTicketState extends State<GenerateTicket> {
                 errorText: 'Please enter a valid email ID',
                 labelText: 'Email',
                 textInputType: TextInputType.emailAddress,
+              ),
+              InputField(
+                validate: _validatePhoneNumber,
+                errorText: 'Please enter a valid 10 digit mobile number',
+                controller: _phoneController,
+                textInputType: TextInputType.phone,
+                labelText: 'Contact Number',
               ),
               Padding(
                 padding: EdgeInsets.all(16),
@@ -229,6 +239,10 @@ class _GenerateTicketState extends State<GenerateTicket> {
                               !validator.email(_emailController.text))
                           ? _validateEmail = true
                           : _validateEmail = false;
+                      (_phoneController.text.isEmpty ||
+                              !validator.phone(_phoneController.text))
+                          ? _validatePhoneNumber = true
+                          : _validatePhoneNumber = false;
                       if (_selectedInstitution == null) {
                         _validateInstitution = true;
                       }
@@ -237,6 +251,7 @@ class _GenerateTicketState extends State<GenerateTicket> {
                     if (!_validateInstitution &&
                         !_validateDescription &&
                         !_validateName &&
+                        !_validatePhoneNumber &&
                         !_validateEmail) {
                       setState(() {
                         _isLoading = true;

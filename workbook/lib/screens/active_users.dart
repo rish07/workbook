@@ -34,11 +34,11 @@ class _ActiveUsersState extends State<ActiveUsers> {
                     : "$baseUrl/employee/activeCustomer",
             body: User.userRole == 'admin'
                 ? {
+                    "userID": User.userEmail,
                     "instituteName": User.instituteName,
+                    "jwtToken": User.userJwtToken
                   }
-                : {
-                    "employeeID": User.userEmail,
-                  },
+                : {"employeeID": User.userEmail, "jwtToken": User.userJwtToken},
           )
         : await http.get('$baseUrl/superAdmin/viewAllAdmin');
     print('Response status: ${response.statusCode}');
