@@ -170,12 +170,12 @@ class _AddPostState extends State<AddPost> {
           backgroundColor: Colors.transparent,
           title: Text(
             'Share post',
-            style: TextStyle(color: teal2, fontWeight: FontWeight.bold),
+            style: TextStyle(color: violet2, fontWeight: FontWeight.bold),
           ),
           leading: IconButton(
               icon: Icon(
                 Icons.clear,
-                color: teal2,
+                color: violet2,
               ),
               onPressed: () {
                 Navigator.pop(context);
@@ -185,7 +185,7 @@ class _AddPostState extends State<AddPost> {
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
               child: MaterialButton(
                   minWidth: 80,
-                  color: teal2,
+                  color: violet2,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(32),
                   ),
@@ -215,14 +215,14 @@ class _AddPostState extends State<AddPost> {
                 ),
                 title: Text(
                   'Super Admin',
-                  style: TextStyle(color: teal2, fontSize: 18),
+                  style: TextStyle(color: violet2, fontSize: 18),
                 ),
               ),
               TextFormField(
                 controller: _controller,
                 textCapitalization: TextCapitalization.sentences,
                 style: TextStyle(color: Colors.black, fontSize: 18),
-                cursorColor: teal2,
+                cursorColor: violet2,
                 cursorRadius: Radius.circular(8),
                 maxLines: 25,
                 decoration: InputDecoration(
@@ -242,7 +242,7 @@ class _AddPostState extends State<AddPost> {
                 IconButton(
                   icon: Icon(
                     Icons.collections,
-                    color: teal2,
+                    color: violet2,
                   ),
                   onPressed: () {
                     setState(() {
@@ -254,7 +254,7 @@ class _AddPostState extends State<AddPost> {
                 IconButton(
                   icon: Icon(
                     Icons.description,
-                    color: teal2,
+                    color: violet2,
                   ),
                   onPressed: () {
                     setState(() {

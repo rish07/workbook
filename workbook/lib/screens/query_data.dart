@@ -38,7 +38,7 @@ class _QueryDataState extends State<QueryData> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
@@ -50,34 +50,49 @@ class _QueryDataState extends State<QueryData> {
               Navigator.pop(context);
             },
           ),
-          backgroundColor: teal2,
+          backgroundColor: violet2,
           centerTitle: true,
           title: GestureDetector(
               onDoubleTap: () {
                 generateTickets();
               },
               child: Text('Queries')),
-          bottom: TabBar(indicatorColor: Colors.white, tabs: [
-            Tab(
-              icon: Icon(Icons.pie_chart),
-              text: 'Dashboard',
-            ),
-            Tab(
-              icon: Icon(Icons.watch_later),
-              text: 'Pending',
-            ),
-            Tab(
-              icon: Icon(Icons.check),
-              text: 'Approved',
-            )
-          ]),
+          bottom: TabBar(
+              labelPadding: EdgeInsets.symmetric(horizontal: 10),
+              indicatorSize: TabBarIndicatorSize.label,
+              isScrollable: true,
+              indicatorColor: Colors.white,
+              tabs: [
+                Tab(
+                  icon: Icon(Icons.pie_chart),
+                  text: 'Dashboard',
+                ),
+                Tab(
+                  icon: Icon(Icons.watch_later),
+                  text: 'Pending',
+                ),
+                Tab(
+                  icon: Icon(Icons.warning),
+                  text: 'Unregistered',
+                ),
+                Tab(
+                  icon: Icon(Icons.check),
+                  text: 'Registered',
+                ),
+              ]),
         ),
         body: TabBarView(children: [
           QueryDashboard(),
           QueryStatus(
+            isRegistered: false,
             isPending: true,
           ),
           QueryStatus(
+            isRegistered: false,
+            isPending: false,
+          ),
+          QueryStatus(
+            isRegistered: true,
             isPending: false,
           ),
         ]),

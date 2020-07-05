@@ -8,7 +8,7 @@ class ComingSoon extends StatelessWidget {
       body: Center(
         child: Text(
           'Coming Soon',
-          style: TextStyle(fontSize: 50, color: teal2),
+          style: TextStyle(fontSize: 50, color: violet2),
         ),
       ),
     );

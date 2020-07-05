@@ -16,18 +16,18 @@ void popDialog(
         title: Center(
             child: Text(
           title,
-          style: TextStyle(color: teal1),
+          style: TextStyle(color: violet1),
         )),
         content: Text(
           content,
-          style: TextStyle(color: teal1),
+          style: TextStyle(color: violet1),
         ),
         actions: <Widget>[
           // usually buttons at the bottom of the dialog
           new MaterialButton(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30)),
-              color: teal2,
+              color: violet2,
               child: new Text(
                 buttonTitle,
                 style: TextStyle(

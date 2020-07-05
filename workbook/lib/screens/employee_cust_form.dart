@@ -48,25 +48,21 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordReController = TextEditingController();
-
+  List gradeDivision = [];
   Future _registerUser() async {
     print('working');
-    var response = await http.post(
-        widget.isEmployee
-            ? '$baseUrl/employee/register'
-            : '$baseUrl/customer/register',
-        body: {
-          "role": "Employee",
-          "userName": _nameController.text,
-          "userID": _emailController.text,
-          "password": _passwordController.text,
-          "instituteName": _selectedInstitution,
-          "grade": _selectedGrade,
-          "division": _selectedDivision,
-          "adharNumber": _aadharController.text,
-          "contactNumber": _phoneController.text,
-          "fcmToken": User.userFcmToken,
-        });
+    var response = await http.post(widget.isEmployee ? '$baseUrl/employee/register' : '$baseUrl/customer/register', body: {
+      "role": "Employee",
+      "userName": _nameController.text,
+      "userID": _emailController.text,
+      "password": _passwordController.text,
+      "instituteName": _selectedInstitution,
+      "grade": _selectedGrade,
+      "division": _selectedDivision,
+      "adharNumber": _aadharController.text,
+      "contactNumber": _phoneController.text,
+      "fcmToken": User.userFcmToken,
+    });
     setState(() {
       _isLoading = false;
     });
@@ -83,15 +79,13 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
           onPress: () {
             Navigator.push(
               context,
-              PageTransition(
-                  child: LoginPage(), type: PageTransitionType.rightToLeft),
+              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
             );
           },
           title: 'Registration Successful',
           context: context,
           buttonTitle: 'Close',
-          content:
-              'Your form has been submitted. Please wait for 24 hours for it to get approved');
+          content: 'Your form has been submitted. Please wait for 24 hours for it to get approved');
     }
   }
 
@@ -133,11 +127,8 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
 
   Future sendNotificationEmployee(String name) async {
     employees.forEach((element) async {
-      var response = await http.post("$baseUrl/sendNotification", body: {
-        "fcmToken": element['fcmToken'],
-        "message": "New employee request from $name. Please login now",
-        "title": "New Registration"
-      });
+      var response = await http
+          .post("$baseUrl/sendNotification", body: {"fcmToken": element['fcmToken'], "message": "New employee request from $name. Please login now", "title": "New Registration"});
       print(response.body);
     });
   }
@@ -151,25 +142,19 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
         });
       }
     });
-    var response = await http.post('$baseUrl/sendNotification', body: {
-      "fcmToken": adminFcm,
-      "message": "New employee request from $name. Please login now",
-      "title": "New Registration"
-    });
+    var response =
+        await http.post('$baseUrl/sendNotification', body: {"fcmToken": adminFcm, "message": "New employee request from $name. Please login now", "title": "New Registration"});
     print(response.body);
   }
 
-  Future getDivision({String instituteName}) async {
-    var response = await http.get("$baseUrl/fetchDivision/$instituteName");
-    print('Response status: ${response.statusCode}');
-    List temp = json.decode(response.body)['payload']['divisions'];
-    temp.forEach((resp) {
-      divisions.add(resp);
+  void _div() {
+    gradeDivision.clear();
+    divisionData.forEach((element) {
+      if (element['grade'] == _selectedGrade) {
+        gradeDivision.add(element['division']);
+      }
     });
-    divisions = Set.of(divisions).toList();
-    setState(() {
-      _isLoading = false;
-    });
+    gradeDivision = Set.of(gradeDivision).toList();
   }
 
   @override
@@ -188,25 +173,20 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
     return Scaffold(
       body: ModalProgressHUD(
         progressIndicator: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(teal2),
+          valueColor: AlwaysStoppedAnimation<Color>(violet2),
           backgroundColor: Colors.transparent,
         ),
         inAsyncCall: _isLoading,
         child: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [teal1, teal2]),
+            gradient: LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [violet1, violet2]),
           ),
           child: Padding(
             padding: EdgeInsets.all(16),
             child: ListView(
               children: [
                 Text(
-                  widget.isEmployee
-                      ? 'Employee Registration'
-                      : 'Customer Registration',
+                  widget.isEmployee ? 'Employee Registration' : 'Customer Registration',
                   style: TextStyle(
                     fontSize: 28,
                     color: Colors.white,
@@ -234,8 +214,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                   validate: _validatePassword,
                   controller: _passwordController,
                   labelText: 'Password',
-                  errorText:
-                      'Min Length = 8 and Max length = 15,\nShould have atleast 1 number, 1 capital letter\nand 1 Special Character',
+                  errorText: 'Min Length = 8 and Max length = 15,\nShould have atleast 1 number, 1 capital letter\nand 1 Special Character',
                 ),
                 PasswordInput(
                   validate: _validateRePassword,
@@ -252,9 +231,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                       });
                     },
                     decoration: InputDecoration(
-                      errorText: _validateInstitution
-                          ? 'Please choose an option'
-                          : null,
+                      errorText: _validateInstitution ? 'Please choose an option' : null,
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.white70),
                       ),
@@ -263,7 +240,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                     iconDisabledColor: Colors.white,
                     iconEnabledColor: Colors.white,
                     iconSize: 24,
-                    dropdownColor: Colors.teal,
+                    dropdownColor: violet1,
                     style: TextStyle(
                       fontFamily: 'Montserrat',
                       fontSize: 20,
@@ -280,7 +257,6 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                         _selectedInstitution = newValue;
                       });
                       await getGrades(instituteName: newValue);
-                      await getDivision(instituteName: newValue);
                     },
                     items: institutes.map((type) {
                       return DropdownMenuItem(
@@ -299,8 +275,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                       });
                     },
                     decoration: InputDecoration(
-                      errorText:
-                          _validateGrade ? 'Please choose an option' : null,
+                      errorText: _validateGrade ? 'Please choose an option' : null,
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.white70),
                       ),
@@ -309,7 +284,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                     iconDisabledColor: Colors.white,
                     iconEnabledColor: Colors.white,
                     iconSize: 24,
-                    dropdownColor: Colors.teal,
+                    dropdownColor: violet1,
                     style: TextStyle(
                       fontFamily: 'Montserrat',
                       fontSize: 20,
@@ -320,10 +295,11 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                       style: TextStyle(color: Colors.white70),
                     ),
                     value: _selectedGrade,
-                    onChanged: (newValue) {
+                    onChanged: (newValue) async {
                       setState(() {
                         _selectedGrade = newValue;
                       });
+                      await _div();
                     },
                     items: grades.map((type) {
                       return DropdownMenuItem(
@@ -342,8 +318,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                       });
                     },
                     decoration: InputDecoration(
-                      errorText:
-                          _validateDivision ? 'Please choose an option' : null,
+                      errorText: _validateDivision ? 'Please choose an option' : null,
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.white70),
                       ),
@@ -352,7 +327,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                     iconDisabledColor: Colors.white,
                     iconEnabledColor: Colors.white,
                     iconSize: 24,
-                    dropdownColor: Colors.teal,
+                    dropdownColor: violet1,
                     style: TextStyle(
                       fontFamily: 'Montserrat',
                       fontSize: 20,
@@ -368,7 +343,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                         _selectedDivision = newValue;
                       });
                     },
-                    items: divisions.map((location) {
+                    items: gradeDivision.map((location) {
                       return DropdownMenuItem(
                         child: Text(location),
                         value: location,
@@ -391,38 +366,20 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                   labelText: 'Contact Number',
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 16.0, horizontal: 64),
+                  padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 64),
                   child: Builder(
                     builder: (context) => registerButton(
                       role: 'Submit',
                       context: context,
                       onPressed: () async {
                         setState(() {
-                          _nameController.text.isEmpty
-                              ? _validateName = true
-                              : _validateName = false;
-                          (_emailController.text.isEmpty ||
-                                  !validator.email(_emailController.text))
-                              ? _validateEmail = true
-                              : _validateEmail = false;
-                          (_passwordController.text.isEmpty ||
-                                  !validator.password(_passwordController.text))
-                              ? _validatePassword = true
-                              : _validatePassword = false;
-                          (_passwordReController.text.isEmpty ||
-                                  !validator.password(_passwordController.text))
-                              ? _validateRePassword = true
-                              : _validateRePassword = false;
+                          _nameController.text.isEmpty ? _validateName = true : _validateName = false;
+                          (_emailController.text.isEmpty || !validator.email(_emailController.text)) ? _validateEmail = true : _validateEmail = false;
+                          (_passwordController.text.isEmpty || !validator.password(_passwordController.text)) ? _validatePassword = true : _validatePassword = false;
+                          (_passwordReController.text.isEmpty || !validator.password(_passwordController.text)) ? _validateRePassword = true : _validateRePassword = false;
 
-                          (_aadharController.text.isEmpty ||
-                                  _aadharController.text.length != 12)
-                              ? _validateAadhar = true
-                              : _validateAadhar = false;
-                          (_phoneController.text.isEmpty ||
-                                  _phoneController.text.length != 10)
-                              ? _validatePhoneNumber = true
-                              : _validatePhoneNumber = false;
+                          (_aadharController.text.isEmpty || _aadharController.text.length != 12) ? _validateAadhar = true : _validateAadhar = false;
+                          (_phoneController.text.isEmpty || _phoneController.text.length != 10) ? _validatePhoneNumber = true : _validatePhoneNumber = false;
                           if (_selectedDivision == null) {
                             _validateDivision = true;
                           }
@@ -432,8 +389,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                           if (_selectedInstitution == null) {
                             _validateInstitution = true;
                           }
-                          if (_passwordController.text !=
-                              _passwordReController.text) {
+                          if (_passwordController.text != _passwordReController.text) {
                             _validateRePassword = true;
                           }
                         });

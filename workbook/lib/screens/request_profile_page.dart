@@ -93,7 +93,7 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
         appBar: AppBar(
           title: Text('${widget.role.toUpperCase()} details'),
           iconTheme: IconThemeData(
-            color: teal2,
+            color: violet2,
           ),
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -205,7 +205,7 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
             child: Container(
               child: Text(
                 '$label: ',
-                style: TextStyle(fontSize: 20, color: teal2),
+                style: TextStyle(fontSize: 20, color: violet2),
               ),
             ),
           ),
@@ -214,7 +214,7 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
             child: Container(
               child: TextFormField(
                 textInputAction: TextInputAction.next,
-                style: TextStyle(color: teal1),
+                style: TextStyle(color: violet1),
                 decoration: InputDecoration(
                   focusedBorder: UnderlineInputBorder(
                     borderSide: BorderSide.none,
@@ -223,7 +223,7 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
                     borderSide: BorderSide.none,
                   ),
                   hintText: value,
-                  hintStyle: TextStyle(color: teal1, fontSize: 18),
+                  hintStyle: TextStyle(color: violet1, fontSize: 18),
                 ),
                 readOnly: true,
               ),

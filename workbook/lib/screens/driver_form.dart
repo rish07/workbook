@@ -87,7 +87,7 @@ class _DriverFormState extends State<DriverForm> {
     return Scaffold(
       body: ModalProgressHUD(
         progressIndicator: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(teal2),
+          valueColor: AlwaysStoppedAnimation<Color>(violet2),
           backgroundColor: Colors.transparent,
         ),
         inAsyncCall: _isLoading,
@@ -96,7 +96,7 @@ class _DriverFormState extends State<DriverForm> {
             gradient: LinearGradient(
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
-                colors: [teal1, teal2]),
+                colors: [violet1, violet2]),
           ),
           child: Padding(
             padding: EdgeInsets.all(16),
@@ -160,7 +160,7 @@ class _DriverFormState extends State<DriverForm> {
                     iconDisabledColor: Colors.white,
                     iconEnabledColor: Colors.white,
                     iconSize: 24,
-                    dropdownColor: Colors.teal,
+                    dropdownColor: violet1,
                     style: TextStyle(
                       fontFamily: 'Montserrat',
                       fontSize: 20,
@@ -203,7 +203,7 @@ class _DriverFormState extends State<DriverForm> {
                     iconDisabledColor: Colors.white,
                     iconEnabledColor: Colors.white,
                     iconSize: 24,
-                    dropdownColor: Colors.teal,
+                    dropdownColor: violet1,
                     style: TextStyle(
                       fontFamily: 'Montserrat',
                       fontSize: 20,

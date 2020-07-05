@@ -3,7 +3,7 @@ import 'package:flutter_image/network.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workbook/constants.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:workbook/screens/add_GD.dart';
+import 'package:workbook/screens/add_grade.dart';
 
 import 'package:workbook/screens/approve_user.dart';
 import 'package:workbook/screens/active_users.dart';
@@ -17,7 +17,7 @@ import 'package:workbook/widget/popUpDialog.dart';
 
 Theme buildDrawer(BuildContext context) {
   return Theme(
-    data: Theme.of(context).copyWith(canvasColor: teal1),
+    data: Theme.of(context).copyWith(canvasColor: violet1),
     child: Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -31,8 +31,8 @@ Theme buildDrawer(BuildContext context) {
                         borderRadius: BorderRadius.circular(20),
                         image: DecorationImage(
                           fit: BoxFit.fill,
-                          image: NetworkImageWithRetry(
-                            '$baseUrl/getInstituteProfile/${User.instituteName}',
+                          image: NetworkImage(
+                            User.instituteImage,
                           ),
                         ),
                       ),
@@ -48,22 +48,14 @@ Theme buildDrawer(BuildContext context) {
               icon: Icons.home,
               title: "Home",
               onTap: () {
-                Navigator.push(
-                    context,
-                    PageTransition(
-                        child: DashBoard(),
-                        type: PageTransitionType.rightToLeft));
+                Navigator.push(context, PageTransition(child: DashBoard(), type: PageTransitionType.rightToLeft));
               }),
           User.userRole != 'superAdmin'
               ? buildDrawerItem(
                   icon: Icons.account_circle,
                   title: "Profile",
                   onTap: () {
-                    Navigator.push(
-                        context,
-                        PageTransition(
-                            child: ProfilePage(),
-                            type: PageTransitionType.rightToLeft));
+                    Navigator.push(context, PageTransition(child: ProfilePage(), type: PageTransitionType.rightToLeft));
                   })
               : Container(),
           User.userRole == 'admin'
@@ -71,18 +63,12 @@ Theme buildDrawer(BuildContext context) {
                   icon: Icons.arrow_downward,
                   title: 'Grades and Divisions',
                   onTap: () {
-                    Navigator.push(
-                        context,
-                        PageTransition(
-                            child: AddGD(),
-                            type: PageTransitionType.rightToLeft));
+                    Navigator.push(context, PageTransition(child: AddGrade(), type: PageTransitionType.rightToLeft));
                   })
               : Container(),
           buildDrawerItem(
               icon: Icons.person,
-              title: User.userRole == 'admin'
-                  ? "Employees"
-                  : (User.userRole == 'employee') ? 'Customers' : 'Admins',
+              title: User.userRole == 'admin' ? "Employees" : (User.userRole == 'employee') ? 'Customers' : 'Admins',
               onTap: () {
                 Navigator.push(
                   context,
@@ -115,9 +101,7 @@ Theme buildDrawer(BuildContext context) {
                   onTap: () {
                     Navigator.push(
                       context,
-                      PageTransition(
-                          child: QueryData(),
-                          type: PageTransitionType.rightToLeft),
+                      PageTransition(child: QueryData(), type: PageTransitionType.rightToLeft),
                     );
                   })
               : Container(),
@@ -127,8 +111,7 @@ Theme buildDrawer(BuildContext context) {
               onTap: () {
                 Navigator.push(
                   context,
-                  PageTransition(
-                      child: Settings(), type: PageTransitionType.rightToLeft),
+                  PageTransition(child: Settings(), type: PageTransitionType.rightToLeft),
                 );
               }),
           buildDrawerItem(
@@ -141,8 +124,7 @@ Theme buildDrawer(BuildContext context) {
                     context: context,
                     content: 'Do you want to logout from your profile?',
                     onPress: () async {
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
                       prefs.remove('userName');
                       prefs.remove('userEmail');
                       prefs.remove('userID');
@@ -160,12 +142,7 @@ Theme buildDrawer(BuildContext context) {
                       prefs.remove('contactNumber');
                       prefs.remove('userPhotoData');
 
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          PageTransition(
-                              child: LoginPage(),
-                              type: PageTransitionType.rightToLeft),
-                          (route) => false);
+                      Navigator.pushAndRemoveUntil(context, PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft), (route) => false);
                     });
               })
         ],

@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 
 Color violetColor = Color(0xFF7052C5);
-Color teal1 = Color(0xFF163F49);
-Color teal2 = Color(0xFF377C7D);
+Color violet1 = Color(0xFF1E081D);
+Color violet2 = Color(0xFF591554);
 String baseUrl = "https://app-workbook.herokuapp.com";
 //String baseUrl = "https://a4bc6d8b9364.ngrok.io";
 List<String> states = [
@@ -763,5 +763,6 @@ var cities = {
 List<String> instituteType = ['Joint Venture', 'LLC', 'Proprietaryship'];
 List<String> institutes = [];
 List<String> grades = [];
-List<String> divisions = [];
+List divisions = [];
+List divisionData = [];
 List<String> carNumber = ['Car Number 1', 'Car Number 2', 'Car Number 3'];

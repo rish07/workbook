@@ -153,7 +153,7 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: Colors.white,
         appBar: AppBar(
           iconTheme: IconThemeData(
-            color: teal2,
+            color: violet2,
           ),
           backgroundColor: Colors.transparent,
           actions: User.userRole != 'superAdmin'
@@ -164,7 +164,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               EdgeInsets.symmetric(horizontal: 8, vertical: 10),
                           child: MaterialButton(
                               minWidth: 80,
-                              color: teal2,
+                              color: violet2,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(32),
                               ),
@@ -186,7 +186,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       : IconButton(
                           icon: Icon(
                             Icons.edit,
-                            color: teal2,
+                            color: violet2,
                           ),
                           onPressed: () {
                             setState(() {
@@ -224,7 +224,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     _isEdit
                         ? IconButton(
                             icon: Icon(Icons.edit),
-                            color: teal2,
+                            color: violet2,
                             onPressed: () {
                               getImage();
                             },
@@ -266,7 +266,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       MediaQuery.of(context).size.width * 0.04),
                               child: Text(
                                 'State: ',
-                                style: TextStyle(fontSize: 20, color: teal2),
+                                style: TextStyle(fontSize: 20, color: violet2),
                               ),
                             ),
                           ),
@@ -275,7 +275,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             child: DropdownButtonFormField(
                               hint: Text(
                                 'Select State',
-                                style: TextStyle(color: teal1, fontSize: 18),
+                                style: TextStyle(color: violet1, fontSize: 18),
                               ),
                               decoration: InputDecoration(
                                 enabledBorder: OutlineInputBorder(
@@ -319,7 +319,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       MediaQuery.of(context).size.width * 0.04),
                               child: Text(
                                 'City: ',
-                                style: TextStyle(fontSize: 20, color: teal2),
+                                style: TextStyle(fontSize: 20, color: violet2),
                               ),
                             ),
                           ),
@@ -328,7 +328,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             child: DropdownButtonFormField(
                               hint: Text(
                                 'Select City',
-                                style: TextStyle(color: teal1, fontSize: 18),
+                                style: TextStyle(color: violet1, fontSize: 18),
                               ),
                               decoration: InputDecoration(
                                 enabledBorder: OutlineInputBorder(
@@ -396,7 +396,7 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Container(
               child: Text(
                 '$label: ',
-                style: TextStyle(fontSize: 20, color: teal2),
+                style: TextStyle(fontSize: 20, color: violet2),
               ),
             ),
           ),
@@ -406,20 +406,20 @@ class _ProfilePageState extends State<ProfilePage> {
               child: TextFormField(
                 onSaved: onSaved,
                 textInputAction: TextInputAction.next,
-                style: TextStyle(color: teal1),
+                style: TextStyle(color: violet1),
                 decoration: InputDecoration(
                   focusedBorder: UnderlineInputBorder(
                     borderSide: _isEdit
-                        ? BorderSide(width: 2, color: teal2)
+                        ? BorderSide(width: 2, color: violet2)
                         : BorderSide.none,
                   ),
                   enabledBorder: UnderlineInputBorder(
                     borderSide: _isEdit
-                        ? BorderSide(width: 1, color: teal2)
+                        ? BorderSide(width: 1, color: violet2)
                         : BorderSide.none,
                   ),
                   hintText: value,
-                  hintStyle: TextStyle(color: teal1, fontSize: 18),
+                  hintStyle: TextStyle(color: violet1, fontSize: 18),
                 ),
                 readOnly: !_isEdit,
               ),

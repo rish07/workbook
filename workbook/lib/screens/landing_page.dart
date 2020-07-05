@@ -50,7 +50,7 @@ class _LandingPageState extends State<LandingPage> {
             gradient: LinearGradient(
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
-                colors: [teal1, teal2])),
+                colors: [violet1, violet2])),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,

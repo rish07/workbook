@@ -111,12 +111,14 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future getInstitutes() async {
-    print('working');
-    var response = await http.get("$baseUrl/admin/institutes");
+    print('working ins');
+    var response = await http.get("$baseUrl/superAdmin/viewAllAdmin");
     print('Response status: ${response.statusCode}');
-    List temp = json.decode(response.body)['payload']['institute'];
+    List temp = json.decode(response.body)['payload']['admin'];
     temp.forEach((resp) {
-      institutes.add(resp['instituteName']);
+      if (resp['approved'] == true) {
+        institutes.add(resp['instituteName']);
+      }
     });
     institutes = Set.of(institutes).toList();
     print(institutes);
@@ -145,7 +147,7 @@ class _LoginPageState extends State<LoginPage> {
         User.userRole = tempo['role'] ?? null;
         User.userEmail = tempo['userID'] ?? null;
         User.instituteName = tempo['instituteName'] ?? null;
-        User.instituteImage = tempo['instituteImage'] ?? null;
+        User.instituteImage = tempo['instituteImageUrl'];
         User.userInstituteType = tempo['instituteType'] ?? null;
         User.numberOfMembers = tempo['numberOfMembers'] ?? null;
         User.state = tempo['state'] ?? null;
@@ -160,12 +162,13 @@ class _LoginPageState extends State<LoginPage> {
         User.profilePicExists = tempo['profilePicture'] == null ? false : true;
         User.carNumber = tempo['carNumber'] ?? null;
       });
+
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('userName', User.userName);
       prefs.setString('userEmail', User.userEmail);
       prefs.setString('userID', User.userID);
       prefs.setString('userRole', User.userRole);
-      //prefs.setString('instituteImage', User.instituteImage);
+      prefs.setString('instituteImage', User.instituteImage);
       prefs.setString('instituteName', User.instituteName);
       prefs.setString('userInstituteType', User.userInstituteType);
       prefs.setInt('numberOfMembers', User.numberOfMembers);
@@ -227,7 +230,7 @@ class _LoginPageState extends State<LoginPage> {
       onWillPop: () async => false,
       child: ModalProgressHUD(
         progressIndicator: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(teal2),
+          valueColor: AlwaysStoppedAnimation<Color>(violet2),
           backgroundColor: Colors.transparent,
         ),
         opacity: 0.5,
@@ -240,7 +243,7 @@ class _LoginPageState extends State<LoginPage> {
             gradient: LinearGradient(
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
-                colors: [teal1, teal2]),
+                colors: [violet1, violet2]),
           ),
           child: Form(
             key: _formKey,

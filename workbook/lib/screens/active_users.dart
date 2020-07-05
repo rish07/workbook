@@ -87,15 +87,15 @@ class _ActiveUsersState extends State<ActiveUsers> {
                   : (User.userRole == 'employee')
                       ? 'Active Customers'
                       : 'Active Admins',
-          style: TextStyle(color: teal2, fontWeight: FontWeight.bold),
+          style: TextStyle(color: violet2, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
-        iconTheme: IconThemeData(color: teal2),
+        iconTheme: IconThemeData(color: violet2),
       ),
       drawer: buildDrawer(context),
       body: ModalProgressHUD(
         progressIndicator: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(teal2),
+          valueColor: AlwaysStoppedAnimation<Color>(violet2),
           backgroundColor: Colors.transparent,
         ),
         inAsyncCall: _loading,

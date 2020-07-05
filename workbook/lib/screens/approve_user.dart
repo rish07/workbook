@@ -181,15 +181,15 @@ class _ApproveUserState extends State<ApproveUser> {
                   : (User.userRole == 'employee')
                       ? 'Approve Customers'
                       : 'Approve Admins',
-          style: TextStyle(color: teal2, fontWeight: FontWeight.bold),
+          style: TextStyle(color: violet2, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
-        iconTheme: IconThemeData(color: teal2),
+        iconTheme: IconThemeData(color: violet2),
       ),
       drawer: buildDrawer(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: teal2,
+          backgroundColor: violet2,
           onPressed: () {
             Navigator.push(
               context,
@@ -223,7 +223,7 @@ class _ApproveUserState extends State<ApproveUser> {
           )),
       body: ModalProgressHUD(
         progressIndicator: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(teal2),
+          valueColor: AlwaysStoppedAnimation<Color>(violet2),
           backgroundColor: Colors.transparent,
         ),
         inAsyncCall: _loading,

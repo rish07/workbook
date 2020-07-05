@@ -77,7 +77,7 @@ class _GenerateTicketState extends State<GenerateTicket> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       progressIndicator: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(teal2),
+        valueColor: AlwaysStoppedAnimation<Color>(violet2),
         backgroundColor: Colors.transparent,
       ),
       inAsyncCall: _isLoading,
@@ -87,7 +87,7 @@ class _GenerateTicketState extends State<GenerateTicket> {
             gradient: LinearGradient(
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
-                colors: [teal1, teal2]),
+                colors: [violet1, violet2]),
           ),
           padding: EdgeInsets.all(16),
           child: ListView(
@@ -143,7 +143,7 @@ class _GenerateTicketState extends State<GenerateTicket> {
                   iconDisabledColor: Colors.white,
                   iconEnabledColor: Colors.white,
                   iconSize: 24,
-                  dropdownColor: Colors.teal,
+                  dropdownColor: violet1,
                   style: TextStyle(
                     fontFamily: 'Montserrat',
                     fontSize: 20,
@@ -209,7 +209,7 @@ class _GenerateTicketState extends State<GenerateTicket> {
                         borderSide: BorderSide(color: Colors.white, width: 2.0),
                       ),
                       fillColor: Colors.lightBlueAccent,
-                      labelText: "Ticket description",
+                      labelText: "Enquiry description",
                       alignLabelWithHint: true,
                       labelStyle: TextStyle(
                         fontSize: 20,
@@ -260,8 +260,9 @@ class _GenerateTicketState extends State<GenerateTicket> {
                     }
                   },
                   child: Text(
-                    'Submit Ticket',
-                    style: TextStyle(color: teal2, fontWeight: FontWeight.bold),
+                    'Submit Enquiry',
+                    style:
+                        TextStyle(color: violet2, fontWeight: FontWeight.bold),
                   ),
                 ),
               )

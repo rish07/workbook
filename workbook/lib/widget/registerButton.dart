@@ -9,7 +9,8 @@ MaterialButton registerButton(
     color: Colors.white,
     child: Text(
       role,
-      style: TextStyle(fontWeight: FontWeight.bold, color: teal2, fontSize: 18),
+      style:
+          TextStyle(fontWeight: FontWeight.bold, color: violet2, fontSize: 18),
     ),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(30),

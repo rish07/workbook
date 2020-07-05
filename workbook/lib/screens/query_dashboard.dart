@@ -87,7 +87,7 @@ class _QueryDashboardState extends State<QueryDashboard> {
                             _registered.length) *
                         100
                   ],
-                  labels: ['Pending', 'Unregistered', 'Registered'],
+                  labels: ['Registered', 'Unregistered', 'Pending'],
                   legendPosition: LegendPosition.Bottom,
                 ),
               ),

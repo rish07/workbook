@@ -10,7 +10,7 @@ class User {
   static String userEmail;
   static String instituteName;
   static String userInstituteType;
-  static var instituteImage;
+  static String instituteImage;
   static int numberOfMembers;
   static String state;
   static String city;

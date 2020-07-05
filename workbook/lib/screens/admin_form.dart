@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -15,6 +18,8 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:workbook/user.dart';
+import 'dart:math' as math;
+import 'package:path/path.dart' as p;
 
 class AdminForm extends StatefulWidget {
   @override
@@ -22,9 +27,10 @@ class AdminForm extends StatefulWidget {
 }
 
 class _AdminFormState extends State<AdminForm> {
+  final math.Random random = math.Random();
   bool _isLoading = false;
   String imageAsB64;
-  File _image;
+
   final picker = ImagePicker();
   String _selectedStateLocation;
   String _selectedCityLocation;
@@ -54,33 +60,62 @@ class _AdminFormState extends State<AdminForm> {
   final TextEditingController _aadharController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _mailController = TextEditingController();
+  String fileType = '';
+  File _file;
+  String fileName = '';
+  String mediaUrl = '';
 
-  Future<String> _registerUser(filename, url) async {
-    var request = http.MultipartRequest('POST', Uri.parse(url));
-    request.fields['role'] = 'Admin';
-    request.fields['userName'] = _nameController.text;
-    request.fields['userID'] = _emailController.text;
-    request.fields['password'] = _passwordController.text;
-    request.fields['instituteName'] = _organizationController.text;
-    request.fields['instituteType'] = _selectedInstitutionType;
-    request.fields['numberOfMembers'] = _organizationNumberController.text;
-    request.fields['state'] = _selectedStateLocation;
-    request.fields['city'] = _selectedCityLocation == 'Others'
-        ? _cityNameController.text
-        : _selectedCityLocation;
-    request.fields['mailAddress'] = _mailController.text;
-    request.fields['adharNumber'] = _aadharController.text;
-    request.fields['contactNumber'] = _phoneController.text;
-    request.fields['fcmToken'] = User.userFcmToken;
+  Future filePicker(BuildContext context) async {
+    try {
+      _file = await FilePicker.getFile(type: FileType.image);
+      setState(() {
+        fileName = p.basename(_file.path);
+      });
+      print(fileName);
+      _uploadFile();
+    } catch (e) {
+      print(e);
+    }
+  }
 
-    request.files.add(
-      await http.MultipartFile.fromPath('instituteImage', filename),
-    );
+  Future<void> _uploadFile() async {
+    setState(() {
+      _isLoading = true;
+    });
+    StorageReference storageReference;
+    int rand = random.nextInt(1000);
+    storageReference = FirebaseStorage.instance.ref().child("images/$rand");
 
-    var res = await request.send();
-    if (res.statusCode == 200) {
-      String response = await res.stream.bytesToString();
-      print(response);
+    final StorageUploadTask uploadTask = storageReference.putFile(_file);
+    final StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
+    final String url = (await downloadUrl.ref.getDownloadURL());
+    setState(() {
+      mediaUrl = url;
+      _isLoading = false;
+      Fluttertoast.showToast(msg: 'File attached successfully');
+    });
+    print("URL is $url");
+  }
+
+  Future _registerUser() async {
+    var response = await http.post("$baseUrl/admin/register", body: {
+      "userName": _nameController.text.toString(),
+      "userID": _emailController.text.toString(),
+      "password": _passwordController.text,
+      "instituteName": _organizationController.text,
+      "instituteType": _selectedInstitutionType,
+      "instituteImageUrl": mediaUrl,
+      "numberOfMembers": _organizationNumberController.text,
+      "state": _selectedStateLocation,
+      "city": _selectedCityLocation,
+      "mailAddress": _mailController.text.toString(),
+      "adharNumber": _aadharController.text,
+      "contactNumber": _phoneController.text,
+      "fcmToken": User.userFcmToken,
+    });
+    print(response.body);
+
+    if (json.decode(response.body)['statusCode'] == 200) {
       popDialog(
           onPress: () {
             Navigator.push(
@@ -95,32 +130,9 @@ class _AdminFormState extends State<AdminForm> {
           content:
               'Your form has been submitted. Please wait for 24 hours for it to get approved');
     } else {
-      print('Error: ${res.statusCode}');
+      Fluttertoast.showToast(msg: 'Error');
     }
-    return res.reasonPhrase;
   }
-
-  Future getImage() async {
-    final pickedImage = await picker.getImage(source: ImageSource.gallery);
-    setState(() {
-      _image = File(pickedImage.path);
-      imagePath = pickedImage.path;
-    });
-    List<int> temp = _image.readAsBytesSync();
-    imageAsB64 = base64Encode(temp);
-    print(imageAsB64);
-  }
-
-  Future upload() async {
-    var res = await _registerUser(imagePath, '$baseUrl/admin/register');
-    setState(() {
-      state = res;
-      _isLoading = false;
-      print(res);
-    });
-  }
-
-  String state = "";
 
   @override
   void initState() {
@@ -147,7 +159,7 @@ class _AdminFormState extends State<AdminForm> {
     return Scaffold(
       body: ModalProgressHUD(
         progressIndicator: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(teal2),
+          valueColor: AlwaysStoppedAnimation<Color>(violet2),
           backgroundColor: Colors.transparent,
         ),
         inAsyncCall: _isLoading,
@@ -156,7 +168,7 @@ class _AdminFormState extends State<AdminForm> {
             gradient: LinearGradient(
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
-                colors: [teal1, teal2]),
+                colors: [violet1, violet2]),
           ),
           child: Padding(
             padding: EdgeInsets.all(16),
@@ -195,7 +207,7 @@ class _AdminFormState extends State<AdminForm> {
                       'Min Length = 8 and Max length = 15,\nShould have atleast 1 number, 1 capital letter\nand 1 Special Character',
                 ),
                 PasswordInput(
-                  validate: _validatePassword,
+                  validate: _validateRePassword,
                   controller: _passwordReController,
                   labelText: 'Re-enter Password',
                   errorText: 'Passwords don\'t match',
@@ -225,7 +237,7 @@ class _AdminFormState extends State<AdminForm> {
                     iconDisabledColor: Colors.white,
                     iconEnabledColor: Colors.white,
                     iconSize: 24,
-                    dropdownColor: Colors.teal,
+                    dropdownColor: violet2,
                     style: TextStyle(
                       fontFamily: 'Montserrat',
                       fontSize: 20,
@@ -274,9 +286,9 @@ class _AdminFormState extends State<AdminForm> {
                             ),
                             color: Colors.white,
                             onPressed: () {
-                              getImage();
+                              filePicker(context);
                             },
-                            child: _image == null
+                            child: _file == null
                                 ? Text('Choose a file')
                                 : Text('Uploaded!'),
                           ),
@@ -311,7 +323,7 @@ class _AdminFormState extends State<AdminForm> {
                     iconDisabledColor: Colors.white,
                     iconEnabledColor: Colors.white,
                     iconSize: 24,
-                    dropdownColor: Colors.teal,
+                    dropdownColor: violet2,
                     style: TextStyle(
                       fontFamily: 'Montserrat',
                       fontSize: 20,
@@ -354,7 +366,7 @@ class _AdminFormState extends State<AdminForm> {
                     iconDisabledColor: Colors.white,
                     iconEnabledColor: Colors.white,
                     iconSize: 24,
-                    dropdownColor: Colors.teal,
+                    dropdownColor: violet2,
                     style: TextStyle(
                       fontFamily: 'Montserrat',
                       fontSize: 20,
@@ -471,7 +483,7 @@ class _AdminFormState extends State<AdminForm> {
                               _passwordReController.text) {
                             _validateRePassword = true;
                           }
-                          if (_image == null) {
+                          if (_file == null) {
                             Scaffold.of(context).showSnackBar(SnackBar(
                               content:
                                   Text('Please upload the institution image!'),
@@ -494,12 +506,12 @@ class _AdminFormState extends State<AdminForm> {
                                 !_validateOrganization &&
                                 !_validatePassword &&
                                 !_validateRePassword &&
-                                _image != null) {
+                                _file != null) {
                           setState(() {
                             _isLoading = true;
                           });
 
-                          await upload();
+                          await _registerUser();
 
                           _nameController.clear();
                           _emailController.clear();

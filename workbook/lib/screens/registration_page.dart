@@ -26,7 +26,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     return Scaffold(
       body: ModalProgressHUD(
         progressIndicator: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(teal2),
+          valueColor: AlwaysStoppedAnimation<Color>(violet2),
           backgroundColor: Colors.transparent,
         ),
         inAsyncCall: _isLoading,
@@ -35,7 +35,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             gradient: LinearGradient(
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
-                colors: [teal1, teal2]),
+                colors: [violet1, violet2]),
           ),
           child: ListView(
             children: <Widget>[
