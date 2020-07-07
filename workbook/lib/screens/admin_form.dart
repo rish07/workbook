@@ -55,8 +55,7 @@ class _AdminFormState extends State<AdminForm> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordReController = TextEditingController();
   final TextEditingController _organizationController = TextEditingController();
-  final TextEditingController _organizationNumberController =
-      TextEditingController();
+  final TextEditingController _organizationNumberController = TextEditingController();
   final TextEditingController _aadharController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _mailController = TextEditingController();
@@ -92,7 +91,7 @@ class _AdminFormState extends State<AdminForm> {
     setState(() {
       mediaUrl = url;
       _isLoading = false;
-      Fluttertoast.showToast(msg: 'File attached successfully');
+      FlutterToast.showToast(msg: 'File attached successfully');
     });
     print("URL is $url");
   }
@@ -120,17 +119,15 @@ class _AdminFormState extends State<AdminForm> {
           onPress: () {
             Navigator.push(
               context,
-              PageTransition(
-                  child: LoginPage(), type: PageTransitionType.rightToLeft),
+              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
             );
           },
           title: 'Registration Successful',
           context: context,
           buttonTitle: 'Close',
-          content:
-              'Your form has been submitted. Please wait for 24 hours for it to get approved');
+          content: 'Your form has been submitted. Please wait for 24 hours for it to get approved');
     } else {
-      Fluttertoast.showToast(msg: 'Error');
+      FlutterToast.showToast(msg: 'Error');
     }
   }
 
@@ -165,10 +162,7 @@ class _AdminFormState extends State<AdminForm> {
         inAsyncCall: _isLoading,
         child: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [violet1, violet2]),
+            gradient: LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [violet1, violet2]),
           ),
           child: Padding(
             padding: EdgeInsets.all(16),
@@ -203,8 +197,7 @@ class _AdminFormState extends State<AdminForm> {
                   validate: _validatePassword,
                   controller: _passwordController,
                   labelText: 'Password',
-                  errorText:
-                      'Min Length = 8 and Max length = 15,\nShould have atleast 1 number, 1 capital letter\nand 1 Special Character',
+                  errorText: 'Min Length = 8 and Max length = 15,\nShould have atleast 1 number, 1 capital letter\nand 1 Special Character',
                 ),
                 PasswordInput(
                   validate: _validateRePassword,
@@ -212,62 +205,56 @@ class _AdminFormState extends State<AdminForm> {
                   labelText: 'Re-enter Password',
                   errorText: 'Passwords don\'t match',
                 ),
-                InputField(
-                    validate: _validateOrganization,
-                    controller: _organizationController,
-                    errorText: 'Max length is 50',
-                    labelText: 'Institution Name'),
+                InputField(validate: _validateOrganization, controller: _organizationController, errorText: 'Max length is 50', labelText: 'Institution Name'),
                 Padding(
                   padding: EdgeInsets.all(16),
-                  child: DropdownButtonFormField(
-                    onTap: () {
-                      setState(() {
-                        _validateInstituteType = false;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      errorText: _validateInstituteType
-                          ? 'Please choose an option'
-                          : null,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white70),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(canvasColor: violet1),
+                    child: DropdownButtonFormField(
+                      onTap: () {
+                        setState(() {
+                          _validateInstituteType = false;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        errorText: _validateInstituteType ? 'Please choose an option' : null,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
                       ),
+                      icon: Icon(Icons.keyboard_arrow_down),
+                      iconDisabledColor: Colors.white,
+                      iconEnabledColor: Colors.white,
+                      iconSize: 24,
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 20,
+                        color: Colors.white70,
+                      ),
+                      hint: Text(
+                        'Select Institution Type',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      value: _selectedInstitutionType,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedInstitutionType = newValue;
+                        });
+                      },
+                      items: instituteType.map((type) {
+                        return DropdownMenuItem(
+                          child: Text(type),
+                          value: type,
+                        );
+                      }).toList(),
                     ),
-                    icon: Icon(Icons.keyboard_arrow_down),
-                    iconDisabledColor: Colors.white,
-                    iconEnabledColor: Colors.white,
-                    iconSize: 24,
-                    dropdownColor: violet2,
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontSize: 20,
-                      color: Colors.white70,
-                    ),
-                    hint: Text(
-                      'Select Institution Type',
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                    value: _selectedInstitutionType,
-                    onChanged: (newValue) {
-                      setState(() {
-                        _selectedInstitutionType = newValue;
-                      });
-                    },
-                    items: instituteType.map((type) {
-                      return DropdownMenuItem(
-                        child: Text(type),
-                        value: type,
-                      );
-                    }).toList(),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Container(
                     height: 60,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        border: Border.all(color: Colors.white70)),
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.white70)),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -288,9 +275,7 @@ class _AdminFormState extends State<AdminForm> {
                             onPressed: () {
                               filePicker(context);
                             },
-                            child: _file == null
-                                ? Text('Choose a file')
-                                : Text('Uploaded!'),
+                            child: _file == null ? Text('Choose a file') : Text('Uploaded!'),
                           ),
                         ),
                       ],
@@ -306,92 +291,93 @@ class _AdminFormState extends State<AdminForm> {
                 ),
                 Padding(
                   padding: EdgeInsets.all(16),
-                  child: DropdownButtonFormField(
-                    onTap: () {
-                      setState(() {
-                        _validateState = false;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      errorText:
-                          _validateState ? 'Please choose an option' : null,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white70),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(canvasColor: violet1),
+                    child: DropdownButtonFormField(
+                      onTap: () {
+                        setState(() {
+                          _validateState = false;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        errorText: _validateState ? 'Please choose an option' : null,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
                       ),
+                      icon: Icon(Icons.keyboard_arrow_down),
+                      iconDisabledColor: Colors.white,
+                      iconEnabledColor: Colors.white,
+                      iconSize: 24,
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 20,
+                        color: Colors.white70,
+                      ),
+                      hint: Text(
+                        'Select State',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      value: _selectedStateLocation,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedStateLocation = newValue;
+                        });
+                      },
+                      items: states.map((location) {
+                        return DropdownMenuItem(
+                          child: Text(location),
+                          value: location,
+                        );
+                      }).toList(),
                     ),
-                    icon: Icon(Icons.keyboard_arrow_down),
-                    iconDisabledColor: Colors.white,
-                    iconEnabledColor: Colors.white,
-                    iconSize: 24,
-                    dropdownColor: violet2,
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontSize: 20,
-                      color: Colors.white70,
-                    ),
-                    hint: Text(
-                      'Select State',
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                    value: _selectedStateLocation,
-                    onChanged: (newValue) {
-                      setState(() {
-                        _selectedStateLocation = newValue;
-                      });
-                    },
-                    items: states.map((location) {
-                      return DropdownMenuItem(
-                        child: Text(location),
-                        value: location,
-                      );
-                    }).toList(),
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.all(16),
-                  child: DropdownButtonFormField(
-                    onTap: () {
-                      setState(() {
-                        _validateCity = false;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      errorText:
-                          _validateCity ? 'Please choose an option' : null,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white70),
-                      ),
-                    ),
-                    icon: Icon(Icons.keyboard_arrow_down),
-                    iconDisabledColor: Colors.white,
-                    iconEnabledColor: Colors.white,
-                    iconSize: 24,
-                    dropdownColor: violet2,
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontSize: 20,
-                      color: Colors.white70,
-                    ),
-                    hint: Text(
-                      'Select City',
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                    value: _selectedCityLocation,
-                    onChanged: (newValue) {
-                      setState(() {
-                        _selectedCityLocation = newValue;
-                      });
-                    },
-                    items: cities[_selectedStateLocation ?? 'Madhya Pradesh']
-                        .map((location) {
-                      return DropdownMenuItem(
-                        child: AutoSizeText(
-                          location,
-                          maxLines: 1,
+                  child: Theme(
+                    data: Theme.of(context).copyWith(canvasColor: violet1),
+                    child: DropdownButtonFormField(
+                      onTap: () {
+                        setState(() {
+                          _validateCity = false;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        errorText: _validateCity ? 'Please choose an option' : null,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
                         ),
-                        value: location,
-                      );
-                    }).toList(),
+                      ),
+                      icon: Icon(Icons.keyboard_arrow_down),
+                      iconDisabledColor: Colors.white,
+                      iconEnabledColor: Colors.white,
+                      iconSize: 24,
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 20,
+                        color: Colors.white70,
+                      ),
+                      hint: Text(
+                        'Select City',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      value: _selectedCityLocation,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedCityLocation = newValue;
+                        });
+                      },
+                      items: cities[_selectedStateLocation ?? 'Madhya Pradesh'].map((location) {
+                        return DropdownMenuItem(
+                          child: AutoSizeText(
+                            location,
+                            maxLines: 1,
+                          ),
+                          value: location,
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ),
                 _selectedCityLocation == 'Others'
@@ -424,52 +410,23 @@ class _AdminFormState extends State<AdminForm> {
                   labelText: 'Contact Number',
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 16.0, horizontal: 64),
+                  padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 64),
                   child: Builder(
                     builder: (context) => registerButton(
                       role: 'Submit',
                       context: context,
                       onPressed: () async {
                         setState(() {
-                          _nameController.text.isEmpty
-                              ? _validateName = true
-                              : _validateName = false;
-                          _selectedCityLocation == 'Others'
-                              ? _cityNameController.text.isEmpty
-                                  ? _validateCityName = true
-                                  : _validateCityName = false
-                              : Container();
-                          (_emailController.text.isEmpty ||
-                                  !validator.email(_emailController.text))
-                              ? _validateEmail = true
-                              : _validateEmail = false;
-                          (_passwordController.text.isEmpty ||
-                                  !validator.password(_passwordController.text))
-                              ? _validatePassword = true
-                              : _validatePassword = false;
-                          (_passwordReController.text.isEmpty ||
-                                  !validator.password(_passwordController.text))
-                              ? _validateRePassword = true
-                              : _validateRePassword = false;
-                          (_organizationController.text.isEmpty ||
-                                  _organizationController.text.length > 50)
-                              ? _validateOrganization = true
-                              : _validateOrganization = false;
-                          _organizationNumberController.text.isEmpty
-                              ? _validateNumberOrganization = true
-                              : _validateNumberOrganization = false;
-                          _mailController.text.isEmpty
-                              ? _validateMail = true
-                              : _validateMail = false;
-                          (_aadharController.text.isEmpty ||
-                                  _aadharController.text.length != 12)
-                              ? _validateAadhar = true
-                              : _validateAadhar = false;
-                          (_phoneController.text.isEmpty ||
-                                  _phoneController.text.length != 10)
-                              ? _validatePhoneNumber = true
-                              : _validatePhoneNumber = false;
+                          _nameController.text.isEmpty ? _validateName = true : _validateName = false;
+                          _selectedCityLocation == 'Others' ? _cityNameController.text.isEmpty ? _validateCityName = true : _validateCityName = false : Container();
+                          (_emailController.text.isEmpty || !validator.email(_emailController.text)) ? _validateEmail = true : _validateEmail = false;
+                          (_passwordController.text.isEmpty || !validator.password(_passwordController.text)) ? _validatePassword = true : _validatePassword = false;
+                          (_passwordReController.text.isEmpty || !validator.password(_passwordController.text)) ? _validateRePassword = true : _validateRePassword = false;
+                          (_organizationController.text.isEmpty || _organizationController.text.length > 50) ? _validateOrganization = true : _validateOrganization = false;
+                          _organizationNumberController.text.isEmpty ? _validateNumberOrganization = true : _validateNumberOrganization = false;
+                          _mailController.text.isEmpty ? _validateMail = true : _validateMail = false;
+                          (_aadharController.text.isEmpty || _aadharController.text.length != 12) ? _validateAadhar = true : _validateAadhar = false;
+                          (_phoneController.text.isEmpty || _phoneController.text.length != 10) ? _validatePhoneNumber = true : _validatePhoneNumber = false;
                           if (_selectedStateLocation == null) {
                             _validateState = true;
                           }
@@ -479,25 +436,17 @@ class _AdminFormState extends State<AdminForm> {
                           if (_selectedCityLocation == null) {
                             _validateCity = true;
                           }
-                          if (_passwordController.text !=
-                              _passwordReController.text) {
+                          if (_passwordController.text != _passwordReController.text) {
                             _validateRePassword = true;
                           }
                           if (_file == null) {
                             Scaffold.of(context).showSnackBar(SnackBar(
-                              content:
-                                  Text('Please upload the institution image!'),
-                              action: SnackBarAction(
-                                  label: 'Okay', onPressed: () {}),
+                              content: Text('Please upload the institution image!'),
+                              action: SnackBarAction(label: 'Okay', onPressed: () {}),
                             ));
                           }
                         });
-                        if (!_validateName &&
-                                !_validateEmail &&
-                                !_validatePhoneNumber &&
-                                !_validateNumberOrganization &&
-                                !_validateMail &&
-                                _selectedCityLocation == 'Other'
+                        if (!_validateName && !_validateEmail && !_validatePhoneNumber && !_validateNumberOrganization && !_validateMail && _selectedCityLocation == 'Other'
                             ? _validateCityName
                             : true &&
                                 !_validateCity &&

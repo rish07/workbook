@@ -61,15 +61,13 @@ class _DriverFormState extends State<DriverForm> {
           onPress: () {
             Navigator.push(
               context,
-              PageTransition(
-                  child: LoginPage(), type: PageTransitionType.rightToLeft),
+              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
             );
           },
           title: 'Registration Successful',
           context: context,
           buttonTitle: 'Close',
-          content:
-              'Your form has been submitted. Please wait for 24 hours for it to get approved');
+          content: 'Your form has been submitted. Please wait for 24 hours for it to get approved');
     }
   }
 
@@ -93,10 +91,7 @@ class _DriverFormState extends State<DriverForm> {
         inAsyncCall: _isLoading,
         child: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [violet1, violet2]),
+            gradient: LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [violet1, violet2]),
           ),
           child: Padding(
             padding: EdgeInsets.all(16),
@@ -131,8 +126,7 @@ class _DriverFormState extends State<DriverForm> {
                   validate: _validatePassword,
                   controller: _passwordController,
                   labelText: 'Password',
-                  errorText:
-                      'Min Length = 8 and Max length = 15,\nShould have atleast 1 number, 1 capital letter\nand 1 Special Character',
+                  errorText: 'Min Length = 8 and Max length = 15,\nShould have atleast 1 number, 1 capital letter\nand 1 Special Character',
                 ),
                 PasswordInput(
                   validate: _validateRePassword,
@@ -142,89 +136,90 @@ class _DriverFormState extends State<DriverForm> {
                 ),
                 Padding(
                   padding: EdgeInsets.all(16),
-                  child: DropdownButtonFormField(
-                    onTap: () {
-                      setState(() {
-                        _validateInstitution = false;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      errorText: _validateInstitution
-                          ? 'Please choose an option'
-                          : null,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white70),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(canvasColor: violet1),
+                    child: DropdownButtonFormField(
+                      onTap: () {
+                        setState(() {
+                          _validateInstitution = false;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        errorText: _validateInstitution ? 'Please choose an option' : null,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
                       ),
+                      icon: Icon(Icons.keyboard_arrow_down),
+                      iconDisabledColor: Colors.white,
+                      iconEnabledColor: Colors.white,
+                      iconSize: 24,
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 20,
+                        color: Colors.white70,
+                      ),
+                      hint: Text(
+                        'Select Institution',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      value: _selectedInstitution,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedInstitution = newValue;
+                        });
+                      },
+                      items: institutes.map((type) {
+                        return DropdownMenuItem(
+                          child: Text(type),
+                          value: type,
+                        );
+                      }).toList(),
                     ),
-                    icon: Icon(Icons.keyboard_arrow_down),
-                    iconDisabledColor: Colors.white,
-                    iconEnabledColor: Colors.white,
-                    iconSize: 24,
-                    dropdownColor: violet1,
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontSize: 20,
-                      color: Colors.white70,
-                    ),
-                    hint: Text(
-                      'Select Institution',
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                    value: _selectedInstitution,
-                    onChanged: (newValue) {
-                      setState(() {
-                        _selectedInstitution = newValue;
-                      });
-                    },
-                    items: institutes.map((type) {
-                      return DropdownMenuItem(
-                        child: Text(type),
-                        value: type,
-                      );
-                    }).toList(),
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.all(16),
-                  child: DropdownButtonFormField(
-                    onTap: () {
-                      setState(() {
-                        _validateCar = false;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      errorText:
-                          _validateCar ? 'Please choose an option' : null,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white70),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(canvasColor: violet1),
+                    child: DropdownButtonFormField(
+                      onTap: () {
+                        setState(() {
+                          _validateCar = false;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        errorText: _validateCar ? 'Please choose an option' : null,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
                       ),
+                      icon: Icon(Icons.keyboard_arrow_down),
+                      iconDisabledColor: Colors.white,
+                      iconEnabledColor: Colors.white,
+                      iconSize: 24,
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 20,
+                        color: Colors.white70,
+                      ),
+                      hint: Text(
+                        'Select Car Number',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      value: _selectedCar,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedCar = newValue;
+                        });
+                      },
+                      items: carNumber.map((type) {
+                        return DropdownMenuItem(
+                          child: Text(type),
+                          value: type,
+                        );
+                      }).toList(),
                     ),
-                    icon: Icon(Icons.keyboard_arrow_down),
-                    iconDisabledColor: Colors.white,
-                    iconEnabledColor: Colors.white,
-                    iconSize: 24,
-                    dropdownColor: violet1,
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontSize: 20,
-                      color: Colors.white70,
-                    ),
-                    hint: Text(
-                      'Select Car Number',
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                    value: _selectedCar,
-                    onChanged: (newValue) {
-                      setState(() {
-                        _selectedCar = newValue;
-                      });
-                    },
-                    items: carNumber.map((type) {
-                      return DropdownMenuItem(
-                        child: Text(type),
-                        value: type,
-                      );
-                    }).toList(),
                   ),
                 ),
                 InputField(
@@ -242,38 +237,20 @@ class _DriverFormState extends State<DriverForm> {
                   labelText: 'Contact Number',
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 16.0, horizontal: 64),
+                  padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 64),
                   child: Builder(
                     builder: (context) => registerButton(
                       role: 'Submit',
                       context: context,
                       onPressed: () async {
                         setState(() {
-                          _nameController.text.isEmpty
-                              ? _validateName = true
-                              : _validateName = false;
-                          (_emailController.text.isEmpty ||
-                                  !validator.email(_emailController.text))
-                              ? _validateEmail = true
-                              : _validateEmail = false;
-                          (_passwordController.text.isEmpty ||
-                                  !validator.password(_passwordController.text))
-                              ? _validatePassword = true
-                              : _validatePassword = false;
-                          (_passwordReController.text.isEmpty ||
-                                  !validator.password(_passwordController.text))
-                              ? _validateRePassword = true
-                              : _validateRePassword = false;
+                          _nameController.text.isEmpty ? _validateName = true : _validateName = false;
+                          (_emailController.text.isEmpty || !validator.email(_emailController.text)) ? _validateEmail = true : _validateEmail = false;
+                          (_passwordController.text.isEmpty || !validator.password(_passwordController.text)) ? _validatePassword = true : _validatePassword = false;
+                          (_passwordReController.text.isEmpty || !validator.password(_passwordController.text)) ? _validateRePassword = true : _validateRePassword = false;
 
-                          (_aadharController.text.isEmpty ||
-                                  _aadharController.text.length != 12)
-                              ? _validateAadhar = true
-                              : _validateAadhar = false;
-                          (_phoneController.text.isEmpty ||
-                                  _phoneController.text.length != 10)
-                              ? _validatePhoneNumber = true
-                              : _validatePhoneNumber = false;
+                          (_aadharController.text.isEmpty || _aadharController.text.length != 12) ? _validateAadhar = true : _validateAadhar = false;
+                          (_phoneController.text.isEmpty || _phoneController.text.length != 10) ? _validatePhoneNumber = true : _validatePhoneNumber = false;
 
                           if (_selectedCar == null) {
                             _validateCar = true;
@@ -281,8 +258,7 @@ class _DriverFormState extends State<DriverForm> {
                           if (_selectedInstitution == null) {
                             _validateInstitution = true;
                           }
-                          if (_passwordController.text !=
-                              _passwordReController.text) {
+                          if (_passwordController.text != _passwordReController.text) {
                             _validateRePassword = true;
                           }
                         });

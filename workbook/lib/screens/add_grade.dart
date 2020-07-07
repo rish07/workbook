@@ -53,12 +53,12 @@ class _AddGradeState extends State<AddGrade> {
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
     if (json.decode(response.body)['statusCode'] == 200) {
-      Fluttertoast.showToast(msg: 'Updated');
+      FlutterToast.showToast(msg: 'Updated');
       setState(() {
         _isLoading = false;
       });
     } else {
-      Fluttertoast.showToast(msg: 'Error');
+      FlutterToast.showToast(msg: 'Error');
     }
   }
 
@@ -106,7 +106,7 @@ class _AddGradeState extends State<AddGrade> {
               FlatButton(
                 onPressed: () {
                   if (controller.text.isEmpty) {
-                    Fluttertoast.showToast(msg: 'Please enter a name');
+                    FlutterToast.showToast(msg: 'Please enter a name');
                   } else {
                     divisions.add({'division': name, 'grade': grades[index]});
                     print(divisions);
@@ -346,9 +346,9 @@ class _AddGradeState extends State<AddGrade> {
               FlatButton(
                 onPressed: () {
                   if (controller.text.isEmpty) {
-                    Fluttertoast.showToast(msg: 'Please enter a name');
+                    FlutterToast.showToast(msg: 'Please enter a name');
                   } else if (grades.contains(controller.text)) {
-                    Fluttertoast.showToast(msg: 'Duplicate Entry', gravity: ToastGravity.TOP);
+                    FlutterToast.showToast(msg: 'Duplicate Entry', gravity: ToastGravity.TOP);
                   } else {
                     grades.add(name);
                     controller.clear();

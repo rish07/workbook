@@ -45,14 +45,12 @@ class _GenerateTicketState extends State<GenerateTicket> {
       popDialog(
           title: "Submitted successfully",
           context: context,
-          content:
-              "Your query has been submitted successfully. Please wait for the admin to contact you",
+          content: "Your query has been submitted successfully. Please wait for the admin to contact you",
           buttonTitle: 'Close',
           onPress: () {
             Navigator.push(
               context,
-              PageTransition(
-                  child: LoginPage(), type: PageTransitionType.rightToLeft),
+              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
             );
             _nameController.clear();
             _emailController.clear();
@@ -60,7 +58,7 @@ class _GenerateTicketState extends State<GenerateTicket> {
             _selectedInstitution = null;
           });
     } else {
-      Fluttertoast.showToast(msg: 'Error');
+      FlutterToast.showToast(msg: 'Error');
     }
   }
 
@@ -84,10 +82,7 @@ class _GenerateTicketState extends State<GenerateTicket> {
       child: Scaffold(
         body: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [violet1, violet2]),
+            gradient: LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [violet1, violet2]),
           ),
           padding: EdgeInsets.all(16),
           child: ListView(
@@ -126,45 +121,48 @@ class _GenerateTicketState extends State<GenerateTicket> {
               ),
               Padding(
                 padding: EdgeInsets.all(16),
-                child: DropdownButtonFormField(
-                  onTap: () {
-                    setState(() {
-                      _validateInstitution = false;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    errorText:
-                        _validateInstitution ? 'Please choose an option' : null,
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white70),
+                child: Theme(
+                  data: Theme.of(context).copyWith(
+                    canvasColor: violet1,
+                  ),
+                  child: DropdownButtonFormField(
+                    onTap: () {
+                      setState(() {
+                        _validateInstitution = false;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      errorText: _validateInstitution ? 'Please choose an option' : null,
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white70),
+                      ),
                     ),
+                    icon: Icon(Icons.keyboard_arrow_down),
+                    iconDisabledColor: Colors.white,
+                    iconEnabledColor: Colors.white,
+                    iconSize: 24,
+                    style: TextStyle(
+                      fontFamily: 'Montserrat',
+                      fontSize: 20,
+                      color: Colors.white70,
+                    ),
+                    hint: Text(
+                      'Select Institution',
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                    value: _selectedInstitution,
+                    onChanged: (newValue) {
+                      setState(() {
+                        _selectedInstitution = newValue;
+                      });
+                    },
+                    items: institutes.map((type) {
+                      return DropdownMenuItem(
+                        child: Text(type),
+                        value: type,
+                      );
+                    }).toList(),
                   ),
-                  icon: Icon(Icons.keyboard_arrow_down),
-                  iconDisabledColor: Colors.white,
-                  iconEnabledColor: Colors.white,
-                  iconSize: 24,
-                  dropdownColor: violet1,
-                  style: TextStyle(
-                    fontFamily: 'Montserrat',
-                    fontSize: 20,
-                    color: Colors.white70,
-                  ),
-                  hint: Text(
-                    'Select Institution',
-                    style: TextStyle(color: Colors.white70),
-                  ),
-                  value: _selectedInstitution,
-                  onChanged: (newValue) {
-                    setState(() {
-                      _selectedInstitution = newValue;
-                    });
-                  },
-                  items: institutes.map((type) {
-                    return DropdownMenuItem(
-                      child: Text(type),
-                      value: type,
-                    );
-                  }).toList(),
                 ),
               ),
               Padding(
@@ -190,8 +188,7 @@ class _GenerateTicketState extends State<GenerateTicket> {
                       color: Colors.white,
                     ),
                     decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 18),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 18),
                       isDense: true,
                       errorMaxLines: 1,
                       focusedErrorBorder: OutlineInputBorder(
@@ -199,9 +196,7 @@ class _GenerateTicketState extends State<GenerateTicket> {
                       ),
                       errorStyle: TextStyle(height: 0, fontSize: 10),
                       floatingLabelBehavior: FloatingLabelBehavior.auto,
-                      errorText: _validateDescription
-                          ? "This field can't be empty"
-                          : null,
+                      errorText: _validateDescription ? "This field can't be empty" : null,
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.white70, width: 1),
                       ),
@@ -229,30 +224,16 @@ class _GenerateTicketState extends State<GenerateTicket> {
                   ),
                   onPressed: () async {
                     setState(() {
-                      _nameController.text.isEmpty
-                          ? _validateName = true
-                          : _validateName = false;
-                      _descriptionController.text.isEmpty
-                          ? _validateDescription = true
-                          : _validateDescription = false;
-                      (_emailController.text.isEmpty ||
-                              !validator.email(_emailController.text))
-                          ? _validateEmail = true
-                          : _validateEmail = false;
-                      (_phoneController.text.isEmpty ||
-                              !validator.phone(_phoneController.text))
-                          ? _validatePhoneNumber = true
-                          : _validatePhoneNumber = false;
+                      _nameController.text.isEmpty ? _validateName = true : _validateName = false;
+                      _descriptionController.text.isEmpty ? _validateDescription = true : _validateDescription = false;
+                      (_emailController.text.isEmpty || !validator.email(_emailController.text)) ? _validateEmail = true : _validateEmail = false;
+                      (_phoneController.text.isEmpty || !validator.phone(_phoneController.text)) ? _validatePhoneNumber = true : _validatePhoneNumber = false;
                       if (_selectedInstitution == null) {
                         _validateInstitution = true;
                       }
                     });
 
-                    if (!_validateInstitution &&
-                        !_validateDescription &&
-                        !_validateName &&
-                        !_validatePhoneNumber &&
-                        !_validateEmail) {
+                    if (!_validateInstitution && !_validateDescription && !_validateName && !_validatePhoneNumber && !_validateEmail) {
                       setState(() {
                         _isLoading = true;
                       });
@@ -261,8 +242,7 @@ class _GenerateTicketState extends State<GenerateTicket> {
                   },
                   child: Text(
                     'Submit Enquiry',
-                    style:
-                        TextStyle(color: violet2, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: violet2, fontWeight: FontWeight.bold),
                   ),
                 ),
               )

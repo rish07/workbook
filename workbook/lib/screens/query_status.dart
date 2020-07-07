@@ -68,14 +68,14 @@ class _QueryStatusState extends State<QueryStatus> {
     print(response.body);
     if (json.decode(response.body)['statusCode'] == 200) {
       Navigator.pop(context);
-      Fluttertoast.showToast(msg: 'Comment Added');
+      FlutterToast.showToast(msg: 'Comment Added');
       setState(() {
         pending.clear();
         _isLoading = true;
         getAllQuery();
       });
     } else {
-      Fluttertoast.showToast(msg: 'Error');
+      FlutterToast.showToast(msg: 'Error');
     }
     setState(() {
       _isLoading = false;
@@ -380,10 +380,10 @@ class _QueryStatusState extends State<QueryStatus> {
                                                           setState(() {
                                                             _isLoading = true;
                                                           });
-                                                          Fluttertoast.showToast(msg: 'Posting comment', toastLength: Toast.LENGTH_LONG);
+                                                          FlutterToast.showToast(msg: 'Posting comment', toastLength: Toast.LENGTH_LONG);
                                                           await createComment(id: pending[index]['_id'], comment: _descriptionController.text);
                                                         } else {
-                                                          Fluttertoast.showToast(msg: 'Comment can\'t be empty!');
+                                                          FlutterToast.showToast(msg: 'Comment can\'t be empty!');
                                                         }
                                                       },
                                                       child: Text(

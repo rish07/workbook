@@ -224,131 +224,137 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                 ),
                 Padding(
                   padding: EdgeInsets.all(16),
-                  child: DropdownButtonFormField(
-                    onTap: () {
-                      setState(() {
-                        _validateInstitution = false;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      errorText: _validateInstitution ? 'Please choose an option' : null,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white70),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(canvasColor: violet1),
+                    child: DropdownButtonFormField(
+                      onTap: () {
+                        setState(() {
+                          _validateInstitution = false;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        errorText: _validateInstitution ? 'Please choose an option' : null,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
                       ),
+                      icon: Icon(Icons.keyboard_arrow_down),
+                      iconDisabledColor: Colors.white,
+                      iconEnabledColor: Colors.white,
+                      iconSize: 24,
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 20,
+                        color: Colors.white70,
+                      ),
+                      hint: Text(
+                        'Select Institution',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      value: _selectedInstitution,
+                      onChanged: (newValue) async {
+                        setState(() {
+                          _isLoading = true;
+                          _selectedInstitution = newValue;
+                        });
+                        await getGrades(instituteName: newValue);
+                      },
+                      items: institutes.map((type) {
+                        return DropdownMenuItem(
+                          child: Text(type),
+                          value: type,
+                        );
+                      }).toList(),
                     ),
-                    icon: Icon(Icons.keyboard_arrow_down),
-                    iconDisabledColor: Colors.white,
-                    iconEnabledColor: Colors.white,
-                    iconSize: 24,
-                    dropdownColor: violet1,
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontSize: 20,
-                      color: Colors.white70,
-                    ),
-                    hint: Text(
-                      'Select Institution',
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                    value: _selectedInstitution,
-                    onChanged: (newValue) async {
-                      setState(() {
-                        _isLoading = true;
-                        _selectedInstitution = newValue;
-                      });
-                      await getGrades(instituteName: newValue);
-                    },
-                    items: institutes.map((type) {
-                      return DropdownMenuItem(
-                        child: Text(type),
-                        value: type,
-                      );
-                    }).toList(),
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.all(16),
-                  child: DropdownButtonFormField(
-                    onTap: () {
-                      setState(() {
-                        _validateGrade = false;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      errorText: _validateGrade ? 'Please choose an option' : null,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white70),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(canvasColor: violet1),
+                    child: DropdownButtonFormField(
+                      onTap: () {
+                        setState(() {
+                          _validateGrade = false;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        errorText: _validateGrade ? 'Please choose an option' : null,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
                       ),
+                      icon: Icon(Icons.keyboard_arrow_down),
+                      iconDisabledColor: Colors.white,
+                      iconEnabledColor: Colors.white,
+                      iconSize: 24,
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 20,
+                        color: Colors.white70,
+                      ),
+                      hint: Text(
+                        'Select Grade',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      value: _selectedGrade,
+                      onChanged: (newValue) async {
+                        setState(() {
+                          _selectedGrade = newValue;
+                        });
+                        await _div();
+                      },
+                      items: grades.map((type) {
+                        return DropdownMenuItem(
+                          child: Text(type),
+                          value: type,
+                        );
+                      }).toList(),
                     ),
-                    icon: Icon(Icons.keyboard_arrow_down),
-                    iconDisabledColor: Colors.white,
-                    iconEnabledColor: Colors.white,
-                    iconSize: 24,
-                    dropdownColor: violet1,
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontSize: 20,
-                      color: Colors.white70,
-                    ),
-                    hint: Text(
-                      'Select Grade',
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                    value: _selectedGrade,
-                    onChanged: (newValue) async {
-                      setState(() {
-                        _selectedGrade = newValue;
-                      });
-                      await _div();
-                    },
-                    items: grades.map((type) {
-                      return DropdownMenuItem(
-                        child: Text(type),
-                        value: type,
-                      );
-                    }).toList(),
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.all(16),
-                  child: DropdownButtonFormField(
-                    onTap: () {
-                      setState(() {
-                        _validateDivision = false;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      errorText: _validateDivision ? 'Please choose an option' : null,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white70),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(canvasColor: violet1),
+                    child: DropdownButtonFormField(
+                      onTap: () {
+                        setState(() {
+                          _validateDivision = false;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        errorText: _validateDivision ? 'Please choose an option' : null,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
                       ),
+                      icon: Icon(Icons.keyboard_arrow_down),
+                      iconDisabledColor: Colors.white,
+                      iconEnabledColor: Colors.white,
+                      iconSize: 24,
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 20,
+                        color: Colors.white70,
+                      ),
+                      hint: Text(
+                        'Select Division',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      value: _selectedDivision,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedDivision = newValue;
+                        });
+                      },
+                      items: gradeDivision.map((location) {
+                        return DropdownMenuItem(
+                          child: Text(location),
+                          value: location,
+                        );
+                      }).toList(),
                     ),
-                    icon: Icon(Icons.keyboard_arrow_down),
-                    iconDisabledColor: Colors.white,
-                    iconEnabledColor: Colors.white,
-                    iconSize: 24,
-                    dropdownColor: violet1,
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontSize: 20,
-                      color: Colors.white70,
-                    ),
-                    hint: Text(
-                      'Select Division',
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                    value: _selectedDivision,
-                    onChanged: (newValue) {
-                      setState(() {
-                        _selectedDivision = newValue;
-                      });
-                    },
-                    items: gradeDivision.map((location) {
-                      return DropdownMenuItem(
-                        child: Text(location),
-                        value: location,
-                      );
-                    }).toList(),
                   ),
                 ),
                 InputField(

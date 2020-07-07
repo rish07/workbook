@@ -334,9 +334,14 @@ class _DashBoardState extends State<DashBoard> {
                                         crossAxisAlignment: CrossAxisAlignment.stretch,
                                         children: [
                                           (posts[index]['mediaUrl'] != "null" && posts[index]['mediaType'] == 'image')
-                                              ? Container(
-                                                  padding: EdgeInsets.all(8),
-                                                  child: Image.network(posts[index]['mediaUrl']),
+                                              ? GestureDetector(
+                                                  onLongPress: () async {
+                                                    await launch(posts[index]['mediaUrl']);
+                                                  },
+                                                  child: Container(
+                                                    padding: EdgeInsets.all(8),
+                                                    child: Image.network(posts[index]['mediaUrl']),
+                                                  ),
                                                 )
                                               : (posts[index]['mediaUrl'] != "null" && posts[index]['mediaType'] == 'pdf')
                                                   ? Container(
@@ -419,7 +424,7 @@ class _DashBoardState extends State<DashBoard> {
                                                           ),
                                                           onPressed: () async {
                                                             if (temp.contains(User.userEmail)) {
-                                                              Fluttertoast.showToast(msg: 'Liked already!');
+                                                              FlutterToast.showToast(msg: 'Liked already!');
                                                             } else {
                                                               await _likePost(postId: posts[index]['_id'], userName: User.userName);
                                                               await _getAllPosts();
@@ -534,13 +539,13 @@ class _DashBoardState extends State<DashBoard> {
 
                                                             print(response.body);
                                                             if (json.decode(response.body)['statusCode'] == 200) {
-                                                              Fluttertoast.showToast(msg: 'Comment posted');
+                                                              FlutterToast.showToast(msg: 'Comment posted');
                                                               setState(() {
                                                                 _getAllPosts();
                                                               });
                                                             }
                                                           } else {
-                                                            Fluttertoast.showToast(msg: 'Comment can\'t be empty');
+                                                            FlutterToast.showToast(msg: 'Comment can\'t be empty');
                                                           }
                                                         }),
                                                   ),

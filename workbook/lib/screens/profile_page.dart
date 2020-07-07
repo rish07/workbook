@@ -121,8 +121,7 @@ class _ProfilePageState extends State<ProfilePage> {
           onPress: () {
             Navigator.push(
               context,
-              PageTransition(
-                  child: DashBoard(), type: PageTransitionType.rightToLeft),
+              PageTransition(child: DashBoard(), type: PageTransitionType.rightToLeft),
             );
           },
           title: 'Update Successful',
@@ -160,8 +159,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ? [
                   _isEdit
                       ? Container(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
                           child: MaterialButton(
                               minWidth: 80,
                               color: violet2,
@@ -207,16 +205,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Padding(
-                      padding:
-                          EdgeInsets.only(bottom: 20.0, left: _isEdit ? 50 : 0),
+                      padding: EdgeInsets.only(bottom: 20.0, left: _isEdit ? 50 : 0),
                       child: Center(
                         child: Hero(
                           tag: "profile",
                           child: CircleAvatar(
                             radius: 50,
-                            backgroundImage: !User.profilePicExists
-                                ? AssetImage('images/userPhoto.jpg')
-                                : NetworkImage((User.userPhotoData)),
+                            backgroundImage: !User.profilePicExists ? AssetImage('images/userPhoto.jpg') : NetworkImage((User.userPhotoData)),
                           ),
                         ),
                       ),
@@ -261,9 +256,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           Expanded(
                             flex: 1,
                             child: Container(
-                              padding: EdgeInsets.only(
-                                  left:
-                                      MediaQuery.of(context).size.width * 0.04),
+                              padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.04),
                               child: Text(
                                 'State: ',
                                 style: TextStyle(fontSize: 20, color: violet2),
@@ -272,30 +265,33 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           Expanded(
                             flex: 2,
-                            child: DropdownButtonFormField(
-                              hint: Text(
-                                'Select State',
-                                style: TextStyle(color: violet1, fontSize: 18),
-                              ),
-                              decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white70),
+                            child: Theme(
+                              data: Theme.of(context).copyWith(canvasColor: violet1),
+                              child: DropdownButtonFormField(
+                                hint: Text(
+                                  'Select State',
+                                  style: TextStyle(color: violet1, fontSize: 18),
                                 ),
-                              ),
-                              items: cities[User.state].map((location) {
-                                return DropdownMenuItem(
-                                  child: AutoSizeText(
-                                    location,
-                                    maxLines: 1,
+                                decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.white70),
                                   ),
-                                  value: location,
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  User.state = value;
-                                });
-                              },
+                                ),
+                                items: cities[User.state].map((location) {
+                                  return DropdownMenuItem(
+                                    child: AutoSizeText(
+                                      location,
+                                      maxLines: 1,
+                                    ),
+                                    value: location,
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    User.state = value;
+                                  });
+                                },
+                              ),
                             ),
                           ),
                         ],
@@ -314,9 +310,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           Expanded(
                             flex: 1,
                             child: Container(
-                              padding: EdgeInsets.only(
-                                  left:
-                                      MediaQuery.of(context).size.width * 0.04),
+                              padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.04),
                               child: Text(
                                 'City: ',
                                 style: TextStyle(fontSize: 20, color: violet2),
@@ -325,30 +319,33 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           Expanded(
                             flex: 2,
-                            child: DropdownButtonFormField(
-                              hint: Text(
-                                'Select City',
-                                style: TextStyle(color: violet1, fontSize: 18),
-                              ),
-                              decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white70),
+                            child: Theme(
+                              data: Theme.of(context).copyWith(canvasColor: violet1),
+                              child: DropdownButtonFormField(
+                                hint: Text(
+                                  'Select City',
+                                  style: TextStyle(color: violet1, fontSize: 18),
                                 ),
-                              ),
-                              items: cities[User.state].map((location) {
-                                return DropdownMenuItem(
-                                  child: AutoSizeText(
-                                    location,
-                                    maxLines: 1,
+                                decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.white70),
                                   ),
-                                  value: location,
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  User.city = value;
-                                });
-                              },
+                                ),
+                                items: cities[User.state].map((location) {
+                                  return DropdownMenuItem(
+                                    child: AutoSizeText(
+                                      location,
+                                      maxLines: 1,
+                                    ),
+                                    value: location,
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    User.city = value;
+                                  });
+                                },
+                              ),
                             ),
                           ),
                         ],
@@ -409,14 +406,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 style: TextStyle(color: violet1),
                 decoration: InputDecoration(
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: _isEdit
-                        ? BorderSide(width: 2, color: violet2)
-                        : BorderSide.none,
+                    borderSide: _isEdit ? BorderSide(width: 2, color: violet2) : BorderSide.none,
                   ),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: _isEdit
-                        ? BorderSide(width: 1, color: violet2)
-                        : BorderSide.none,
+                    borderSide: _isEdit ? BorderSide(width: 1, color: violet2) : BorderSide.none,
                   ),
                   hintText: value,
                   hintStyle: TextStyle(color: violet1, fontSize: 18),

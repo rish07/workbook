@@ -39,7 +39,7 @@ dependencies:
   shared_preferences:
   flutter_image:
   basic_utils:
-  dropdown_formfield:
+  dropdown_formfield: ^0.1.2
   fluttertoast:
   animated_text_kit:
   firebase_storage:

@@ -52,7 +52,7 @@ class _AddPostState extends State<AddPost> {
 
   Future createPost() async {
     if (_controller.text.isEmpty && mediaUrl.isEmpty) {
-      Fluttertoast.showToast(msg: 'The post can not be empty!');
+      FlutterToast.showToast(msg: 'The post can not be empty!');
       setState(() {
         _loading = false;
       });
@@ -63,12 +63,7 @@ class _AddPostState extends State<AddPost> {
           HttpHeaders.contentTypeHeader: 'application/json',
         },
         body: json.encode(
-          {
-            "createdBy": User.userRole,
-            "mediaUrl": mediaUrl.isEmpty ? 'null' : mediaUrl,
-            "content": _controller.text,
-            "mediaType": fileType
-          },
+          {"createdBy": User.userRole, "mediaUrl": mediaUrl.isEmpty ? 'null' : mediaUrl, "content": _controller.text, "mediaType": fileType},
         ),
       );
 
@@ -76,15 +71,14 @@ class _AddPostState extends State<AddPost> {
       print(response.body);
 
       if (json.decode(response.body)['statusCode'] == 200) {
-        Fluttertoast.showToast(msg: 'Post uploaded successfully');
+        FlutterToast.showToast(msg: 'Post uploaded successfully');
         sendNotification();
         Navigator.push(
           context,
-          PageTransition(
-              child: DashBoard(), type: PageTransitionType.rightToLeft),
+          PageTransition(child: DashBoard(), type: PageTransitionType.rightToLeft),
         );
       } else {
-        Fluttertoast.showToast(msg: 'Error');
+        FlutterToast.showToast(msg: 'Error');
       }
       setState(() {
         _loading = false;
@@ -104,8 +98,7 @@ class _AddPostState extends State<AddPost> {
       }
 
       if (fileType == 'pdf') {
-        file = await FilePicker.getFile(
-            type: FileType.custom, allowedExtensions: ['pdf', 'docx']);
+        file = await FilePicker.getFile(type: FileType.custom, allowedExtensions: ['pdf', 'docx']);
         fileName = p.basename(file.path);
         setState(() {
           fileName = p.basename(file.path);
@@ -124,16 +117,14 @@ class _AddPostState extends State<AddPost> {
     });
     StorageReference storageReference;
     if (fileType == 'image') {
-      storageReference =
-          FirebaseStorage.instance.ref().child("images/something");
+      storageReference = FirebaseStorage.instance.ref().child("images/something");
     }
 
     if (fileType == 'pdf') {
       storageReference = FirebaseStorage.instance.ref().child("pdf/$filename");
     }
     if (fileType == 'others') {
-      storageReference =
-          FirebaseStorage.instance.ref().child("others/$filename");
+      storageReference = FirebaseStorage.instance.ref().child("others/$filename");
     }
     final StorageUploadTask uploadTask = storageReference.putFile(file);
     final StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
@@ -141,7 +132,7 @@ class _AddPostState extends State<AddPost> {
     setState(() {
       mediaUrl = url;
       _loading = false;
-      Fluttertoast.showToast(msg: 'File attached successfully');
+      FlutterToast.showToast(msg: 'File attached successfully');
     });
     print("URL is $url");
   }
