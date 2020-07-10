@@ -47,6 +47,10 @@ dependencies:
   share:
   flutter_speed_dial:
   multi_charts:
+  google_maps_flutter:
+  location:
+  geolocator:
+
 
 
 
