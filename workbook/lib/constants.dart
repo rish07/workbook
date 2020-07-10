@@ -766,3 +766,21 @@ List<String> grades = [];
 List divisions = [];
 List divisionData = [];
 List<String> carNumber = ['Car Number 1', 'Car Number 2', 'Car Number 3'];
+List routeData = [
+  {
+    "routeName": "Route 1",
+    "locations": [
+      {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"},
+      {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"}
+    ]
+  },
+  {
+    "routeName": "Route 2",
+    "locations": [
+      {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"},
+      {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"}
+    ]
+  },
+];
+List routeNames = ['Route 1', 'Route 2'];
+List locationNames = [];

@@ -1,5 +1,10 @@
 import 'dart:convert';
+
+import 'package:intl/intl.dart';
+
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:basic_utils/basic_utils.dart';
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_image/network.dart';
@@ -14,7 +19,9 @@ import 'package:workbook/screens/active_users.dart';
 import 'package:workbook/screens/map_screen.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';
+import 'package:workbook/widget/input_field.dart';
 import 'package:workbook/widget/registerButton.dart';
+import 'package:workbook/widget/travel_modal.dart';
 
 class RequestProfilePage extends StatefulWidget {
   final String carNumber;
@@ -74,6 +81,34 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
     } else {
       throw Exception('Failed to load the employees');
     }
+  }
+
+  Future _getRoutes() async {
+    var response = await http.post('$baseUrl/driver/getRoutes', body: {
+      "routes": [
+        {
+          "routeName": "Route 1",
+          "locations": [
+            {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"},
+            {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"}
+          ]
+        },
+        {
+          "routeName": "Route 2",
+          "locations": [
+            {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"},
+            {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"}
+          ]
+        },
+      ]
+    });
+    print(response.body);
+    setState(() {
+      routeData = json.decode(response.body)['routes'];
+      routeData.forEach((element) {
+        routeNames.add(element['routeName']);
+      });
+    });
   }
 
   String photoUrl;
@@ -190,61 +225,72 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
             ? FloatingActionButton.extended(
                 backgroundColor: violet2,
                 onPressed: () {
-                  return showDialog(
-                      context: (context),
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Center(
-                              child: Text(
-                            'Add route name',
-                            style: TextStyle(color: violet1),
-                          )),
-                          content: TextFormField(
-                            autocorrect: true,
-                            autofocus: true,
-                            textCapitalization: TextCapitalization.words,
-                            cursorRadius: Radius.circular(8),
-                            cursorColor: violet1,
-                            style: TextStyle(color: Colors.black, fontSize: 18),
-                            controller: _routeNameController,
-                            decoration: InputDecoration(
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: violet2),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: violet2, width: 2),
+                  if (User.userRole == 'driver') {
+                    return showDialog(
+                        context: (context),
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Center(
+                                child: Text(
+                              'Add route name',
+                              style: TextStyle(color: violet1),
+                            )),
+                            content: TextFormField(
+                              autocorrect: true,
+                              autofocus: true,
+                              textCapitalization: TextCapitalization.words,
+                              cursorRadius: Radius.circular(8),
+                              cursorColor: violet1,
+                              style: TextStyle(color: Colors.black, fontSize: 18),
+                              controller: _routeNameController,
+                              decoration: InputDecoration(
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: violet2),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: violet2, width: 2),
+                                ),
                               ),
                             ),
-                          ),
-                          actions: <Widget>[
-                            // usually buttons at the bottom of the dialog
-                            new MaterialButton(
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                                color: violet2,
-                                child: new Text(
-                                  'Proceed',
-                                  style: TextStyle(
-                                    color: Colors.white,
+                            actions: <Widget>[
+                              // usually buttons at the bottom of the dialog
+                              new MaterialButton(
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                                  color: violet2,
+                                  child: new Text(
+                                    'Proceed',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
                                   ),
-                                ),
-                                onPressed: () {
-                                  if (_routeNameController.text.isNotEmpty) {
-                                    Navigator.push(
-                                        context,
-                                        PageTransition(
-                                            child: GoogleMapScreen(
-                                              driverID: widget.id,
-                                              routeName: _routeNameController.text,
-                                            ),
-                                            type: PageTransitionType.rightToLeft));
-                                    _routeNameController.clear();
-                                  } else {
-                                    FlutterToast.showToast(msg: 'Route Name is required.');
-                                  }
-                                }),
-                          ],
-                        );
-                      });
+                                  onPressed: () {
+                                    if (_routeNameController.text.isNotEmpty) {
+                                      Navigator.push(
+                                          context,
+                                          PageTransition(
+                                              child: GoogleMapScreen(
+                                                driverID: widget.id,
+                                                routeName: _routeNameController.text,
+                                              ),
+                                              type: PageTransitionType.rightToLeft));
+                                      _routeNameController.clear();
+                                    } else {
+                                      FlutterToast.showToast(msg: 'Route Name is required.');
+                                    }
+                                  }),
+                            ],
+                          );
+                        });
+                  } else {
+                    return showModalBottomSheet(
+                        backgroundColor: Colors.transparent,
+                        context: context,
+                        builder: (BuildContext context) {
+                          return OpenBottomModal(
+                            regId: widget.id,
+                          );
+                        });
+                  }
                 },
                 label: Row(
                   children: <Widget>[
@@ -256,7 +302,7 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
                       ),
                     ),
                     Text(
-                      'Add Route',
+                      User.userRole == 'driver' ? 'Add Route' : 'Add Travel Service',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],

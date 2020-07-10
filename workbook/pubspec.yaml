@@ -50,6 +50,8 @@ dependencies:
   google_maps_flutter:
   location:
   geolocator:
+  datetime_picker_formfield:
+  intl:
 
 
 
