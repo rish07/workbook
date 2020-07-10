@@ -1,6 +1,14 @@
 import 'dart:convert';
+
+import 'package:intl/intl.dart';
+
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:basic_utils/basic_utils.dart';
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_image/network.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -8,9 +16,12 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/active_users.dart';
+import 'package:workbook/screens/map_screen.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';
+import 'package:workbook/widget/input_field.dart';
 import 'package:workbook/widget/registerButton.dart';
+import 'package:workbook/widget/travel_modal.dart';
 
 class RequestProfilePage extends StatefulWidget {
   final String carNumber;
@@ -51,16 +62,14 @@ class RequestProfilePage extends StatefulWidget {
 
 class _RequestProfilePageState extends State<RequestProfilePage> {
   bool _loading = false;
-
+  final TextEditingController _routeNameController = TextEditingController();
   Future _deleteUser() async {
     print('working');
-    var response = await http.post(
-        '$baseUrl/${User.userRole}/delete${StringUtils.capitalize(widget.role)}',
-        body: {
-          "jwtToken": User.userJwtToken,
-          "userID": User.userEmail,
-          "id": widget.id,
-        });
+    var response = await http.post('$baseUrl/${User.userRole}/delete${StringUtils.capitalize(widget.role)}', body: {
+      "jwtToken": User.userJwtToken,
+      "userID": User.userEmail,
+      "id": widget.id,
+    });
 
     print('Response status: ${response.statusCode}');
     print(response.body);
@@ -74,6 +83,34 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
     }
   }
 
+  Future _getRoutes() async {
+    var response = await http.post('$baseUrl/driver/getRoutes', body: {
+      "routes": [
+        {
+          "routeName": "Route 1",
+          "locations": [
+            {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"},
+            {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"}
+          ]
+        },
+        {
+          "routeName": "Route 2",
+          "locations": [
+            {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"},
+            {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"}
+          ]
+        },
+      ]
+    });
+    print(response.body);
+    setState(() {
+      routeData = json.decode(response.body)['routes'];
+      routeData.forEach((element) {
+        routeNames.add(element['routeName']);
+      });
+    });
+  }
+
   String photoUrl;
   @override
   void initState() {
@@ -85,12 +122,49 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _routeNameController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _loading,
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
+          actions: <Widget>[
+            widget.isActive
+                ? Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                    child: MaterialButton(
+                        minWidth: 80,
+                        color: Colors.red,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                        child: Text(
+                          'DELETE',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        onPressed: () async {
+                          setState(() {
+                            _loading = true;
+                          });
+                          await _deleteUser();
+                          Navigator.push(
+                              context,
+                              PageTransition(
+                                  child: ActiveUsers(
+                                    isDriver: widget.isDriver ? true : false,
+                                  ),
+                                  type: PageTransitionType.rightToLeft));
+                        }),
+                  )
+                : Container()
+          ],
           title: Text('${widget.role.toUpperCase()} details'),
           iconTheme: IconThemeData(
             color: violet2,
@@ -110,8 +184,7 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
                       radius: 50,
                       backgroundImage: !widget.exists
                           ? AssetImage('images/userPhoto.jpg')
-                          : NetworkImageWithRetry(
-                              ("https://app-workbook.herokuapp.com/getUserProfile/employee/5eeccd1737d07600172c6064")),
+                          : NetworkImageWithRetry(("https://app-workbook.herokuapp.com/getUserProfile/employee/5eeccd1737d07600172c6064")),
                     ),
                   ),
                 ),
@@ -124,25 +197,15 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
                   value: widget.emailID ?? "-",
                 ),
                 buildFieldEntry(
-                  label: User.userRole != 'superAdmin' && !widget.isDriver
-                      ? 'Grade'
-                      : (User.userRole != 'superAdmin' && widget.isDriver)
-                          ? "Car Number"
-                          : 'Institute Name',
+                  label: User.userRole != 'superAdmin' && !widget.isDriver ? 'Grade' : (User.userRole != 'superAdmin' && widget.isDriver) ? "Car Number" : 'Institute Name',
                   value: User.userRole != 'superAdmin' && !widget.isDriver
                       ? widget.grade ?? "-"
-                      : (User.userRole != 'superAdmin' && widget.isDriver)
-                          ? widget.carNumber ?? '-'
-                          : widget.instituteName ?? '-',
+                      : (User.userRole != 'superAdmin' && widget.isDriver) ? widget.carNumber ?? '-' : widget.instituteName ?? '-',
                 ),
                 User.userRole != 'superAdmin' && !widget.isDriver
                     ? buildFieldEntry(
-                        label: User.userRole != 'superAdmin'
-                            ? 'Division'
-                            : 'Institute Type',
-                        value: User.userRole != 'superAdmin'
-                            ? widget.division ?? "-"
-                            : widget.instituteType ?? '-',
+                        label: User.userRole != 'superAdmin' ? 'Division' : 'Institute Type',
+                        value: User.userRole != 'superAdmin' ? widget.division ?? "-" : widget.instituteType ?? '-',
                       )
                     : Container(),
                 buildFieldEntry(
@@ -153,43 +216,98 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
                   label: 'Aadhar Number',
                   value: widget.aadharNumber.toString() ?? "-",
                 ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.1,
-                ),
-                widget.isActive
-                    ? MaterialButton(
-                        padding: EdgeInsets.all(8),
-                        minWidth: 150,
-                        color: Colors.red,
-                        child: Text(
-                          'DELETE',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 18),
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        onPressed: () async {
-                          setState(() {
-                            _loading = true;
-                          });
-                          await _deleteUser();
-                          Navigator.push(
-                              context,
-                              PageTransition(
-                                  child: ActiveUsers(
-                                    isDriver: widget.isDriver ? true : false,
-                                  ),
-                                  type: PageTransitionType.rightToLeft));
-                        },
-                      )
-                    : Container(),
               ],
             ),
           ),
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: widget.isActive
+            ? FloatingActionButton.extended(
+                backgroundColor: violet2,
+                onPressed: () {
+                  if (User.userRole == 'driver') {
+                    return showDialog(
+                        context: (context),
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Center(
+                                child: Text(
+                              'Add route name',
+                              style: TextStyle(color: violet1),
+                            )),
+                            content: TextFormField(
+                              autocorrect: true,
+                              autofocus: true,
+                              textCapitalization: TextCapitalization.words,
+                              cursorRadius: Radius.circular(8),
+                              cursorColor: violet1,
+                              style: TextStyle(color: Colors.black, fontSize: 18),
+                              controller: _routeNameController,
+                              decoration: InputDecoration(
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: violet2),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: violet2, width: 2),
+                                ),
+                              ),
+                            ),
+                            actions: <Widget>[
+                              // usually buttons at the bottom of the dialog
+                              new MaterialButton(
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                                  color: violet2,
+                                  child: new Text(
+                                    'Proceed',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    if (_routeNameController.text.isNotEmpty) {
+                                      Navigator.push(
+                                          context,
+                                          PageTransition(
+                                              child: GoogleMapScreen(
+                                                driverID: widget.id,
+                                                routeName: _routeNameController.text,
+                                              ),
+                                              type: PageTransitionType.rightToLeft));
+                                      _routeNameController.clear();
+                                    } else {
+                                      FlutterToast.showToast(msg: 'Route Name is required.');
+                                    }
+                                  }),
+                            ],
+                          );
+                        });
+                  } else {
+                    return showModalBottomSheet(
+                        backgroundColor: Colors.transparent,
+                        context: context,
+                        builder: (BuildContext context) {
+                          return OpenBottomModal(
+                            regId: widget.id,
+                          );
+                        });
+                  }
+                },
+                label: Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(right: 8.0),
+                      child: Icon(
+                        Icons.location_on,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      User.userRole == 'driver' ? 'Add Route' : 'Add Travel Service',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ))
+            : null,
       ),
     );
   }

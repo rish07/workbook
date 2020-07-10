@@ -78,6 +78,7 @@ class _DashBoardState extends State<DashBoard> {
       User.division = prefs.getString('division');
       User.contactNumber = prefs.getInt('contactNumber');
       User.userPhotoData = prefs.getString('userPhotoData');
+      User.userJwtToken = prefs.getString('userJwtToken');
       User.profilePicExists = prefs.getBool('profilePicExists');
     });
   }
@@ -208,7 +209,7 @@ class _DashBoardState extends State<DashBoard> {
                           size: 25,
                         ),
                         Text(
-                          User.userRole == 'superAdmin' ? 'Admins' : (User.userRole == 'admin') ? 'Employees' : (User.userRole == 'employee') ? 'Customers' : 'Staff',
+                          User.userRole == 'superAdmin' ? 'Admins' : (User.userRole == 'admin') ? 'Emp' : (User.userRole == 'employee') ? 'Cust' : 'Staff',
                           style: TextStyle(fontSize: 10),
                         )
                       ],

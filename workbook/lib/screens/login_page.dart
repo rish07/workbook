@@ -36,8 +36,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   void registerNotification() {
     firebaseMessaging.requestNotificationPermissions();
 
@@ -56,11 +55,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void configLocalNotification() {
-    var initializationSettingsAndroid =
-        new AndroidInitializationSettings('app_icon');
+    var initializationSettingsAndroid = new AndroidInitializationSettings('app_icon');
     var initializationSettingsIOS = new IOSInitializationSettings();
-    var initializationSettings = new InitializationSettings(
-        initializationSettingsAndroid, initializationSettingsIOS);
+    var initializationSettings = new InitializationSettings(initializationSettingsAndroid, initializationSettingsIOS);
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
@@ -75,14 +72,11 @@ class _LoginPageState extends State<LoginPage> {
       priority: Priority.High,
     );
     var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
-    var platformChannelSpecifics = new NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    var platformChannelSpecifics = new NotificationDetails(androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
 
     print(message);
 
-    await flutterLocalNotificationsPlugin.show(0, message['title'].toString(),
-        message['body'].toString(), platformChannelSpecifics,
-        payload: json.encode(message));
+    await flutterLocalNotificationsPlugin.show(0, message['title'].toString(), message['body'].toString(), platformChannelSpecifics, payload: json.encode(message));
   }
 
   @override
@@ -126,11 +120,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future _loginUser() async {
     print('working');
-    var response = await http.post('$baseUrl/login', body: {
-      "userID": _emailController.text,
-      "password": _passwordController.text,
-      "fcmToken": fcmToken
-    });
+    var response = await http.post('$baseUrl/login', body: {"userID": _emailController.text, "password": _passwordController.text, "fcmToken": fcmToken});
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
     setState(() {
@@ -157,8 +147,7 @@ class _LoginPageState extends State<LoginPage> {
         User.grade = tempo['grade'] ?? null;
         User.division = tempo['division'] ?? null;
         User.contactNumber = tempo['contactNumber'] ?? null;
-        User.userPhotoData =
-            "$baseUrl/getUserProfile/${User.userRole}/${User.userID}";
+        User.userPhotoData = "$baseUrl/getUserProfile/${User.userRole}/${User.userID}";
         User.profilePicExists = tempo['profilePicture'] == null ? false : true;
         User.carNumber = tempo['carNumber'] ?? null;
       });
@@ -180,15 +169,12 @@ class _LoginPageState extends State<LoginPage> {
       prefs.setString('division', User.division);
       prefs.setInt('contactNumber', User.contactNumber);
       prefs.setString('userPhotoData', User.userPhotoData);
+      prefs.setString('userJwtToken', User.userJwtToken);
       prefs.setBool('profilePicExists', User.profilePicExists);
 
       Navigator.push(
         context,
-        PageTransition(
-            child: User.userRole == 'customer' || User.userRole == 'driver'
-                ? ComingSoon()
-                : DashBoard(),
-            type: PageTransitionType.rightToLeft),
+        PageTransition(child: User.userRole == 'customer' || User.userRole == 'driver' ? ComingSoon() : DashBoard(), type: PageTransitionType.rightToLeft),
       );
     } else if (json.decode(response.body)['statusCode'] == 401) {
       popDialog(
@@ -240,10 +226,7 @@ class _LoginPageState extends State<LoginPage> {
         child: Container(
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [violet1, violet2]),
+            gradient: LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [violet1, violet2]),
           ),
           child: Form(
             key: _formKey,
@@ -301,8 +284,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 25),
+                    padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 25),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -310,16 +292,12 @@ class _LoginPageState extends State<LoginPage> {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                PageTransition(
-                                    child: GenerateTicket(),
-                                    type: PageTransitionType.rightToLeft),
+                                PageTransition(child: GenerateTicket(), type: PageTransitionType.rightToLeft),
                               );
                             },
                             child: Text(
                               'Guest user?',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
+                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                             )),
                         Container(
                           alignment: Alignment.bottomRight,
