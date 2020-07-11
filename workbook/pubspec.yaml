@@ -52,6 +52,7 @@ dependencies:
   geolocator:
   datetime_picker_formfield:
   intl:
+  uuid:
 
 
 

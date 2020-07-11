@@ -225,7 +225,7 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
             ? FloatingActionButton.extended(
                 backgroundColor: violet2,
                 onPressed: () {
-                  if (User.userRole == 'driver') {
+                  if (widget.role == 'driver') {
                     return showDialog(
                         context: (context),
                         builder: (BuildContext context) {
@@ -302,7 +302,7 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
                       ),
                     ),
                     Text(
-                      User.userRole == 'driver' ? 'Add Route' : 'Add Travel Service',
+                      widget.role == 'driver' ? 'Add Route' : 'Add Travel Service',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],

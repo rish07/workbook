@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
@@ -9,7 +12,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'dart:math' show cos, sqrt, asin;
-
+import 'package:uuid/uuid.dart';
+import 'package:workbook/user.dart';
 import 'package:workbook/widget/popUpDialog.dart';
 
 class GoogleMapScreen extends StatefulWidget {
@@ -55,7 +59,7 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
   static double latitude;
   static double longitude;
 
-  CameraPosition _kGooglePlex;
+  CameraPosition _kGooglePlex = CameraPosition(target: LatLng(19.07, 72.87));
 
   List<Marker> markers = <Marker>[];
 
@@ -73,6 +77,23 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
         target: LatLng(latitude, longitude),
         zoom: 13,
       );
+      final circle = Circle(
+        circleId: CircleId("curr_loc"),
+        center: LatLng(loc.latitude, loc.longitude),
+        fillColor: Colors.blueAccent,
+        strokeColor: Colors.blueAccent,
+        radius: 5,
+        zIndex: 100,
+      );
+      final circleBackground = Circle(
+        circleId: CircleId("curr_loc_bg"),
+        center: LatLng(loc.latitude, loc.longitude),
+        strokeColor: Color.fromRGBO(230, 230, 230, 1),
+        radius: 18,
+        zIndex: 10,
+      );
+      circles.add(circle);
+      circles.add(circleBackground);
     });
     GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(
@@ -85,50 +106,54 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
   }
 
   Future _createRoute() async {
-    var response = await http.post('$baseUrl/driver/createRoute', body: {
-      "id": "Driver _id",
-      "locations": [
-        {"longitude": 23.3, "latitude": 53.4, "Name": "Some place"},
-      ],
-      "routeName": "Route 1"
+    var body = json.encode({
+      "driverID": widget.driverID,
+      "locations": _locations,
+      "routeName": widget.routeName,
+      "userID": User.userEmail,
+      "jwtToken": User.userJwtToken,
     });
+    print(body);
+    var response = await http.post(
+      'https://workbook.in.ngrok.io/admin/createRoute',
+      body: body,
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+      },
+    );
+
+    print('--------------------------------------------------------');
+    print(response.body);
   }
 
-//  Future<void> getAllMarkers() {
-//    markers = [];
-//    print("Getting marker data");
-//    _fireStore.collection('markers').getDocuments().then((QuerySnapshot snapshot) => {
-//          snapshot.documents.forEach((markerData) => {
-//                setState(() {
-//                  var maxFoodDelay = new DateTime.now().subtract(new Duration(days: 1));
-//                  var lastFed = DateTime.fromMillisecondsSinceEpoch(markerData.data["FedAt"].seconds * 1000);
-//                  markers.add(
-//                    Marker(
-//                        markerId: MarkerId(markerData.data["markerId"]),
-//                        position: LatLng(markerData.data["latitude"], markerData.data["longitude"]),
-//                        infoWindow: InfoWindow(title: 'Amanora', snippet: 'Pune'),
-//                        onTap: () {
-//                          showModalBottomSheet(
-//                              context: context,
-//                              isScrollControlled: true,
-//                              builder: (context) => SingleChildScrollView(
-//                                  child: Container(
-//                                      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-//                                      child: MarkerInfoScreen(
-//                                          lastFed: lastFed,
-//                                          isFedEver: markerData.data["isFedEver"],
-//                                          markerId: markerData.data["markerId"],
-//                                          firebaseUser: widget.firebaseUser,
-//                                          updateMarkerView: getAllMarkers()))));
-//                        },
-//                        flat: true,
-//                        draggable: true,
-//                        icon: BitmapDescriptor.defaultMarkerWithHue(lastFed.isBefore(maxFoodDelay) ? 0 : 120.0)),
-//                  );
-//                })
-//              }),
-//        });
-//  }
+  Future<void> getAllMarkers() {
+    markers = [];
+    print("Getting marker data");
+    var uuid = Uuid();
+    setState(() {
+      _locations.forEach((element) {
+        markers.add(
+          Marker(
+            markerId: MarkerId(uuid.v1()),
+            position: LatLng(double.parse(element['latitude']), double.parse(element['longitude'])),
+            infoWindow: InfoWindow(title: element['name']),
+            flat: false,
+            draggable: false,
+            consumeTapEvents: true,
+            onTap: () {
+              popDialog(
+                title: 'Delete Route?',
+                content: 'Do you want to delete this location from the route?',
+                context: context,
+                onPress: () {},
+                buttonTitle: 'Delete',
+              );
+            },
+          ),
+        );
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +182,11 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
                       'Update',
                       style: TextStyle(color: Colors.white),
                     ),
-                    onPressed: () async {}),
+                    onPressed: () async {
+                      print('working');
+                      await _createRoute();
+                      FlutterToast.showToast(msg: 'updated');
+                    }),
               )
             ],
             centerTitle: true,
@@ -199,13 +228,15 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
                           ),
                           onPressed: () {
                             _locations.add({
-                              "latitude": location.latitude,
-                              "longitude": location.longitude,
-                              "locationName": address,
+                              "latitude": location.latitude.toString(),
+                              "longitude": location.longitude.toString(),
+                              "name": address,
                             });
                             print('here11111111111111111111111111111111111111111111111111');
                             print(_locations);
+                            getAllMarkers();
                             Navigator.pop(context);
+                            getAllMarkers();
                           },
                         ),
                       ],
