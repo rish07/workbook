@@ -130,6 +130,34 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
     print(response.body);
   }
 
+  Future _deleteLocation({String locationID}) async {
+    print('delete');
+    var body = json.encode(
+      {
+        "routeID": widget.routeID,
+        "locationID": locationID,
+        "userID": User.userEmail,
+        "jwtToken": User.userJwtToken,
+      },
+    );
+    print(body);
+    var response = await http.post(
+      '$baseUrl/admin/deleteLocation',
+      body: body,
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+      },
+    );
+
+    print(response.body);
+    if (json.decode(response.body)['statusCode'] == 200) {
+      FlutterToast.showToast(msg: 'Deleted');
+    } else {
+      FlutterToast.showToast(msg: 'Error');
+    }
+    Navigator.pop(context);
+  }
+
   Future _updateLocation() async {
     print('updating route');
     _locations.forEach((element) async {
@@ -175,21 +203,23 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
                     loc['longitude'],
                   ),
                   infoWindow: InfoWindow(
-                      title: loc['name'],
-                      snippet: 'dcisb',
-                      onTap: () {
-                        popDialog(
-                          title: 'Delete Route?',
-                          content: 'Do you want to delete this location from the route?',
-                          context: context,
-                          onPress: () {},
-                          buttonTitle: 'Delete',
-                        );
-                      }),
+                    title: loc['name'],
+                    snippet: 'dcisb',
+                  ),
                   flat: false,
                   draggable: false,
                   consumeTapEvents: true,
-                  onTap: () {},
+                  onTap: () {
+                    popDialog(
+                      title: 'Delete Route?',
+                      content: 'Do you want to delete this location from the route?',
+                      context: context,
+                      onPress: () {
+                        _deleteLocation(locationID: loc['_id']);
+                      },
+                      buttonTitle: 'Delete',
+                    );
+                  },
                 ),
               );
             });
