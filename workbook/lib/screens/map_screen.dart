@@ -126,7 +126,7 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
       },
     );
 
-    print('--------------------------------------------------------');
+    print('---------------------------------------------------------');
     print(response.body);
   }
 
