@@ -17,11 +17,13 @@ import 'package:workbook/user.dart';
 import 'package:workbook/widget/popUpDialog.dart';
 
 class GoogleMapScreen extends StatefulWidget {
+  final bool isEdit;
   final String routeName;
+  final String routeID;
   final String driverID;
   Location location = new Location();
 
-  GoogleMapScreen({Key key, this.routeName, this.driverID}) : super(key: key);
+  GoogleMapScreen({Key key, this.routeName, this.driverID, this.isEdit, this.routeID}) : super(key: key);
   @override
   _GoogleMapScreenState createState() => _GoogleMapScreenState();
 }
@@ -30,6 +32,7 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
   void initState() {
     super.initState();
     _getLocation();
+    getAllMarkers();
   }
 
   List _locations = [];
@@ -106,16 +109,17 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
   }
 
   Future _createRoute() async {
+    print('creating route');
     var body = json.encode({
       "driverID": widget.driverID,
-      "locations": _locations,
+      "location": _locations,
       "routeName": widget.routeName,
       "userID": User.userEmail,
       "jwtToken": User.userJwtToken,
     });
     print(body);
     var response = await http.post(
-      'https://workbook.in.ngrok.io/admin/createRoute',
+      '$baseUrl/admin/createRoute',
       body: body,
       headers: {
         HttpHeaders.contentTypeHeader: 'application/json',
@@ -126,8 +130,74 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
     print(response.body);
   }
 
-  Future<void> getAllMarkers() {
-    markers = [];
+  Future _updateLocation() async {
+    print('updating route');
+    _locations.forEach((element) async {
+      var body = json.encode(
+        {
+          "id": widget.routeID,
+          "location": element,
+          "routeName": widget.routeName,
+          "userID": User.userEmail,
+          "jwtToken": User.userJwtToken,
+        },
+      );
+      print(body);
+      print('--------------------------------------------------------');
+      var response = await http.post(
+        '$baseUrl/admin/updateRoute',
+        body: body,
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+        },
+      );
+      print(response.body);
+    });
+    FlutterToast.showToast(msg: 'Updated');
+  }
+
+  Future<void> getAllMarkers() async {
+    if (widget.isEdit) {
+      var response = await http.get('$baseUrl/getRoutes');
+      List temp = json.decode(response.body)['payload']['routes'];
+      temp.forEach((ele) {
+        if (ele['routeName'] == widget.routeName) {
+          List tempNew = ele['location'];
+          tempNew.forEach((loc) {
+            print(loc['name']);
+            print('hereeeeeeeeeeeeeeeeee');
+            setState(() {
+              markers.add(
+                Marker(
+                  markerId: MarkerId(loc['_id']),
+                  position: LatLng(
+                    loc['latitude'],
+                    loc['longitude'],
+                  ),
+                  infoWindow: InfoWindow(
+                      title: loc['name'],
+                      snippet: 'dcisb',
+                      onTap: () {
+                        popDialog(
+                          title: 'Delete Route?',
+                          content: 'Do you want to delete this location from the route?',
+                          context: context,
+                          onPress: () {},
+                          buttonTitle: 'Delete',
+                        );
+                      }),
+                  flat: false,
+                  draggable: false,
+                  consumeTapEvents: true,
+                  onTap: () {},
+                ),
+              );
+            });
+          });
+        }
+      });
+    }
+
     print("Getting marker data");
     var uuid = Uuid();
     setState(() {
@@ -135,7 +205,7 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
         markers.add(
           Marker(
             markerId: MarkerId(uuid.v1()),
-            position: LatLng(double.parse(element['latitude']), double.parse(element['longitude'])),
+            position: LatLng(element['latitude'], element['longitude']),
             infoWindow: InfoWindow(title: element['name']),
             flat: false,
             draggable: false,
@@ -145,8 +215,8 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
                 title: 'Delete Route?',
                 content: 'Do you want to delete this location from the route?',
                 context: context,
-                onPress: () {},
                 buttonTitle: 'Delete',
+                onPress: () {},
               );
             },
           ),
@@ -184,8 +254,11 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
                     ),
                     onPressed: () async {
                       print('working');
-                      await _createRoute();
-                      FlutterToast.showToast(msg: 'updated');
+                      if (widget.isEdit) {
+                        await _updateLocation();
+                      } else {
+                        await _createRoute();
+                      }
                     }),
               )
             ],
@@ -228,15 +301,14 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
                           ),
                           onPressed: () {
                             _locations.add({
-                              "latitude": location.latitude.toString(),
-                              "longitude": location.longitude.toString(),
+                              "latitude": location.latitude,
+                              "longitude": location.longitude,
                               "name": address,
                             });
                             print('here11111111111111111111111111111111111111111111111111');
                             print(_locations);
                             getAllMarkers();
                             Navigator.pop(context);
-                            getAllMarkers();
                           },
                         ),
                       ],

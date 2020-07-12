@@ -61,6 +61,9 @@ class RequestProfilePage extends StatefulWidget {
 }
 
 class _RequestProfilePageState extends State<RequestProfilePage> {
+  String routeID;
+  String routeName;
+  bool _routeExists = false;
   bool _loading = false;
   final TextEditingController _routeNameController = TextEditingController();
   Future _deleteUser() async {
@@ -84,30 +87,21 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
   }
 
   Future _getRoutes() async {
-    var response = await http.post('$baseUrl/driver/getRoutes', body: {
-      "routes": [
-        {
-          "routeName": "Route 1",
-          "locations": [
-            {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"},
-            {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"}
-          ]
-        },
-        {
-          "routeName": "Route 2",
-          "locations": [
-            {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"},
-            {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"}
-          ]
-        },
-      ]
-    });
+    var response = await http.get('$baseUrl/getRoutes');
     print(response.body);
     setState(() {
-      routeData = json.decode(response.body)['routes'];
+      routeData = json.decode(response.body)['payload']['routes'];
       routeData.forEach((element) {
+        if (element['driverID'] == widget.id) {
+          setState(() {
+            _routeExists = true;
+            routeName = element['routeName'];
+            routeID = element['_id'];
+          });
+        }
         routeNames.add(element['routeName']);
       });
+      _loading = false;
     });
   }
 
@@ -115,6 +109,8 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
   @override
   void initState() {
     // TODO: implement initState
+    _loading = true;
+    _getRoutes();
     setState(() {
       photoUrl = "$baseUrl/getUserProfile/${widget.role}/${widget.id}";
     });
@@ -172,60 +168,69 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
           backgroundColor: Colors.transparent,
           elevation: 0,
         ),
-        body: Container(
-          padding: EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Center(
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage: !widget.exists
-                          ? AssetImage('images/userPhoto.jpg')
-                          : NetworkImageWithRetry(("https://app-workbook.herokuapp.com/getUserProfile/employee/5eeccd1737d07600172c6064")),
-                    ),
+        body: _loading
+            ? Container(
+                child: Center(
+                  child: Text(
+                    'Loading',
+                    style: TextStyle(color: Colors.grey, fontSize: 28, fontWeight: FontWeight.bold),
                   ),
                 ),
-                buildFieldEntry(
-                  label: 'Name',
-                  value: widget.userName ?? "-",
+              )
+            : Container(
+                padding: EdgeInsets.all(16),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 20.0),
+                        child: Center(
+                          child: CircleAvatar(
+                            radius: 50,
+                            backgroundImage: !widget.exists
+                                ? AssetImage('images/userPhoto.jpg')
+                                : NetworkImageWithRetry(("https://app-workbook.herokuapp.com/getUserProfile/employee/5eeccd1737d07600172c6064")),
+                          ),
+                        ),
+                      ),
+                      buildFieldEntry(
+                        label: 'Name',
+                        value: widget.userName ?? "-",
+                      ),
+                      buildFieldEntry(
+                        label: 'Email ID',
+                        value: widget.emailID ?? "-",
+                      ),
+                      buildFieldEntry(
+                        label: User.userRole != 'superAdmin' && !widget.isDriver ? 'Grade' : (User.userRole != 'superAdmin' && widget.isDriver) ? "Car Number" : 'Institute Name',
+                        value: User.userRole != 'superAdmin' && !widget.isDriver
+                            ? widget.grade ?? "-"
+                            : (User.userRole != 'superAdmin' && widget.isDriver) ? widget.carNumber ?? '-' : widget.instituteName ?? '-',
+                      ),
+                      User.userRole != 'superAdmin' && !widget.isDriver
+                          ? buildFieldEntry(
+                              label: User.userRole != 'superAdmin' ? 'Division' : 'Institute Type',
+                              value: User.userRole != 'superAdmin' ? widget.division ?? "-" : widget.instituteType ?? '-',
+                            )
+                          : Container(),
+                      buildFieldEntry(
+                        label: 'Contact Number',
+                        value: widget.contactNumber.toString() ?? "-",
+                      ),
+                      buildFieldEntry(
+                        label: 'Aadhar Number',
+                        value: widget.aadharNumber.toString() ?? "-",
+                      ),
+                    ],
+                  ),
                 ),
-                buildFieldEntry(
-                  label: 'Email ID',
-                  value: widget.emailID ?? "-",
-                ),
-                buildFieldEntry(
-                  label: User.userRole != 'superAdmin' && !widget.isDriver ? 'Grade' : (User.userRole != 'superAdmin' && widget.isDriver) ? "Car Number" : 'Institute Name',
-                  value: User.userRole != 'superAdmin' && !widget.isDriver
-                      ? widget.grade ?? "-"
-                      : (User.userRole != 'superAdmin' && widget.isDriver) ? widget.carNumber ?? '-' : widget.instituteName ?? '-',
-                ),
-                User.userRole != 'superAdmin' && !widget.isDriver
-                    ? buildFieldEntry(
-                        label: User.userRole != 'superAdmin' ? 'Division' : 'Institute Type',
-                        value: User.userRole != 'superAdmin' ? widget.division ?? "-" : widget.instituteType ?? '-',
-                      )
-                    : Container(),
-                buildFieldEntry(
-                  label: 'Contact Number',
-                  value: widget.contactNumber.toString() ?? "-",
-                ),
-                buildFieldEntry(
-                  label: 'Aadhar Number',
-                  value: widget.aadharNumber.toString() ?? "-",
-                ),
-              ],
-            ),
-          ),
-        ),
+              ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: widget.isActive
             ? FloatingActionButton.extended(
                 backgroundColor: violet2,
                 onPressed: () {
-                  if (widget.role == 'driver') {
+                  if (widget.role == 'driver' && !_routeExists) {
                     return showDialog(
                         context: (context),
                         builder: (BuildContext context) {
@@ -269,6 +274,7 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
                                           context,
                                           PageTransition(
                                               child: GoogleMapScreen(
+                                                isEdit: _routeExists ? true : false,
                                                 driverID: widget.id,
                                                 routeName: _routeNameController.text,
                                               ),
@@ -281,6 +287,13 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
                             ],
                           );
                         });
+                  } else if (widget.role == 'driver' && _routeExists) {
+                    return Navigator.push(
+                      context,
+                      PageTransition(
+                          child: GoogleMapScreen(routeID: _routeExists ? routeID : null, isEdit: _routeExists ? true : false, driverID: widget.id, routeName: routeName),
+                          type: PageTransitionType.rightToLeft),
+                    );
                   } else {
                     return showModalBottomSheet(
                         backgroundColor: Colors.transparent,
@@ -302,7 +315,7 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
                       ),
                     ),
                     Text(
-                      widget.role == 'driver' ? 'Add Route' : 'Add Travel Service',
+                      widget.role == 'driver' && !_routeExists ? 'Add Route' : (widget.role == 'driver' && _routeExists) ? 'Edit Route' : 'Add Travel Service',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
