@@ -2,8 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_webservice/places.dart' as place;
 import 'package:page_transition/page_transition.dart';
 import 'dart:async';
 import 'package:workbook/screens/request_profile_page.dart';
@@ -29,6 +33,7 @@ class GoogleMapScreen extends StatefulWidget {
 }
 
 class _GoogleMapScreenState extends State<GoogleMapScreen> {
+  final TextEditingController _locationName = TextEditingController();
   void initState() {
     super.initState();
     _getLocation();
@@ -56,6 +61,8 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
       address = "$name, $thoroughfare, $locality, $administrativeArea, $postalCode, $country";
     });
   }
+
+  place.GoogleMapsPlaces _places = place.GoogleMapsPlaces(apiKey: "AIzaSyAuAeRHabINV88n4SoqODJbq0QZhCOl5dE");
 
   Completer<GoogleMapController> _controller = Completer();
 
@@ -255,6 +262,28 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
     });
   }
 
+  Future<Null> displayPrediction(place.Prediction p) async {
+    if (p != null) {
+      place.PlacesDetailsResponse detail = await _places.getDetailsByPlaceId(p.placeId);
+
+      var placeId = p.placeId;
+      double lat = detail.result.geometry.location.lat;
+      double lng = detail.result.geometry.location.lng;
+
+      var address = await Geocoder.local.findAddressesFromQuery(p.description);
+
+      print(lat);
+      print(lng);
+    }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _locationName.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -299,19 +328,21 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
               'Set Route',
               style: TextStyle(color: violet2),
             )),
-        body: GoogleMap(
-            mapType: MapType.normal,
-            initialCameraPosition: _kGooglePlex,
-            onMapCreated: (GoogleMapController controller) {
-              _controller.complete(controller);
-            },
-            circles: Set<Circle>.of(circles),
-            markers: Set<Marker>.of(markers),
-            myLocationButtonEnabled: true,
-            onTap: (LatLng location) async {
-              await _getLocationAddress(location.latitude, location.longitude);
+        body: Stack(
+          children: [
+            GoogleMap(
+              mapType: MapType.normal,
+              initialCameraPosition: _kGooglePlex,
+              onMapCreated: (GoogleMapController controller) {
+                _controller.complete(controller);
+              },
+              circles: Set<Circle>.of(circles),
+              markers: Set<Marker>.of(markers),
+              myLocationButtonEnabled: true,
+              onTap: (LatLng location) async {
+                await _getLocationAddress(location.latitude, location.longitude);
 
-              showDialog(
+                showDialog(
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
@@ -343,8 +374,56 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
                         ),
                       ],
                     );
-                  });
-            }),
+                  },
+                );
+              },
+            ),
+            Positioned(
+              top: MediaQuery.of(context).size.height * 0.02,
+              right: 15.0,
+              left: 15.0,
+              child: Container(
+                height: 50.0,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(32.0),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(color: Colors.grey, offset: Offset(1.0, 5.0), blurRadius: 10, spreadRadius: 3),
+                  ],
+                ),
+                child: TextFormField(
+                  controller: _locationName,
+                  onTap: () async {
+                    place.Prediction p = await PlacesAutocomplete.show(
+                      mode: Mode.overlay,
+                      language: "en",
+                      context: context,
+                      components: [new place.Component(place.Component.country, "in")],
+                      apiKey: "AIzaSyAuAeRHabINV88n4SoqODJbq0QZhCOl5dE",
+                    );
+                    displayPrediction(p);
+                  },
+                  textCapitalization: TextCapitalization.words,
+                  cursorColor: Colors.black,
+                  style: TextStyle(color: violet1, fontSize: 16),
+                  decoration: InputDecoration(
+                    icon: Container(
+                      margin: EdgeInsets.only(top: 5, bottom: 5, left: 16),
+                      child: Icon(
+                        Icons.not_listed_location,
+                        color: Colors.black,
+                      ),
+                    ),
+                    hintText: "Destination?",
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 5),
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: _getLocation,
           backgroundColor: Color.fromRGBO(250, 250, 250, 1),

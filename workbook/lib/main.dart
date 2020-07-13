@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Montserrat',
       ),
-      home: LandingPage(),
+      home: GoogleMapScreen(),
 //      home: LandingPage(
 //        platform: platform,
 //      ),

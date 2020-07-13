@@ -99,7 +99,7 @@ class _ActiveUsersState extends State<ActiveUsers> {
                             context,
                             PageTransition(
                                 child: RequestProfilePage(
-                                  routeExists: _employeeList[index]['route'].length == 0 ? false : true,
+                                  routeExists: _employeeList[index]['route']?.length == 0 ? false : true,
                                   carNumber: _employeeList[index]['carNumber'],
                                   isDriver: widget.isDriver ? true : false,
                                   instituteType: _employeeList[index]['instituteType'],

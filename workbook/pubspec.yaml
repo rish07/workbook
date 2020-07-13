@@ -53,7 +53,9 @@ dependencies:
   datetime_picker_formfield:
   intl:
   uuid:
-
+  google_maps_webservice:
+  flutter_google_places:
+  geocoder:
 
 
 
