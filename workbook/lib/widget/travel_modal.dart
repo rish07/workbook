@@ -1,5 +1,7 @@
 import 'dart:convert';
-
+import 'dart:io';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:workbook/user.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,7 +14,9 @@ import 'package:workbook/constants.dart';
 class OpenBottomModal extends StatefulWidget {
   final String regId;
 
-  const OpenBottomModal({Key key, this.regId}) : super(key: key);
+  final String userRole;
+
+  const OpenBottomModal({Key key, this.regId, this.userRole}) : super(key: key);
   @override
   _OpenBottomModalState createState() => _OpenBottomModalState();
 }
@@ -32,13 +36,13 @@ class _OpenBottomModalState extends State<OpenBottomModal> {
     Map droppingPoint = {};
     routeData.forEach((element) {
       if (element['routeName'] == _selectedRouteName) {
-        element['locations'].forEach((location) {
-          if (location['locationName'] == _selectedBoardingPoint) {
+        element['location'].forEach((location) {
+          if (location['name'] == _selectedBoardingPoint) {
             setState(() {
               boardingPoint = location;
             });
           }
-          if (location['locationName'] == _selectedDroppingPoint) {
+          if (location['name'] == _selectedDroppingPoint) {
             setState(() {
               droppingPoint = location;
             });
@@ -48,19 +52,42 @@ class _OpenBottomModalState extends State<OpenBottomModal> {
     });
     setState(() {
       body = json.encode({
+        "route": {
+          "routeName": _selectedRouteName,
+          "area": areaName,
+          "boardingPoint": boardingPoint,
+          "droppingPoint": droppingPoint,
+          "pickUpTime": time,
+          "cost": cost,
+        },
         "id": widget.regId,
-        "area": areaName,
-        "boardingPoint": boardingPoint,
-        "droppingPoint": droppingPoint,
-        "pickUpTime": time,
-        "cost": cost,
+        "role": widget.userRole,
+        "jwtToken": User.userJwtToken,
+        "userID": User.userEmail,
       });
     });
 
     var response = await http.post(
-      '$baseUrl/setRoute',
+      '$baseUrl/admin/addUserRoute',
       body: body,
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+      },
     );
+    print(response.body);
+    if (json.decode(response.body)['statusCode'] == 200) {
+      FlutterToast.showToast(msg: 'Travel service added');
+      Navigator.pop(context);
+    } else {
+      FlutterToast.showToast(msg: 'Error, try again');
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    locationNames = [];
   }
 
   @override
@@ -137,10 +164,11 @@ class _OpenBottomModalState extends State<OpenBottomModal> {
                         onChanged: (value) {
                           setState(() {
                             _selectedRouteName = value;
+                            locationNames = [];
                             routeData.forEach((element) {
                               if (element['routeName'] == _selectedRouteName) {
-                                element['locations'].forEach((location) {
-                                  locationNames.add(location['locationName']);
+                                element['location'].forEach((location) {
+                                  locationNames.add(location['name']);
                                 });
                               }
                             });
@@ -184,7 +212,7 @@ class _OpenBottomModalState extends State<OpenBottomModal> {
                           return DropdownMenuItem(
                             child: AutoSizeText(
                               route,
-                              maxLines: 1,
+                              maxLines: 2,
                               style: TextStyle(color: violet1),
                             ),
                             value: route,

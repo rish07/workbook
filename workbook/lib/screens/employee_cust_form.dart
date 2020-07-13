@@ -147,14 +147,25 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
     print(response.body);
   }
 
-  void _div() {
+  Future getDivision({String instituteName}) async {
+    var response = await http.get("$baseUrl/fetchDivision/$instituteName");
+    print('Response status: ${response.statusCode}');
+    setState(() {
+      divisionData = json.decode(response.body)['payload']['divisions'];
+    });
+  }
+
+  Future _div() async {
+    await getDivision(instituteName: _selectedInstitution);
     gradeDivision.clear();
+    print(divisionData);
     divisionData.forEach((element) {
       if (element['grade'] == _selectedGrade) {
         gradeDivision.add(element['division']);
       }
     });
     gradeDivision = Set.of(gradeDivision).toList();
+    print(gradeDivision);
   }
 
   @override

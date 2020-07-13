@@ -28,10 +28,11 @@ class RequestProfilePage extends StatefulWidget {
   final bool isDriver;
   final String instituteName;
   final String instituteType;
-  final bool exists;
+  final bool profilePicExists;
   final String id;
   final String role;
   final bool isActive;
+  final bool routeExists;
   final String userName;
   final String emailID;
   final String grade;
@@ -49,12 +50,13 @@ class RequestProfilePage extends StatefulWidget {
       this.aadharNumber,
       this.contactNumber,
       this.id,
-      this.exists,
+      this.profilePicExists,
       this.isActive,
       this.instituteName,
       this.instituteType,
       this.isDriver,
-      this.carNumber})
+      this.carNumber,
+      this.routeExists})
       : super(key: key);
   @override
   _RequestProfilePageState createState() => _RequestProfilePageState();
@@ -91,17 +93,18 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
     print(response.body);
     setState(() {
       routeData = json.decode(response.body)['payload']['routes'];
+      print(routeData);
       routeData.forEach((element) {
         if (element['driverID'] == widget.id) {
           setState(() {
             _routeExists = true;
             routeName = element['routeName'];
             routeID = element['_id'];
-            print(routeID);
           });
         }
         routeNames.add(element['routeName']);
       });
+      routeNames = Set.of(routeNames).toList();
       _loading = false;
     });
   }
@@ -188,7 +191,7 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
                         child: Center(
                           child: CircleAvatar(
                             radius: 50,
-                            backgroundImage: !widget.exists
+                            backgroundImage: !widget.profilePicExists
                                 ? AssetImage('images/userPhoto.jpg')
                                 : NetworkImageWithRetry(("https://app-workbook.herokuapp.com/getUserProfile/employee/5eeccd1737d07600172c6064")),
                           ),
@@ -301,6 +304,7 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
                         context: context,
                         builder: (BuildContext context) {
                           return OpenBottomModal(
+                            userRole: widget.role,
                             regId: widget.id,
                           );
                         });
@@ -316,7 +320,9 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
                       ),
                     ),
                     Text(
-                      widget.role == 'driver' && !_routeExists ? 'Add Route' : (widget.role == 'driver' && _routeExists) ? 'Edit Route' : 'Add Travel Service',
+                      widget.role == 'driver' && !_routeExists
+                          ? 'Add Route'
+                          : (widget.role == 'driver' && _routeExists) ? 'Edit Route' : (widget.routeExists) ? 'Edit Travel Service' : 'Add Travel Service',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],

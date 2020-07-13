@@ -65,8 +65,9 @@ class _AddGradeState extends State<AddGrade> {
   Future getDivision({String instituteName}) async {
     var response = await http.get("$baseUrl/fetchDivision/$instituteName");
     print('Response status: ${response.statusCode}');
-
-    divisionData = json.decode(response.body)['payload']['divisions'];
+    setState(() {
+      divisionData = json.decode(response.body)['payload']['divisions'];
+    });
   }
 
   bool _isEdit = false;
