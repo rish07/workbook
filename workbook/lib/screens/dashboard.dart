@@ -425,7 +425,7 @@ class _DashBoardState extends State<DashBoard> {
                                                           ),
                                                           onPressed: () async {
                                                             if (temp.contains(User.userEmail)) {
-                                                              FlutterToast.showToast(msg: 'Liked already!');
+                                                              Fluttertoast.showToast(context, msg: 'Liked already!');
                                                             } else {
                                                               await _likePost(postId: posts[index]['_id'], userName: User.userName);
                                                               await _getAllPosts();
@@ -540,13 +540,13 @@ class _DashBoardState extends State<DashBoard> {
 
                                                             print(response.body);
                                                             if (json.decode(response.body)['statusCode'] == 200) {
-                                                              FlutterToast.showToast(msg: 'Comment posted');
+                                                              Fluttertoast.showToast(context, msg: 'Comment posted');
                                                               setState(() {
                                                                 _getAllPosts();
                                                               });
                                                             }
                                                           } else {
-                                                            FlutterToast.showToast(msg: 'Comment can\'t be empty');
+                                                            Fluttertoast.showToast(context, msg: 'Comment can\'t be empty');
                                                           }
                                                         }),
                                                   ),

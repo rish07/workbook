@@ -58,7 +58,7 @@ class _GenerateTicketState extends State<GenerateTicket> {
             _selectedInstitution = null;
           });
     } else {
-      FlutterToast.showToast(msg: 'Error');
+      Fluttertoast.showToast(context, msg: 'Error');
     }
   }
 

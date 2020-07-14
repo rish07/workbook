@@ -60,6 +60,7 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
     setState(() {
       address = "$name, $thoroughfare, $locality, $administrativeArea, $postalCode, $country";
     });
+    return address;
   }
 
   place.GoogleMapsPlaces _places = place.GoogleMapsPlaces(apiKey: "AIzaSyAuAeRHabINV88n4SoqODJbq0QZhCOl5dE");
@@ -69,7 +70,9 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
   static double latitude;
   static double longitude;
 
-  CameraPosition _kGooglePlex = CameraPosition(target: LatLng(19.07, 72.87));
+  CameraPosition _kGooglePlex = CameraPosition(
+    target: LatLng(19.07, 72.87),
+  );
 
   List<Marker> markers = <Marker>[];
 
@@ -77,7 +80,7 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
 
   void _getLocation() async {
     LocationData loc = await widget.location.getLocation();
-    //getAllMarkers();
+    getAllMarkers();
     print(loc);
     latitude = loc.latitude;
     longitude = loc.longitude;
@@ -158,9 +161,12 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
 
     print(response.body);
     if (json.decode(response.body)['statusCode'] == 200) {
-      FlutterToast.showToast(msg: 'Deleted');
+      Fluttertoast.showToast(context, msg: 'Deleted');
+      setState(() {
+        getAllMarkers();
+      });
     } else {
-      FlutterToast.showToast(msg: 'Error');
+      Fluttertoast.showToast(context, msg: 'Error');
     }
     Navigator.pop(context);
   }
@@ -187,11 +193,16 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
         },
       );
       print(response.body);
+      if (json.decode(response.body)['statusCode'] == 200) {
+        Fluttertoast.showToast(context, msg: 'Updated');
+      } else {
+        Fluttertoast.showToast(context, msg: 'Error');
+      }
     });
-    FlutterToast.showToast(msg: 'Updated');
   }
 
   Future<void> getAllMarkers() async {
+    markers = [];
     if (widget.isEdit) {
       var response = await http.get('$baseUrl/getRoutes');
       List temp = json.decode(response.body)['payload']['routes'];
@@ -210,23 +221,20 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
                     loc['longitude'],
                   ),
                   infoWindow: InfoWindow(
-                    title: loc['name'],
-                    snippet: 'dcisb',
-                  ),
-                  flat: false,
+                      title: loc['name'],
+                      onTap: () {
+                        popDialog(
+                          title: 'Delete Route?',
+                          content: 'Do you want to delete this location from the route?',
+                          context: context,
+                          onPress: () {
+                            _deleteLocation(locationID: loc['_id']);
+                          },
+                          buttonTitle: 'Delete',
+                        );
+                      }),
+                  flat: true,
                   draggable: false,
-                  consumeTapEvents: true,
-                  onTap: () {
-                    popDialog(
-                      title: 'Delete Route?',
-                      content: 'Do you want to delete this location from the route?',
-                      context: context,
-                      onPress: () {
-                        _deleteLocation(locationID: loc['_id']);
-                      },
-                      buttonTitle: 'Delete',
-                    );
-                  },
                 ),
               );
             });
@@ -239,27 +247,19 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
     var uuid = Uuid();
     setState(() {
       _locations.forEach((element) {
+        print(element['name']);
         markers.add(
           Marker(
             markerId: MarkerId(uuid.v1()),
             position: LatLng(element['latitude'], element['longitude']),
             infoWindow: InfoWindow(title: element['name']),
-            flat: false,
+            flat: true,
             draggable: false,
-            consumeTapEvents: true,
-            onTap: () {
-              popDialog(
-                title: 'Delete Route?',
-                content: 'Do you want to delete this location from the route?',
-                context: context,
-                buttonTitle: 'Delete',
-                onPress: () {},
-              );
-            },
           ),
         );
       });
     });
+    markers = Set.of(markers).toList();
   }
 
   Future<Null> displayPrediction(place.Prediction p) async {
@@ -270,20 +270,34 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
       double lat = detail.result.geometry.location.lat;
       double lng = detail.result.geometry.location.lng;
 
-      var address = await Geocoder.local.findAddressesFromQuery(p.description);
-
-      print(lat);
-      print(lng);
+      String add = detail.result.formattedAddress;
+      GoogleMapController controller = await _controller.future;
+      controller.animateCamera(CameraUpdate.newCameraPosition(
+        CameraPosition(
+          bearing: 0,
+          target: LatLng(lat, lng),
+          zoom: 17.0,
+        ),
+      ));
+      setState(() {
+        _locations.add({
+          "latitude": lat,
+          "longitude": lng,
+          "name": add,
+        });
+        getAllMarkers();
+      });
     }
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
+
     _locationName.dispose();
   }
 
+  bool _mapLoading = true;
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -328,118 +342,110 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
               'Set Route',
               style: TextStyle(color: violet2),
             )),
-        body: Stack(
-          children: [
-            GoogleMap(
-              mapType: MapType.normal,
-              initialCameraPosition: _kGooglePlex,
-              onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
-              },
-              circles: Set<Circle>.of(circles),
-              markers: Set<Marker>.of(markers),
-              myLocationButtonEnabled: true,
-              onTap: (LatLng location) async {
-                await _getLocationAddress(location.latitude, location.longitude);
+        body: Stack(children: [
+          GoogleMap(
+            mapType: MapType.normal,
+            initialCameraPosition: _kGooglePlex,
+            onMapCreated: (GoogleMapController controller) {
+              setState(() {
+                _mapLoading = false;
+              });
+              _controller.complete(controller);
+            },
+            circles: Set<Circle>.of(circles),
+            markers: Set<Marker>.of(markers),
+            myLocationButtonEnabled: true,
+            onTap: (LatLng location) async {
+              await _getLocationAddress(location.latitude, location.longitude);
 
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text("Add location?"),
-                      content: Text("Are you sure you want to add the tapped location $address to ${widget.routeName}"),
-                      actions: <Widget>[
-                        FlatButton(
-                          child: Text("Cancel"),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        FlatButton(
-                          child: Text(
-                            "Add",
-                            style: TextStyle(fontWeight: FontWeight.w700),
-                          ),
-                          onPressed: () {
-                            _locations.add({
-                              "latitude": location.latitude,
-                              "longitude": location.longitude,
-                              "name": address,
-                            });
-                            print('here11111111111111111111111111111111111111111111111111');
-                            print(_locations);
-                            getAllMarkers();
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
-            Positioned(
-              top: MediaQuery.of(context).size.height * 0.02,
-              right: 15.0,
-              left: 15.0,
-              child: Container(
-                height: 50.0,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(32.0),
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(color: Colors.grey, offset: Offset(1.0, 5.0), blurRadius: 10, spreadRadius: 3),
-                  ],
-                ),
-                child: TextFormField(
-                  controller: _locationName,
-                  onTap: () async {
-                    place.Prediction p = await PlacesAutocomplete.show(
-                      mode: Mode.overlay,
-                      language: "en",
-                      context: context,
-                      components: [new place.Component(place.Component.country, "in")],
-                      apiKey: "AIzaSyAuAeRHabINV88n4SoqODJbq0QZhCOl5dE",
-                    );
-                    displayPrediction(p);
-                  },
-                  textCapitalization: TextCapitalization.words,
-                  cursorColor: Colors.black,
-                  style: TextStyle(color: violet1, fontSize: 16),
-                  decoration: InputDecoration(
-                    icon: Container(
-                      margin: EdgeInsets.only(top: 5, bottom: 5, left: 16),
-                      child: Icon(
-                        Icons.not_listed_location,
-                        color: Colors.black,
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text("Add location?"),
+                    content: Text("Are you sure you want to add the tapped location $address to ${widget.routeName}"),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text("Cancel"),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
                       ),
-                    ),
-                    hintText: "Destination?",
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 5),
+                      FlatButton(
+                        child: Text(
+                          "Add",
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        onPressed: () {
+                          _locations.add({
+                            "latitude": location.latitude,
+                            "longitude": location.longitude,
+                            "name": address,
+                          });
+                          print('here11111111111111111111111111111111111111111111111111');
+                          print(_locations);
+                          getAllMarkers();
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+          _mapLoading
+              ? Container(
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                  color: Colors.grey[100],
+                  child: Center(
+                    child: CircularProgressIndicator(),
                   ),
+                )
+              : Container(),
+        ]),
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FloatingActionButton(
+                heroTag: null,
+                onPressed: _getLocation,
+                backgroundColor: Color.fromRGBO(250, 250, 250, 1),
+                tooltip: 'Get Location',
+                child: Icon(
+                  Icons.my_location,
+                  color: violet1,
                 ),
               ),
-            )
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FloatingActionButton(
+                heroTag: null,
+                onPressed: () async {
+                  place.Prediction p = await PlacesAutocomplete.show(
+                    // offset: (10),
+                    overlayBorderRadius: BorderRadius.circular(16),
+                    mode: Mode.overlay,
+                    language: "en",
+                    context: context,
+                    components: [new place.Component(place.Component.country, "in")],
+                    apiKey: "AIzaSyAuAeRHabINV88n4SoqODJbq0QZhCOl5dE",
+                  );
+                  displayPrediction(p);
+                },
+                backgroundColor: Color.fromRGBO(250, 250, 250, 1),
+                tooltip: 'Get Location',
+                child: Icon(
+                  Icons.search,
+                  color: violet1,
+                ),
+              ),
+            ),
           ],
-        ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: _getLocation,
-          backgroundColor: Color.fromRGBO(250, 250, 250, 1),
-          tooltip: 'Get Location',
-          label: Row(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(Icons.gps_fixed, color: violet1),
-              ),
-              Text(
-                'Get my Location',
-                style: TextStyle(color: violet1),
-              ),
-            ],
-          ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),

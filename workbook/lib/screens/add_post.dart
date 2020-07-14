@@ -52,7 +52,7 @@ class _AddPostState extends State<AddPost> {
 
   Future createPost() async {
     if (_controller.text.isEmpty && mediaUrl.isEmpty) {
-      FlutterToast.showToast(msg: 'The post can not be empty!');
+      Fluttertoast.showToast(context, msg: 'The post can not be empty!');
       setState(() {
         _loading = false;
       });
@@ -71,14 +71,14 @@ class _AddPostState extends State<AddPost> {
       print(response.body);
 
       if (json.decode(response.body)['statusCode'] == 200) {
-        FlutterToast.showToast(msg: 'Post uploaded successfully');
+        Fluttertoast.showToast(context, msg: 'Post uploaded successfully');
         sendNotification();
         Navigator.push(
           context,
           PageTransition(child: DashBoard(), type: PageTransitionType.rightToLeft),
         );
       } else {
-        FlutterToast.showToast(msg: 'Error');
+        Fluttertoast.showToast(context, msg: 'Error');
       }
       setState(() {
         _loading = false;
@@ -132,7 +132,7 @@ class _AddPostState extends State<AddPost> {
     setState(() {
       mediaUrl = url;
       _loading = false;
-      FlutterToast.showToast(msg: 'File attached successfully');
+      Fluttertoast.showToast(context, msg: 'File attached successfully');
     });
     print("URL is $url");
   }

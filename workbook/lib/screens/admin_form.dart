@@ -30,7 +30,6 @@ class _AdminFormState extends State<AdminForm> {
   final math.Random random = math.Random();
   bool _isLoading = false;
   String imageAsB64;
-
   final picker = ImagePicker();
   String _selectedStateLocation;
   String _selectedCityLocation;
@@ -91,7 +90,7 @@ class _AdminFormState extends State<AdminForm> {
     setState(() {
       mediaUrl = url;
       _isLoading = false;
-      FlutterToast.showToast(msg: 'File attached successfully');
+      Fluttertoast.showToast(context, msg: 'File attached successfully');
     });
     print("URL is $url");
   }
@@ -127,7 +126,7 @@ class _AdminFormState extends State<AdminForm> {
           buttonTitle: 'Close',
           content: 'Your form has been submitted. Please wait for 24 hours for it to get approved');
     } else {
-      FlutterToast.showToast(msg: 'Error');
+      Fluttertoast.showToast(context, msg: 'Error');
     }
   }
 

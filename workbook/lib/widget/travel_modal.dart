@@ -76,10 +76,10 @@ class _OpenBottomModalState extends State<OpenBottomModal> {
     );
     print(response.body);
     if (json.decode(response.body)['statusCode'] == 200) {
-      FlutterToast.showToast(msg: 'Travel service added');
+      Fluttertoast.showToast(context, msg: 'Travel service added');
       Navigator.pop(context);
     } else {
-      FlutterToast.showToast(msg: 'Error, try again');
+      Fluttertoast.showToast(context, msg: 'Error, try again');
     }
   }
 
