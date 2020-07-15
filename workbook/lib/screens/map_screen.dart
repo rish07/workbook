@@ -80,7 +80,7 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
 
   void _getLocation() async {
     LocationData loc = await widget.location.getLocation();
-    getAllMarkers();
+    //getAllMarkers();
     print(loc);
     latitude = loc.latitude;
     longitude = loc.longitude;
@@ -116,6 +116,16 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
         zoom: 17.0,
       ),
     ));
+    if (User.userRole == 'driver') {
+      String temp = await _getLocationAddress(loc.latitude, loc.longitude);
+      print(temp);
+      Map _location = {
+        "latitude": loc.latitude,
+        "longitude": loc.longitude,
+        "locationName": temp,
+      };
+      await _updateDriverLocation(_location);
+    }
   }
 
   Future _createRoute() async {
@@ -201,6 +211,32 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
     });
   }
 
+  Future _updateDriverLocation(Map location) async {
+    var response = await http.post('$baseUrl/driver/updateLocation',
+        body: json.encode(
+          {"userID": User.userEmail, "id": User.userID, "jwtToken": User.userJwtToken, "location": location},
+        ),
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+        });
+    print(response.body);
+  }
+
+  Future _fetchDriverLocation() async {
+    var response = await http.post('$baseUrl/driver/getLocation',
+        body: json.encode(
+          {
+            "userID": User.userEmail,
+            "routeName": 'Route X',
+            "jwtToken": User.userJwtToken,
+          },
+        ),
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+        });
+    print(response.body);
+  }
+
   Future<void> getAllMarkers() async {
     markers = [];
     if (widget.isEdit) {
@@ -210,8 +246,6 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
         if (ele['routeName'] == widget.routeName) {
           List tempNew = ele['location'];
           tempNew.forEach((loc) {
-            print(loc['name']);
-            print('hereeeeeeeeeeeeeeeeee');
             setState(() {
               markers.add(
                 Marker(
@@ -221,7 +255,7 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
                     loc['longitude'],
                   ),
                   infoWindow: InfoWindow(
-                      title: loc['name'],
+                      title: loc['locationName'],
                       onTap: () {
                         popDialog(
                           title: 'Delete Route?',
@@ -247,12 +281,12 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
     var uuid = Uuid();
     setState(() {
       _locations.forEach((element) {
-        print(element['name']);
+        print(element['locationName']);
         markers.add(
           Marker(
             markerId: MarkerId(uuid.v1()),
             position: LatLng(element['latitude'], element['longitude']),
-            infoWindow: InfoWindow(title: element['name']),
+            infoWindow: InfoWindow(title: element['locationName']),
             flat: true,
             draggable: false,
           ),
@@ -266,7 +300,6 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
     if (p != null) {
       place.PlacesDetailsResponse detail = await _places.getDetailsByPlaceId(p.placeId);
 
-      var placeId = p.placeId;
       double lat = detail.result.geometry.location.lat;
       double lng = detail.result.geometry.location.lng;
 
@@ -283,7 +316,7 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
         _locations.add({
           "latitude": lat,
           "longitude": lng,
-          "name": add,
+          "locationName": add,
         });
         getAllMarkers();
       });
@@ -380,7 +413,7 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
                           _locations.add({
                             "latitude": location.latitude,
                             "longitude": location.longitude,
-                            "name": address,
+                            "locationName": address,
                           });
                           print('here11111111111111111111111111111111111111111111111111');
                           print(_locations);
@@ -406,6 +439,7 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
               : Container(),
         ]),
         floatingActionButton: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
@@ -445,6 +479,26 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
                 ),
               ),
             ),
+            (User.userRole == 'customer' || User.userRole == 'employee')
+                ? Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FloatingActionButton(
+                      heroTag: null,
+                      onPressed: () async {
+                        await _fetchDriverLocation();
+                      },
+                      backgroundColor: Color.fromRGBO(250, 250, 250, 1),
+                      tooltip: 'Get Driver Location',
+                      child: Icon(
+                        Icons.directions_car,
+                        color: violet1,
+                      ),
+                    ),
+                  )
+                : Container(
+                    height: 0,
+                    width: 0,
+                  ),
           ],
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

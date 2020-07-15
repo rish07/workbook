@@ -19,7 +19,7 @@ class _LandingPageState extends State<LandingPage> {
     var email = prefs.getString('userEmail');
 
     print(email);
-    Navigator.push(context, PageTransition(child: email == null ? LoginPage() : DashBoard(), type: null));
+    Navigator.push(context, PageTransition(child: email == null ? LoginPage() : DashBoard(), type: PageTransitionType.fade));
   }
 
   @override

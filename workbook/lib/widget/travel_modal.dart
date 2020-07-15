@@ -31,18 +31,19 @@ class _OpenBottomModalState extends State<OpenBottomModal> {
   String _selectedDroppingPoint;
   String _selectedPickupTime;
   var body;
+
   Future _setRoute(String areaName, double cost, String time) async {
     Map boardingPoint = {};
     Map droppingPoint = {};
     routeData.forEach((element) {
       if (element['routeName'] == _selectedRouteName) {
         element['location'].forEach((location) {
-          if (location['name'] == _selectedBoardingPoint) {
+          if (location['locationName'] == _selectedBoardingPoint) {
             setState(() {
               boardingPoint = location;
             });
           }
-          if (location['name'] == _selectedDroppingPoint) {
+          if (location['locationName'] == _selectedDroppingPoint) {
             setState(() {
               droppingPoint = location;
             });
@@ -168,7 +169,7 @@ class _OpenBottomModalState extends State<OpenBottomModal> {
                             routeData.forEach((element) {
                               if (element['routeName'] == _selectedRouteName) {
                                 element['location'].forEach((location) {
-                                  locationNames.add(location['name']);
+                                  locationNames.add(location['locationName']);
                                 });
                               }
                             });
@@ -306,6 +307,7 @@ class _OpenBottomModalState extends State<OpenBottomModal> {
                           initialTime: TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
                         );
                         setState(() {
+                          print(_timeController.text.toString());
                           _selectedPickupTime = _timeController.text.toString();
                         });
                         return DateTimeField.convert(time);

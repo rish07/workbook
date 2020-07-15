@@ -27,6 +27,7 @@ import 'package:workbook/screens/add_post.dart';
 import 'package:workbook/screens/approve_user.dart';
 import 'package:workbook/screens/coming_soon.dart';
 import 'package:workbook/screens/login_page.dart';
+import 'package:workbook/screens/map_screen.dart';
 import 'package:workbook/screens/profile_page.dart';
 import 'package:workbook/screens/query_data.dart';
 import 'package:workbook/screens/settings.dart';
@@ -123,7 +124,7 @@ class _DashBoardState extends State<DashBoard> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        PageTransition(child: DashBoard(), type: PageTransitionType.fade),
+                        PageTransition(child: GoogleMapScreen(), type: PageTransitionType.fade),
                       );
                     },
                     child: Column(
