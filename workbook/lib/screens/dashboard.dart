@@ -170,10 +170,14 @@ class _DashBoardState extends State<DashBoard> {
                   child: MaterialButton(
                     minWidth: 1,
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        PageTransition(child: AddPost(), type: PageTransitionType.fade),
-                      );
+                      if (User.userRole == 'superAdmin') {
+                        Navigator.push(
+                          context,
+                          PageTransition(child: AddPost(), type: PageTransitionType.fade),
+                        );
+                      } else {
+                        Fluttertoast.showToast(context, msg: 'Only Superadmin can post for now!');
+                      }
                     },
                     child: Column(
                       children: [
@@ -197,20 +201,25 @@ class _DashBoardState extends State<DashBoard> {
                       Navigator.push(
                         context,
                         PageTransition(
-                            child: ApproveUser(
-                              isDriver: false,
-                            ),
+                            child: User.userRole != 'driver'
+                                ? ApproveUser(
+                                    isDriver: false,
+                                  )
+                                : GoogleMapScreen(
+                                    driverID: User.userID,
+                                    isEdit: false,
+                                  ),
                             type: PageTransitionType.rightToLeft),
                       );
                     },
                     child: Column(
                       children: [
                         Icon(
-                          Icons.people,
+                          User.userRole == 'driver' ? Icons.map : Icons.people,
                           size: 25,
                         ),
                         Text(
-                          User.userRole == 'superAdmin' ? 'Admins' : (User.userRole == 'admin') ? 'Emp' : (User.userRole == 'employee') ? 'Cust' : 'Staff',
+                          User.userRole == 'superAdmin' ? 'Admins' : (User.userRole == 'admin') ? 'Emp' : (User.userRole == 'employee') ? 'Cust' : 'Travel',
                           style: TextStyle(fontSize: 10),
                         )
                       ],
@@ -705,6 +714,23 @@ class _DashBoardState extends State<DashBoard> {
                           Navigator.push(
                             context,
                             PageTransition(child: QueryData(), type: PageTransitionType.rightToLeft),
+                          );
+                        })
+                    : Container(),
+                User.userRole == 'employee' || User.userRole == 'customer' || User.userRole == 'driver'
+                    ? buildDrawerItemDashboard(
+                        icon: Icons.map,
+                        title: 'Travel',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            PageTransition(
+                                child: GoogleMapScreen(
+                                  driverID: User.userRole == 'driver' ? User.userID : null,
+                                  routeName: User.userRoute,
+                                  isEdit: false,
+                                ),
+                                type: PageTransitionType.rightToLeft),
                           );
                         })
                     : Container(),

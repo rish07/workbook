@@ -131,6 +131,7 @@ class _LoginPageState extends State<LoginPage> {
       var tempo = resp['user'];
 
       setState(() {
+        User.userRoute = resp['user']['route'] != null ? resp['user']['route'][0]['routeName'] : null;
         User.userJwtToken = resp['jwtToken'];
         User.userName = tempo['userName'] ?? null;
         User.userID = tempo['_id'] ?? null;

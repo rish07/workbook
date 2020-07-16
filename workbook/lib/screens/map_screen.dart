@@ -8,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_webservice/places.dart' as place;
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'dart:async';
 import 'package:workbook/screens/request_profile_page.dart';
@@ -33,10 +34,15 @@ class GoogleMapScreen extends StatefulWidget {
 }
 
 class _GoogleMapScreenState extends State<GoogleMapScreen> {
+  BitmapDescriptor myIcon;
   final TextEditingController _locationName = TextEditingController();
   void initState() {
     super.initState();
+    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(10, 10)), 'images/car-icon.png').then((onValue) {
+      myIcon = onValue;
+    });
     _getLocation();
+    _fetchDriverLocation();
     getAllMarkers();
   }
 
@@ -80,7 +86,9 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
 
   void _getLocation() async {
     LocationData loc = await widget.location.getLocation();
-    //getAllMarkers();
+    if (User.userRole == 'customer' || User.userRole == 'employee') {
+      getAllMarkers();
+    }
     print(loc);
     latitude = loc.latitude;
     longitude = loc.longitude;
@@ -212,17 +220,37 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
   }
 
   Future _updateDriverLocation(Map location) async {
+    setState(() {
+      _isLoading = true;
+    });
     var response = await http.post('$baseUrl/driver/updateLocation',
         body: json.encode(
-          {"userID": User.userEmail, "id": User.userID, "jwtToken": User.userJwtToken, "location": location},
+          {
+            "userID": User.userEmail,
+            "id": User.userID,
+            "jwtToken": User.userJwtToken,
+            "location": location,
+          },
         ),
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
         });
+    setState(() {
+      _isLoading = false;
+    });
     print(response.body);
+    if (json.decode(response.body)['statusCode'] == 200) {
+      Fluttertoast.showToast(context, msg: 'Location Updated!');
+    } else {
+      Fluttertoast.showToast(context, msg: 'Error');
+    }
   }
 
   Future _fetchDriverLocation() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     var response = await http.post('$baseUrl/driver/getLocation',
         body: json.encode(
           {
@@ -234,12 +262,42 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
         });
+    setState(() {
+      _isLoading = false;
+    });
     print(response.body);
+    if (json.decode(response.body)['statusCode'] == 200) {
+      var temp = json.decode(response.body)['payload'];
+      var uuid = Uuid();
+      setState(() {
+        markers.add(
+          Marker(
+              markerId: MarkerId(
+                uuid.v1(),
+              ),
+              flat: true,
+              icon: myIcon,
+              draggable: false,
+              position: LatLng(temp['location']['latitude'], temp['location']['longitude']),
+              infoWindow: InfoWindow(
+                title: temp['location']['locationName'],
+              )),
+        );
+      });
+      GoogleMapController controller = await _controller.future;
+      controller.animateCamera(CameraUpdate.newCameraPosition(
+        CameraPosition(
+          bearing: 0,
+          target: LatLng(temp['location']['latitude'], temp['location']['longitude']),
+          zoom: 17.0,
+        ),
+      ));
+    }
   }
 
   Future<void> getAllMarkers() async {
     markers = [];
-    if (widget.isEdit) {
+    if (widget.isEdit || User.userRole == 'employee' || User.userRole == 'driver') {
       var response = await http.get('$baseUrl/getRoutes');
       List temp = json.decode(response.body)['payload']['routes'];
       temp.forEach((ele) {
@@ -255,8 +313,9 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
                     loc['longitude'],
                   ),
                   infoWindow: InfoWindow(
-                      title: loc['locationName'],
-                      onTap: () {
+                    title: loc['locationName'],
+                    onTap: () {
+                      if (User.userRole == 'admin') {
                         popDialog(
                           title: 'Delete Route?',
                           content: 'Do you want to delete this location from the route?',
@@ -266,7 +325,9 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
                           },
                           buttonTitle: 'Delete',
                         );
-                      }),
+                      }
+                    },
+                  ),
                   flat: true,
                   draggable: false,
                 ),
@@ -331,177 +392,194 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
   }
 
   bool _mapLoading = true;
+  bool _isLoading = false;
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async => false,
-      child: Scaffold(
-        appBar: AppBar(
-            leading: IconButton(
-                color: violet1,
-                icon: Icon(
-                  Icons.arrow_back,
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                }),
-            actions: <Widget>[
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                child: MaterialButton(
-                    minWidth: 80,
-                    color: violet2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(32),
-                    ),
-                    child: Text(
-                      'Update',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    onPressed: () async {
-                      print('working');
-                      if (widget.isEdit) {
-                        await _updateLocation();
-                      } else {
-                        await _createRoute();
-                      }
-                    }),
-              )
-            ],
-            centerTitle: true,
-            elevation: 0,
-            backgroundColor: Colors.white,
-            title: Text(
-              'Set Route',
-              style: TextStyle(color: violet2),
-            )),
-        body: Stack(children: [
-          GoogleMap(
-            mapType: MapType.normal,
-            initialCameraPosition: _kGooglePlex,
-            onMapCreated: (GoogleMapController controller) {
-              setState(() {
-                _mapLoading = false;
-              });
-              _controller.complete(controller);
-            },
-            circles: Set<Circle>.of(circles),
-            markers: Set<Marker>.of(markers),
-            myLocationButtonEnabled: true,
-            onTap: (LatLng location) async {
-              await _getLocationAddress(location.latitude, location.longitude);
-
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text("Add location?"),
-                    content: Text("Are you sure you want to add the tapped location $address to ${widget.routeName}"),
-                    actions: <Widget>[
-                      FlatButton(
-                        child: Text("Cancel"),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      FlatButton(
-                        child: Text(
-                          "Add",
-                          style: TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        onPressed: () {
-                          _locations.add({
-                            "latitude": location.latitude,
-                            "longitude": location.longitude,
-                            "locationName": address,
-                          });
-                          print('here11111111111111111111111111111111111111111111111111');
-                          print(_locations);
-                          getAllMarkers();
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-          ),
-          _mapLoading
-              ? Container(
-                  height: MediaQuery.of(context).size.height,
-                  width: MediaQuery.of(context).size.width,
-                  color: Colors.grey[100],
-                  child: Center(
-                    child: CircularProgressIndicator(),
+      child: ModalProgressHUD(
+        progressIndicator: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(violet2),
+          backgroundColor: Colors.transparent,
+        ),
+        inAsyncCall: _isLoading,
+        child: Scaffold(
+          appBar: AppBar(
+              leading: IconButton(
+                  color: violet1,
+                  icon: Icon(
+                    Icons.arrow_back,
                   ),
-                )
-              : Container(),
-        ]),
-        floatingActionButton: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: FloatingActionButton(
-                heroTag: null,
-                onPressed: _getLocation,
-                backgroundColor: Color.fromRGBO(250, 250, 250, 1),
-                tooltip: 'Get Location',
-                child: Icon(
-                  Icons.my_location,
-                  color: violet1,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: FloatingActionButton(
-                heroTag: null,
-                onPressed: () async {
-                  place.Prediction p = await PlacesAutocomplete.show(
-                    // offset: (10),
-                    overlayBorderRadius: BorderRadius.circular(16),
-                    mode: Mode.overlay,
-                    language: "en",
+                  onPressed: () {
+                    Navigator.pop(context);
+                  }),
+              actions: <Widget>[
+                User.userRole == 'admin'
+                    ? Container(
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                        child: MaterialButton(
+                            minWidth: 80,
+                            color: violet2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            child: Text(
+                              'Update',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            onPressed: () async {
+                              print('working');
+                              if (widget.isEdit) {
+                                await _updateLocation();
+                              } else {
+                                await _createRoute();
+                              }
+                            }),
+                      )
+                    : Container(),
+              ],
+              centerTitle: true,
+              elevation: 10,
+              backgroundColor: Colors.white,
+              title: Text(
+                User.userRole == 'admin' ? 'Set Route' : (User.userRole == 'customer' || User.userRole == 'employee') ? 'Travel' : 'Routes',
+                style: TextStyle(color: violet2, fontWeight: FontWeight.bold),
+              )),
+          body: Stack(children: [
+            GoogleMap(
+              mapType: MapType.normal,
+              initialCameraPosition: _kGooglePlex,
+              onMapCreated: (GoogleMapController controller) {
+                setState(() {
+                  _mapLoading = false;
+                });
+                _controller.complete(controller);
+              },
+              circles: Set<Circle>.of(circles),
+              markers: Set<Marker>.of(markers),
+              myLocationButtonEnabled: true,
+              onTap: (LatLng location) async {
+                await _getLocationAddress(location.latitude, location.longitude);
+
+                if (User.userRole == 'admin') {
+                  showDialog(
                     context: context,
-                    components: [new place.Component(place.Component.country, "in")],
-                    apiKey: "AIzaSyAuAeRHabINV88n4SoqODJbq0QZhCOl5dE",
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Add location?"),
+                        content: Text("Are you sure you want to add the tapped location $address to ${widget.routeName}"),
+                        actions: <Widget>[
+                          FlatButton(
+                            child: Text("Cancel"),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          FlatButton(
+                            child: Text(
+                              "Add",
+                              style: TextStyle(fontWeight: FontWeight.w700),
+                            ),
+                            onPressed: () {
+                              _locations.add({
+                                "latitude": location.latitude,
+                                "longitude": location.longitude,
+                                "locationName": address,
+                              });
+                              print('here11111111111111111111111111111111111111111111111111');
+                              print(_locations);
+                              getAllMarkers();
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      );
+                    },
                   );
-                  displayPrediction(p);
-                },
-                backgroundColor: Color.fromRGBO(250, 250, 250, 1),
-                tooltip: 'Get Location',
-                child: Icon(
-                  Icons.search,
-                  color: violet1,
-                ),
-              ),
+                }
+              },
             ),
-            (User.userRole == 'customer' || User.userRole == 'employee')
-                ? Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: FloatingActionButton(
-                      heroTag: null,
-                      onPressed: () async {
-                        await _fetchDriverLocation();
-                      },
-                      backgroundColor: Color.fromRGBO(250, 250, 250, 1),
-                      tooltip: 'Get Driver Location',
-                      child: Icon(
-                        Icons.directions_car,
-                        color: violet1,
-                      ),
+            _mapLoading
+                ? Container(
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width,
+                    color: Colors.grey[100],
+                    child: Center(
+                      child: CircularProgressIndicator(),
                     ),
                   )
-                : Container(
-                    height: 0,
-                    width: 0,
+                : Container(),
+          ]),
+          floatingActionButton: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: FloatingActionButton(
+                  heroTag: null,
+                  onPressed: _getLocation,
+                  backgroundColor: Color.fromRGBO(250, 250, 250, 1),
+                  tooltip: 'Get Location',
+                  child: Icon(
+                    Icons.my_location,
+                    color: violet1,
                   ),
-          ],
+                ),
+              ),
+              User.userRole == 'admin'
+                  ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FloatingActionButton(
+                        heroTag: null,
+                        onPressed: () async {
+                          place.Prediction p = await PlacesAutocomplete.show(
+                            // offset: (10),
+                            overlayBorderRadius: BorderRadius.circular(16),
+                            mode: Mode.overlay,
+                            language: "en",
+                            context: context,
+                            components: [new place.Component(place.Component.country, "in")],
+                            apiKey: "AIzaSyAuAeRHabINV88n4SoqODJbq0QZhCOl5dE",
+                          );
+                          displayPrediction(p);
+                        },
+                        backgroundColor: Color.fromRGBO(250, 250, 250, 1),
+                        tooltip: 'Search Location',
+                        child: Icon(
+                          Icons.search,
+                          color: violet1,
+                        ),
+                      ),
+                    )
+                  : Container(
+                      height: 0,
+                      width: 0,
+                    ),
+              (User.userRole == 'customer' || User.userRole == 'employee')
+                  ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FloatingActionButton(
+                        heroTag: null,
+                        onPressed: () async {
+                          await _fetchDriverLocation();
+                        },
+                        backgroundColor: Color.fromRGBO(250, 250, 250, 1),
+                        tooltip: 'Get Driver Location',
+                        child: Icon(
+                          Icons.directions_car,
+                          color: violet1,
+                        ),
+                      ),
+                    )
+                  : Container(
+                      height: 0,
+                      width: 0,
+                    ),
+            ],
+          ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
     );
   }

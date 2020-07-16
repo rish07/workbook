@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/login_page.dart';
 import 'package:workbook/widget/popUpDialog.dart';
@@ -35,8 +36,7 @@ class _SettingsState extends State<Settings> {
             ListTile(
               title: Text(
                 'Help Center',
-                style:
-                    TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
               ),
             ),
             Divider(
@@ -45,8 +45,7 @@ class _SettingsState extends State<Settings> {
             ListTile(
               title: Text(
                 'Privacy Policy',
-                style:
-                    TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
               ),
             ),
             Divider(
@@ -55,8 +54,7 @@ class _SettingsState extends State<Settings> {
             ListTile(
               title: Text(
                 'User Agreement',
-                style:
-                    TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
               ),
             ),
             Divider(
@@ -65,8 +63,7 @@ class _SettingsState extends State<Settings> {
             ListTile(
               title: Text(
                 'End User License Agreement',
-                style:
-                    TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
               ),
             ),
             Divider(
@@ -74,9 +71,20 @@ class _SettingsState extends State<Settings> {
             ),
             ListTile(
               title: Text(
+                'User Manual',
+                style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+              ),
+              onTap: () async {
+                await launch('https://docs.google.com/document/d/1mzftgkkfC6WN8PhmgOi5bJeCobLrKw3O6F8eIb_TOn8/edit');
+              },
+            ),
+            Divider(
+              thickness: 2,
+            ),
+            ListTile(
+              title: Text(
                 'Sign Out',
-                style:
-                    TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
               ),
               onTap: () {
                 popDialog(
@@ -85,8 +93,7 @@ class _SettingsState extends State<Settings> {
                     context: context,
                     content: 'Do you want to logout from your profile?',
                     onPress: () async {
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
                       prefs.remove('userName');
                       prefs.remove('userEmail');
                       prefs.remove('userID');
@@ -104,12 +111,7 @@ class _SettingsState extends State<Settings> {
                       prefs.remove('contactNumber');
                       prefs.remove('userPhotoData');
 
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          PageTransition(
-                              child: LoginPage(),
-                              type: PageTransitionType.rightToLeft),
-                          (route) => false);
+                      Navigator.pushAndRemoveUntil(context, PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft), (route) => false);
                     });
               },
             ),
@@ -119,8 +121,7 @@ class _SettingsState extends State<Settings> {
             ListTile(
               title: Text(
                 'Version: 0.0.1',
-                style:
-                    TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
               ),
             ),
             Divider(
