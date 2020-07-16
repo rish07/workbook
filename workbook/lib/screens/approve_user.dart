@@ -224,7 +224,7 @@ class _ApproveUserState extends State<ApproveUser> {
                                       isDriver: widget.isDriver ? true : false,
                                       instituteName: _employeeList[index]['instituteName'],
                                       isActive: false,
-                                      exists: _employeeList[index]['profilePicture'] == null ? false : true,
+                                      profilePicExists: _employeeList[index]['profilePicture'] == null ? false : true,
                                       id: _employeeList[index]['_id'],
                                       role: _employeeList[index]['role'],
                                       userName: _employeeList[index]['userName'],

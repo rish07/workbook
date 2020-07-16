@@ -8,9 +8,6 @@ import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/screens/login_page.dart';
 
 class LandingPage extends StatefulWidget {
-  final TargetPlatform platform;
-
-  const LandingPage({Key key, this.platform}) : super(key: key);
   @override
   _LandingPageState createState() => _LandingPageState();
 }
@@ -22,15 +19,7 @@ class _LandingPageState extends State<LandingPage> {
     var email = prefs.getString('userEmail');
 
     print(email);
-    Navigator.push(
-        context,
-        PageTransition(
-            child: email == null
-                ? LoginPage()
-                : DashBoard(
-                    platform: widget.platform,
-                  ),
-            type: null));
+    Navigator.push(context, PageTransition(child: email == null ? LoginPage() : DashBoard(), type: PageTransitionType.fade));
   }
 
   @override
@@ -46,21 +35,14 @@ class _LandingPageState extends State<LandingPage> {
     return Scaffold(
       body: Container(
         padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [violet1, violet2])),
+        decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [violet1, violet2])),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
               width: MediaQuery.of(context).size.width * 0.7,
-              child: AutoSizeText('Workbook',
-                  maxLines: 1,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 70, color: Colors.white)),
+              child: AutoSizeText('Workbook', maxLines: 1, textAlign: TextAlign.center, style: TextStyle(fontSize: 70, color: Colors.white)),
             ),
             Image.asset('images/book.gif'),
           ],

@@ -53,20 +53,21 @@ class _AddGradeState extends State<AddGrade> {
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
     if (json.decode(response.body)['statusCode'] == 200) {
-      FlutterToast.showToast(msg: 'Updated');
+      Fluttertoast.showToast(context, msg: 'updated');
       setState(() {
         _isLoading = false;
       });
     } else {
-      FlutterToast.showToast(msg: 'Error');
+      Fluttertoast.showToast(context, msg: 'Error');
     }
   }
 
   Future getDivision({String instituteName}) async {
     var response = await http.get("$baseUrl/fetchDivision/$instituteName");
     print('Response status: ${response.statusCode}');
-
-    divisionData = json.decode(response.body)['payload']['divisions'];
+    setState(() {
+      divisionData = json.decode(response.body)['payload']['divisions'];
+    });
   }
 
   bool _isEdit = false;
@@ -106,7 +107,7 @@ class _AddGradeState extends State<AddGrade> {
               FlatButton(
                 onPressed: () {
                   if (controller.text.isEmpty) {
-                    FlutterToast.showToast(msg: 'Please enter a name');
+                    Fluttertoast.showToast(context, msg: 'Please enter a name');
                   } else {
                     divisions.add({'division': name, 'grade': grades[index]});
                     print(divisions);
@@ -346,9 +347,9 @@ class _AddGradeState extends State<AddGrade> {
               FlatButton(
                 onPressed: () {
                   if (controller.text.isEmpty) {
-                    FlutterToast.showToast(msg: 'Please enter a name');
+                    Fluttertoast.showToast(context, msg: 'Please enter a name');
                   } else if (grades.contains(controller.text)) {
-                    FlutterToast.showToast(msg: 'Duplicate Entry', gravity: ToastGravity.TOP);
+                    Fluttertoast.showToast(context, msg: 'Duplicate Entry', gravity: ToastGravity.TOP);
                   } else {
                     grades.add(name);
                     controller.clear();

@@ -27,6 +27,7 @@ import 'package:workbook/screens/add_post.dart';
 import 'package:workbook/screens/approve_user.dart';
 import 'package:workbook/screens/coming_soon.dart';
 import 'package:workbook/screens/login_page.dart';
+import 'package:workbook/screens/map_screen.dart';
 import 'package:workbook/screens/profile_page.dart';
 import 'package:workbook/screens/query_data.dart';
 import 'package:workbook/screens/settings.dart';
@@ -123,7 +124,7 @@ class _DashBoardState extends State<DashBoard> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        PageTransition(child: DashBoard(), type: PageTransitionType.fade),
+                        PageTransition(child: GoogleMapScreen(), type: PageTransitionType.fade),
                       );
                     },
                     child: Column(
@@ -169,10 +170,14 @@ class _DashBoardState extends State<DashBoard> {
                   child: MaterialButton(
                     minWidth: 1,
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        PageTransition(child: AddPost(), type: PageTransitionType.fade),
-                      );
+                      if (User.userRole == 'superAdmin') {
+                        Navigator.push(
+                          context,
+                          PageTransition(child: AddPost(), type: PageTransitionType.fade),
+                        );
+                      } else {
+                        Fluttertoast.showToast(context, msg: 'Only Superadmin can post for now!');
+                      }
                     },
                     child: Column(
                       children: [
@@ -196,20 +201,25 @@ class _DashBoardState extends State<DashBoard> {
                       Navigator.push(
                         context,
                         PageTransition(
-                            child: ApproveUser(
-                              isDriver: false,
-                            ),
+                            child: User.userRole != 'driver'
+                                ? ApproveUser(
+                                    isDriver: false,
+                                  )
+                                : GoogleMapScreen(
+                                    driverID: User.userID,
+                                    isEdit: false,
+                                  ),
                             type: PageTransitionType.rightToLeft),
                       );
                     },
                     child: Column(
                       children: [
                         Icon(
-                          Icons.people,
+                          User.userRole == 'driver' ? Icons.map : Icons.people,
                           size: 25,
                         ),
                         Text(
-                          User.userRole == 'superAdmin' ? 'Admins' : (User.userRole == 'admin') ? 'Emp' : (User.userRole == 'employee') ? 'Cust' : 'Staff',
+                          User.userRole == 'superAdmin' ? 'Admins' : (User.userRole == 'admin') ? 'Emp' : (User.userRole == 'employee') ? 'Cust' : 'Travel',
                           style: TextStyle(fontSize: 10),
                         )
                       ],
@@ -425,7 +435,7 @@ class _DashBoardState extends State<DashBoard> {
                                                           ),
                                                           onPressed: () async {
                                                             if (temp.contains(User.userEmail)) {
-                                                              FlutterToast.showToast(msg: 'Liked already!');
+                                                              Fluttertoast.showToast(context, msg: 'Liked already!');
                                                             } else {
                                                               await _likePost(postId: posts[index]['_id'], userName: User.userName);
                                                               await _getAllPosts();
@@ -540,13 +550,13 @@ class _DashBoardState extends State<DashBoard> {
 
                                                             print(response.body);
                                                             if (json.decode(response.body)['statusCode'] == 200) {
-                                                              FlutterToast.showToast(msg: 'Comment posted');
+                                                              Fluttertoast.showToast(context, msg: 'Comment posted');
                                                               setState(() {
                                                                 _getAllPosts();
                                                               });
                                                             }
                                                           } else {
-                                                            FlutterToast.showToast(msg: 'Comment can\'t be empty');
+                                                            Fluttertoast.showToast(context, msg: 'Comment can\'t be empty');
                                                           }
                                                         }),
                                                   ),
@@ -704,6 +714,23 @@ class _DashBoardState extends State<DashBoard> {
                           Navigator.push(
                             context,
                             PageTransition(child: QueryData(), type: PageTransitionType.rightToLeft),
+                          );
+                        })
+                    : Container(),
+                User.userRole == 'employee' || User.userRole == 'customer' || User.userRole == 'driver'
+                    ? buildDrawerItemDashboard(
+                        icon: Icons.map,
+                        title: 'Travel',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            PageTransition(
+                                child: GoogleMapScreen(
+                                  driverID: User.userRole == 'driver' ? User.userID : null,
+                                  routeName: User.userRoute,
+                                  isEdit: false,
+                                ),
+                                type: PageTransitionType.rightToLeft),
                           );
                         })
                     : Container(),

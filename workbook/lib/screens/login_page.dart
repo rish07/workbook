@@ -131,6 +131,7 @@ class _LoginPageState extends State<LoginPage> {
       var tempo = resp['user'];
 
       setState(() {
+        User.userRoute = resp['user']['route'] != null ? resp['user']['route'][0]['routeName'] : null;
         User.userJwtToken = resp['jwtToken'];
         User.userName = tempo['userName'] ?? null;
         User.userID = tempo['_id'] ?? null;
@@ -174,7 +175,7 @@ class _LoginPageState extends State<LoginPage> {
 
       Navigator.push(
         context,
-        PageTransition(child: User.userRole == 'customer' || User.userRole == 'driver' ? ComingSoon() : DashBoard(), type: PageTransitionType.rightToLeft),
+        PageTransition(child: User.userRole == 'customer' ? ComingSoon() : DashBoard(), type: PageTransitionType.rightToLeft),
       );
     } else if (json.decode(response.body)['statusCode'] == 401) {
       popDialog(

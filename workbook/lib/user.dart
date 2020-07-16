@@ -21,4 +21,5 @@ class User {
   static String division;
   static String userFcmToken;
   static String userJwtToken;
+  static String userRoute;
 }

@@ -9,6 +9,7 @@ import 'package:workbook/screens/approve_user.dart';
 import 'package:workbook/screens/active_users.dart';
 import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/screens/login_page.dart';
+import 'package:workbook/screens/map_screen.dart';
 import 'package:workbook/screens/profile_page.dart';
 import 'package:workbook/screens/query_data.dart';
 import 'package:workbook/screens/settings.dart';
@@ -102,6 +103,22 @@ Theme buildDrawer(BuildContext context) {
                     Navigator.push(
                       context,
                       PageTransition(child: QueryData(), type: PageTransitionType.rightToLeft),
+                    );
+                  })
+              : Container(),
+          User.userRole == 'employee' || User.userRole == 'customer'
+              ? buildDrawerItem(
+                  icon: Icons.map,
+                  title: 'Travel',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                          child: GoogleMapScreen(
+                            routeName: User.userRoute,
+                            isEdit: false,
+                          ),
+                          type: PageTransitionType.rightToLeft),
                     );
                   })
               : Container(),

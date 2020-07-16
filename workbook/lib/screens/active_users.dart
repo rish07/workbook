@@ -29,15 +29,9 @@ class _ActiveUsersState extends State<ActiveUsers> {
         ? await http.post(
             User.userRole == 'admin' && !widget.isDriver
                 ? "$baseUrl/admin/viewAllEmployees"
-                : (User.userRole == 'admin' && widget.isDriver)
-                    ? "$baseUrl/admin/viewAllDrivers"
-                    : "$baseUrl/employee/activeCustomer",
+                : (User.userRole == 'admin' && widget.isDriver) ? "$baseUrl/admin/viewAllDrivers" : "$baseUrl/employee/activeCustomer",
             body: User.userRole == 'admin'
-                ? {
-                    "userID": User.userEmail,
-                    "instituteName": User.instituteName,
-                    "jwtToken": User.userJwtToken
-                  }
+                ? {"userID": User.userEmail, "instituteName": User.instituteName, "jwtToken": User.userJwtToken}
                 : {"employeeID": User.userEmail, "jwtToken": User.userJwtToken},
           )
         : await http.get('$baseUrl/superAdmin/viewAllAdmin');
@@ -51,13 +45,10 @@ class _ActiveUsersState extends State<ActiveUsers> {
           ? json.decode(response.body)['payload']['employees']
           : (User.userRole == 'admin' && widget.isDriver)
               ? json.decode(response.body)['payload']['drivers']
-              : (User.userRole == 'employee')
-                  ? json.decode(response.body)['payload']['customer']
-                  : json.decode(response.body)['payload']['admin'];
+              : (User.userRole == 'employee') ? json.decode(response.body)['payload']['customer'] : json.decode(response.body)['payload']['admin'];
       for (var employee in employees) {
         _employeeList.add(employee);
       }
-      print(_employeeList);
     } else {
       throw Exception('Failed to load the employees');
     }
@@ -82,11 +73,7 @@ class _ActiveUsersState extends State<ActiveUsers> {
         title: Text(
           User.userRole == 'admin' && !widget.isDriver
               ? 'Active Employees'
-              : (User.userRole == 'admin' && widget.isDriver)
-                  ? "Active Drivers"
-                  : (User.userRole == 'employee')
-                      ? 'Active Customers'
-                      : 'Active Admins',
+              : (User.userRole == 'admin' && widget.isDriver) ? "Active Drivers" : (User.userRole == 'employee') ? 'Active Customers' : 'Active Admins',
           style: TextStyle(color: violet2, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
@@ -112,27 +99,18 @@ class _ActiveUsersState extends State<ActiveUsers> {
                             context,
                             PageTransition(
                                 child: RequestProfilePage(
+                                  routeExists: _employeeList[index]['route']?.length == 0 ? false : true,
                                   carNumber: _employeeList[index]['carNumber'],
                                   isDriver: widget.isDriver ? true : false,
-                                  instituteType: _employeeList[index]
-                                      ['instituteType'],
-                                  instituteName: _employeeList[index]
-                                      ['instituteName'],
+                                  instituteType: _employeeList[index]['instituteType'],
+                                  instituteName: _employeeList[index]['instituteName'],
                                   isActive: true,
-                                  exists: _employeeList[index]
-                                              ['profilePicture'] ==
-                                          null
-                                      ? false
-                                      : true,
+                                  profilePicExists: _employeeList[index]['profilePicture'] == null ? false : true,
                                   id: _employeeList[index]['_id'],
                                   role: _employeeList[index]['role'],
                                   userName: _employeeList[index]['userName'],
-                                  aadharNumber: _employeeList[index]
-                                          ['adharNumber']
-                                      .toString(),
-                                  contactNumber: _employeeList[index]
-                                          ['contactNumber']
-                                      .toString(),
+                                  aadharNumber: _employeeList[index]['adharNumber'].toString(),
+                                  contactNumber: _employeeList[index]['contactNumber'].toString(),
                                   division: _employeeList[index]['division'],
                                   grade: _employeeList[index]['grade'],
                                   emailID: _employeeList[index]['userID'],
@@ -158,25 +136,19 @@ class _ActiveUsersState extends State<ActiveUsers> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     _employeeList[index]['userName'],
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
+                                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                                   ),
-                                  User.userRole != 'superAdmin' &&
-                                          !widget.isDriver
+                                  User.userRole != 'superAdmin' && !widget.isDriver
                                       ? Row(
                                           children: [
                                             Text(
                                               'Division: ',
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold),
+                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                             ),
                                             Text(
                                               _employeeList[index]['division'],
@@ -188,26 +160,20 @@ class _ActiveUsersState extends State<ActiveUsers> {
                                           children: [
                                             Text(
                                               'Institute Name: ',
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold),
+                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                             ),
                                             Text(
-                                              _employeeList[index]
-                                                  ['instituteName'],
+                                              _employeeList[index]['instituteName'],
                                               style: TextStyle(fontSize: 14),
                                             )
                                           ],
                                         ),
-                                  User.userRole != 'superAdmin' &&
-                                          !widget.isDriver
+                                  User.userRole != 'superAdmin' && !widget.isDriver
                                       ? Row(
                                           children: [
                                             Text(
                                               'Grade: ',
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold),
+                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                             ),
                                             Text(
                                               _employeeList[index]['grade'],
@@ -220,16 +186,11 @@ class _ActiveUsersState extends State<ActiveUsers> {
                                               children: [
                                                 Text(
                                                   'Institute Type: ',
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold),
+                                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                                 ),
                                                 Text(
-                                                  _employeeList[index]
-                                                      ['instituteType'],
-                                                  style:
-                                                      TextStyle(fontSize: 14),
+                                                  _employeeList[index]['instituteType'],
+                                                  style: TextStyle(fontSize: 14),
                                                 )
                                               ],
                                             )
@@ -237,16 +198,11 @@ class _ActiveUsersState extends State<ActiveUsers> {
                                               children: [
                                                 Text(
                                                   'Car Number: ',
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold),
+                                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                                 ),
                                                 Text(
-                                                  _employeeList[index]
-                                                      ['carNumber'],
-                                                  style:
-                                                      TextStyle(fontSize: 14),
+                                                  _employeeList[index]['carNumber'],
+                                                  style: TextStyle(fontSize: 14),
                                                 )
                                               ],
                                             )

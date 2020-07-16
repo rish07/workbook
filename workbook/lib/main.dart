@@ -11,7 +11,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    final platform = Theme.of(context).platform;
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -22,9 +21,6 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Montserrat',
       ),
       home: LandingPage(),
-//      home: LandingPage(
-//        platform: platform,
-//      ),
     );
   }
 }
