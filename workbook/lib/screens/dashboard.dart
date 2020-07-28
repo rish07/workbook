@@ -175,6 +175,11 @@ class _DashBoardState extends State<DashBoard> {
                           context,
                           PageTransition(child: AddPost(), type: PageTransitionType.fade),
                         );
+                      } else if (User.userRole == 'admin') {
+                        Navigator.push(
+                          context,
+                          PageTransition(child: QueryData(), type: PageTransitionType.rightToLeft),
+                        );
                       } else {
                         Fluttertoast.showToast(context, msg: 'Only Superadmin can post for now!');
                       }
@@ -182,11 +187,11 @@ class _DashBoardState extends State<DashBoard> {
                     child: Column(
                       children: [
                         Icon(
-                          Icons.add_circle_outline,
+                          User.userRole != 'admin' ? Icons.add_circle_outline : Icons.message,
                           size: 25,
                         ),
                         Text(
-                          'Post',
+                          User.userRole != 'admin' ? 'Post' : 'Queries',
                           style: TextStyle(fontSize: 10),
                         )
                       ],
