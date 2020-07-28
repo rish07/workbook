@@ -373,7 +373,7 @@ class _ApproveUserState extends State<ApproveUser> {
                                       MaterialButton(
                                         minWidth: 35,
                                         elevation: 10,
-                                        shape: CircleBorder(side: BorderSide(color: Colors.green)),
+                                        shape: CircleBorder(side: BorderSide(color: violet2)),
                                         onPressed: () {
                                           popDialog(
                                               title: User.userRole == 'admin' && !widget.isDriver
