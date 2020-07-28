@@ -32,10 +32,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         inAsyncCall: _isLoading,
         child: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [violet1, violet2]),
+            gradient: LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [violet1, violet2]),
           ),
           child: ListView(
             children: <Widget>[
@@ -63,9 +60,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       onPressed: () async {
                         Navigator.push(
                           context,
-                          PageTransition(
-                              child: AdminForm(),
-                              type: PageTransitionType.rightToLeft),
+                          PageTransition(child: AdminForm(), type: PageTransitionType.rightToLeft),
                         );
                       }),
                   SizedBox(
@@ -78,15 +73,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         setState(() {
                           _isLoading = true;
                         });
-                        var response =
-                            await http.get('$baseUrl/superAdmin/viewAllAdmin');
-
+                        var response = await http.get('$baseUrl/superAdmin/viewAllAdmin');
+                        setState(() {
+                          _isLoading = false;
+                        });
                         Navigator.push(
                           context,
                           PageTransition(
                               child: EmployeeCustomerForm(
-                                admins: json.decode(response.body)['payload']
-                                    ['admin'],
+                                admins: json.decode(response.body)['payload']['admin'],
                                 isEmployee: true,
                               ),
                               type: PageTransitionType.rightToLeft),
@@ -99,15 +94,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       role: 'Driver',
                       context: context,
                       onPressed: () async {
-                        setState(() {
-                          _isLoading = true;
-                        });
-
                         Navigator.push(
                           context,
-                          PageTransition(
-                              child: DriverForm(),
-                              type: PageTransitionType.rightToLeft),
+                          PageTransition(child: DriverForm(), type: PageTransitionType.rightToLeft),
                         );
                       }),
                   SizedBox(
@@ -117,10 +106,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       role: 'Customer',
                       context: context,
                       onPressed: () async {
-                        setState(() {
-                          _isLoading = true;
-                        });
-
                         Navigator.push(
                           context,
                           PageTransition(

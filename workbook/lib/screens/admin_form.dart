@@ -112,7 +112,9 @@ class _AdminFormState extends State<AdminForm> {
       "fcmToken": User.userFcmToken,
     });
     print(response.body);
-
+    setState(() {
+      _isLoading = false;
+    });
     if (json.decode(response.body)['statusCode'] == 200) {
       popDialog(
           onPress: () {
@@ -125,8 +127,40 @@ class _AdminFormState extends State<AdminForm> {
           context: context,
           buttonTitle: 'Close',
           content: 'Your form has been submitted. Please wait for 24 hours for it to get approved');
+
+      _nameController.clear();
+      _emailController.clear();
+      _passwordController.clear();
+      _passwordReController.clear();
+      _organizationController.clear();
+      _cityNameController.clear();
+      _selectedCityLocation = null;
+      _selectedStateLocation = null;
+      _organizationNumberController.clear();
+      _mailController.clear();
+      _aadharController.clear();
+      _phoneController.clear();
+    } else if (json.decode(response.body)['payload']['err']['keyValue'] != null) {
+      popDialog(
+          title: 'Duplicate user',
+          context: context,
+          content: 'Admin with email ID ${json.decode(response.body)['payload']['err']['keyValue']['userID']} already exists. Please login in!',
+          onPress: () {
+            Navigator.push(
+              context,
+              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
+            );
+          },
+          buttonTitle: 'Login');
     } else {
-      Fluttertoast.showToast(context, msg: 'Error');
+      popDialog(
+          title: 'Error',
+          content: "Registration failed, please try again!",
+          context: context,
+          onPress: () {
+            Navigator.pop(context);
+          },
+          buttonTitle: 'Okay');
     }
   }
 
@@ -453,6 +487,7 @@ class _AdminFormState extends State<AdminForm> {
                                 !_validateAadhar &&
                                 !_validateOrganization &&
                                 !_validatePassword &&
+                                !_validateMail &&
                                 !_validateRePassword &&
                                 _file != null) {
                           setState(() {
@@ -460,19 +495,6 @@ class _AdminFormState extends State<AdminForm> {
                           });
 
                           await _registerUser();
-
-                          _nameController.clear();
-                          _emailController.clear();
-                          _passwordController.clear();
-                          _passwordReController.clear();
-                          _organizationController.clear();
-                          _cityNameController.clear();
-                          _selectedCityLocation = null;
-                          _selectedStateLocation = null;
-                          _organizationNumberController.clear();
-                          _mailController.clear();
-                          _aadharController.clear();
-                          _phoneController.clear();
                         }
                       },
                     ),
