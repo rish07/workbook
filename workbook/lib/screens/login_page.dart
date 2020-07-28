@@ -1,6 +1,10 @@
+import 'dart:async';
+
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:regexed_validator/regexed_validator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,6 +31,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  var _connectionStatus = 'Unknown';
+  Connectivity connectivity;
+  StreamSubscription<ConnectivityResult> subscription;
   final _formKey = GlobalKey<FormState>();
   User user = User();
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
@@ -86,6 +93,22 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     registerNotification();
     configLocalNotification();
+    connectivity = new Connectivity();
+    subscription = connectivity.onConnectivityChanged.listen((ConnectivityResult result) {
+      _connectionStatus = result.toString();
+      print(_connectionStatus);
+      if (result == ConnectivityResult.wifi || result == ConnectivityResult.mobile) {
+      } else {
+        popDialog(
+            title: 'No Network!',
+            context: context,
+            content: 'Please recheck your internet connection and try again!',
+            buttonTitle: 'Okay',
+            onPress: () {
+              SystemChannels.platform.invokeListMethod('SystemNavigator.pop');
+            });
+      }
+    });
   }
 
   @override
