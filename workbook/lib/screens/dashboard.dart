@@ -124,7 +124,7 @@ class _DashBoardState extends State<DashBoard> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        PageTransition(child: GoogleMapScreen(), type: PageTransitionType.fade),
+                        PageTransition(child: DashBoard(), type: PageTransitionType.fade),
                       );
                     },
                     child: Column(
@@ -132,6 +132,7 @@ class _DashBoardState extends State<DashBoard> {
                         Icon(
                           Icons.home,
                           size: 25,
+                          color: violet2,
                         ),
                         Text(
                           'Home',
@@ -154,7 +155,7 @@ class _DashBoardState extends State<DashBoard> {
                     child: Column(
                       children: [
                         Icon(
-                          Icons.mail,
+                          Icons.mail_outline,
                           size: 25,
                         ),
                         Text(
@@ -187,7 +188,7 @@ class _DashBoardState extends State<DashBoard> {
                     child: Column(
                       children: [
                         Icon(
-                          User.userRole != 'admin' ? Icons.add_circle_outline : Icons.message,
+                          User.userRole != 'admin' ? Icons.add_circle_outline : Icons.chat_bubble_outline,
                           size: 25,
                         ),
                         Text(
@@ -220,7 +221,7 @@ class _DashBoardState extends State<DashBoard> {
                     child: Column(
                       children: [
                         Icon(
-                          User.userRole == 'driver' ? Icons.map : Icons.people,
+                          User.userRole == 'driver' ? Icons.map : Icons.people_outline,
                           size: 25,
                         ),
                         Text(
@@ -419,78 +420,81 @@ class _DashBoardState extends State<DashBoard> {
                                             ),
                                           ),
                                           Divider(
+                                            height: 0,
                                             color: Colors.grey,
                                           ),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Container(
+                                          Container(
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Container(
+                                                      child: Row(
+                                                        children: [
+                                                          IconButton(
+                                                            icon: Transform(
+                                                              alignment: Alignment.center,
+                                                              transform: Matrix4.rotationY(math.pi),
+                                                              child: Icon(
+                                                                Icons.thumb_up,
+                                                                color: temp.contains(User.userEmail) ? violet2 : Colors.grey,
+                                                              ),
+                                                            ),
+                                                            onPressed: () async {
+                                                              if (temp.contains(User.userEmail)) {
+                                                                Fluttertoast.showToast(context, msg: 'Liked already!');
+                                                              } else {
+                                                                await _likePost(postId: posts[index]['_id'], userName: User.userName);
+                                                                await _getAllPosts();
+                                                                setState(() {});
+                                                              }
+                                                            },
+                                                          ),
+                                                          Text('Like'),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                MaterialButton(
                                                     child: Row(
                                                       children: [
-                                                        IconButton(
-                                                          icon: Transform(
-                                                            alignment: Alignment.center,
-                                                            transform: Matrix4.rotationY(math.pi),
-                                                            child: Icon(
-                                                              Icons.thumb_up,
-                                                              color: temp.contains(User.userEmail) ? violet2 : Colors.grey,
-                                                            ),
-                                                          ),
-                                                          onPressed: () async {
-                                                            if (temp.contains(User.userEmail)) {
-                                                              Fluttertoast.showToast(context, msg: 'Liked already!');
-                                                            } else {
-                                                              await _likePost(postId: posts[index]['_id'], userName: User.userName);
-                                                              await _getAllPosts();
-                                                              setState(() {});
-                                                            }
-                                                          },
+                                                        Icon(
+                                                          Icons.comment,
+                                                          color: violet2,
                                                         ),
-                                                        Text('Like'),
+                                                        Padding(
+                                                          padding: EdgeInsets.only(left: 8.0),
+                                                          child: Text('Comment'),
+                                                        ),
                                                       ],
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                              MaterialButton(
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(
-                                                        Icons.comment,
-                                                        color: violet2,
-                                                      ),
-                                                      Padding(
-                                                        padding: EdgeInsets.only(left: 8.0),
-                                                        child: Text('Comment'),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  onPressed: () {}),
-                                              MaterialButton(
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(
-                                                        Icons.share,
-                                                        color: violet2,
-                                                      ),
-                                                      Padding(
-                                                        padding: EdgeInsets.only(left: 8.0),
-                                                        child: Text('Share'),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  onPressed: () {
-                                                    Share.share(
-                                                      posts[index]['content'],
-                                                    );
-                                                  }),
-                                            ],
+                                                    onPressed: () {}),
+                                                MaterialButton(
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(
+                                                          Icons.share,
+                                                          color: violet2,
+                                                        ),
+                                                        Padding(
+                                                          padding: EdgeInsets.only(left: 8.0),
+                                                          child: Text('Share'),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    onPressed: () {
+                                                      Share.share(
+                                                        posts[index]['content'],
+                                                      );
+                                                    }),
+                                              ],
+                                            ),
                                           ),
                                           posts[index]['commentEnabled']
                                               ? Container(
-                                                  height: posts[index]['comments'].length != 0 ? 200 : 20,
+                                                  height: posts[index]['comments'].length != 0 ? 200 : 0,
                                                   width: MediaQuery.of(context).size.width * 0.8,
                                                   child: Column(
                                                     mainAxisAlignment: MainAxisAlignment.center,
