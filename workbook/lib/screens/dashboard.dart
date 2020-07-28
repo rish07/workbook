@@ -31,15 +31,13 @@ import 'package:workbook/screens/map_screen.dart';
 import 'package:workbook/screens/profile_page.dart';
 import 'package:workbook/screens/query_data.dart';
 import 'package:workbook/screens/settings.dart';
+import 'package:workbook/screens/temp.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';
 import 'package:workbook/widget/popUpDialog.dart';
 import 'package:http/http.dart' as http;
 
 class DashBoard extends StatefulWidget {
-  final TargetPlatform platform;
-
-  const DashBoard({Key key, this.platform}) : super(key: key);
   @override
   _DashBoardState createState() => _DashBoardState();
 }
@@ -112,9 +110,10 @@ class _DashBoardState extends State<DashBoard> {
         backgroundColor: Color(0xFFF5F5F5),
         bottomNavigationBar: BottomAppBar(
           child: Container(
-            height: MediaQuery.of(context).size.height * 0.07,
-            padding: EdgeInsets.symmetric(horizontal: 16),
+            height: MediaQuery.of(context).size.height * 0.08,
+            padding: EdgeInsets.symmetric(horizontal: 8),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
@@ -124,7 +123,7 @@ class _DashBoardState extends State<DashBoard> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        PageTransition(child: GoogleMapScreen(), type: PageTransitionType.fade),
+                        PageTransition(child: DashBoard(), type: PageTransitionType.fade),
                       );
                     },
                     child: Column(
@@ -336,233 +335,240 @@ class _DashBoardState extends State<DashBoard> {
                               key: Key(index.toString()),
                               child: Stack(
                                 children: [
-                                  Card(
-                                    elevation: 5,
-                                    child: Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                                        children: [
-                                          (posts[index]['mediaUrl'] != "null" && posts[index]['mediaType'] == 'image')
-                                              ? GestureDetector(
-                                                  onLongPress: () async {
-                                                    await launch(posts[index]['mediaUrl']);
-                                                  },
-                                                  child: Container(
-                                                    padding: EdgeInsets.all(8),
-                                                    child: Image.network(posts[index]['mediaUrl']),
-                                                  ),
-                                                )
-                                              : (posts[index]['mediaUrl'] != "null" && posts[index]['mediaType'] == 'pdf')
-                                                  ? Container(
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 5),
+                                    child: Card(
+                                      elevation: 5,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                                          children: [
+                                            (posts[index]['mediaUrl'] != "null" && posts[index]['mediaType'] == 'image')
+                                                ? GestureDetector(
+                                                    onLongPress: () async {
+                                                      await launch(posts[index]['mediaUrl']);
+                                                    },
+                                                    child: Container(
                                                       padding: EdgeInsets.all(8),
-                                                      child: ListTile(
-                                                        title: Row(
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          children: [
-                                                            Container(
-                                                              height: 50,
-                                                              width: 50,
-                                                              child: Image.asset(
-                                                                'images/pdf.png',
+                                                      child: Image.network(posts[index]['mediaUrl']),
+                                                    ),
+                                                  )
+                                                : (posts[index]['mediaUrl'] != "null" && posts[index]['mediaType'] == 'pdf')
+                                                    ? Container(
+                                                        padding: EdgeInsets.all(8),
+                                                        child: ListTile(
+                                                          title: Row(
+                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            children: [
+                                                              Container(
+                                                                height: 50,
+                                                                width: 50,
+                                                                child: Image.asset(
+                                                                  'images/pdf.png',
+                                                                ),
                                                               ),
-                                                            ),
-                                                            IconButton(
-                                                                icon: Icon(Icons.file_download),
-                                                                color: violet2,
-                                                                onPressed: () async {
-                                                                  await launch(posts[index]['mediaUrl']);
-                                                                })
-                                                          ],
+                                                              IconButton(
+                                                                  icon: Icon(Icons.file_download),
+                                                                  color: violet2,
+                                                                  onPressed: () async {
+                                                                    await launch(posts[index]['mediaUrl']);
+                                                                  })
+                                                            ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                    )
-                                                  : Container(),
-                                          Container(
-                                            padding: EdgeInsets.all(8),
-                                            child: Text(
-                                              posts[index]['content'],
-                                              style: TextStyle(fontSize: 14),
-                                              textAlign: TextAlign.left,
+                                                      )
+                                                    : Container(),
+                                            Container(
+                                              padding: EdgeInsets.all(8),
+                                              child: Text(
+                                                posts[index]['content'],
+                                                style: TextStyle(fontSize: 14),
+                                                textAlign: TextAlign.left,
+                                              ),
                                             ),
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.only(left: 16.0, top: 32, right: 16),
-                                            child: Row(
+                                            Padding(
+                                              padding: EdgeInsets.only(left: 16.0, top: 32, right: 16),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Text('Likes: '),
+                                                      Text(posts[index]['likes'].toString()),
+                                                    ],
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.show_chart,
+                                                        color: violet2,
+                                                      ),
+                                                      Text(
+                                                        posts[index]['views'].toString(),
+                                                        style: TextStyle(color: violet1),
+                                                      ),
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                            Divider(
+                                              color: Colors.grey,
+                                            ),
+                                            Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 Row(
                                                   children: [
-                                                    Text('Likes: '),
-                                                    Text(posts[index]['likes'].toString()),
+                                                    Container(
+                                                      child: FlatButton(
+                                                        child: Row(
+                                                          children: [
+                                                            Transform(
+                                                              alignment: Alignment.center,
+                                                              transform: Matrix4.rotationY(math.pi),
+                                                              child: Icon(
+                                                                Icons.thumb_up,
+                                                                color: temp.contains(User.userEmail) ? violet2 : Colors.grey,
+                                                              ),
+                                                            ),
+                                                            Padding(
+                                                              padding: const EdgeInsets.all(8.0),
+                                                              child: Text('Like'),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        onPressed: () async {
+                                                          Fluttertoast.showToast(context, msg: 'Liking..');
+                                                          if (temp.contains(User.userEmail)) {
+                                                            Fluttertoast.showToast(context, msg: 'Liked already!');
+                                                          } else {
+                                                            await _likePost(postId: posts[index]['_id'], userName: User.userName);
+                                                            await _getAllPosts();
+                                                            setState(() {});
+                                                          }
+                                                        },
+                                                      ),
+                                                    ),
                                                   ],
                                                 ),
-                                                Row(
-                                                  children: [
-                                                    Icon(
-                                                      Icons.show_chart,
-                                                      color: violet2,
-                                                    ),
-                                                    Text(
-                                                      posts[index]['views'].toString(),
-                                                      style: TextStyle(color: violet1),
-                                                    ),
-                                                  ],
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          Divider(
-                                            color: Colors.grey,
-                                          ),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Container(
+                                                MaterialButton(
                                                     child: Row(
                                                       children: [
-                                                        IconButton(
-                                                          icon: Transform(
-                                                            alignment: Alignment.center,
-                                                            transform: Matrix4.rotationY(math.pi),
-                                                            child: Icon(
-                                                              Icons.thumb_up,
-                                                              color: temp.contains(User.userEmail) ? violet2 : Colors.grey,
-                                                            ),
-                                                          ),
-                                                          onPressed: () async {
-                                                            if (temp.contains(User.userEmail)) {
-                                                              Fluttertoast.showToast(context, msg: 'Liked already!');
-                                                            } else {
-                                                              await _likePost(postId: posts[index]['_id'], userName: User.userName);
-                                                              await _getAllPosts();
-                                                              setState(() {});
-                                                            }
-                                                          },
+                                                        Icon(
+                                                          Icons.comment,
+                                                          color: violet2,
                                                         ),
-                                                        Text('Like'),
+                                                        Padding(
+                                                          padding: EdgeInsets.only(left: 8.0),
+                                                          child: Text('Comment'),
+                                                        ),
                                                       ],
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                              MaterialButton(
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(
-                                                        Icons.comment,
-                                                        color: violet2,
-                                                      ),
-                                                      Padding(
-                                                        padding: EdgeInsets.only(left: 8.0),
-                                                        child: Text('Comment'),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  onPressed: () {}),
-                                              MaterialButton(
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(
-                                                        Icons.share,
-                                                        color: violet2,
-                                                      ),
-                                                      Padding(
-                                                        padding: EdgeInsets.only(left: 8.0),
-                                                        child: Text('Share'),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  onPressed: () {
-                                                    Share.share(
-                                                      posts[index]['content'],
-                                                    );
-                                                  }),
-                                            ],
-                                          ),
-                                          posts[index]['commentEnabled']
-                                              ? Container(
-                                                  height: posts[index]['comments'].length != 0 ? 200 : 20,
-                                                  width: MediaQuery.of(context).size.width * 0.8,
-                                                  child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                    children: [
-                                                      Text(posts[index]['comments'].length != 0 ? 'Comments' : ''),
-                                                      posts[index]['comments'].length != 0
-                                                          ? Container(
-                                                              height: 180,
-                                                              child: ListView.builder(
-                                                                shrinkWrap: true,
-                                                                itemCount: posts[index]['comments'].length,
-                                                                itemBuilder: (context, i) {
-                                                                  return Column(
-                                                                    children: [
-                                                                      ListTile(
-                                                                        title: Text(
-                                                                          posts[index]['comments'][i]['userName'],
-                                                                          style: TextStyle(color: violet2, fontWeight: FontWeight.bold),
-                                                                        ),
-                                                                        subtitle: Text(
-                                                                          posts[index]['comments'][i]['comment'],
-                                                                          style: TextStyle(color: Colors.black),
-                                                                        ),
-                                                                      ),
-                                                                      Divider(),
-                                                                    ],
-                                                                  );
-                                                                },
-                                                              ),
-                                                            )
-                                                          : Container(),
-                                                    ],
-                                                  ),
-                                                )
-                                              : Container(),
-                                          posts[index]['commentEnabled']
-                                              ? TextFormField(
-                                                  style: TextStyle(color: Colors.black),
-                                                  maxLines: 1,
-                                                  controller: contro,
-                                                  cursorRadius: Radius.circular(8),
-                                                  cursorColor: Colors.black,
-                                                  decoration: InputDecoration(
-                                                    enabledBorder: OutlineInputBorder(
-                                                        borderSide: BorderSide(
-                                                      color: Colors.grey,
-                                                    )),
-                                                    isDense: true,
-                                                    focusedBorder: OutlineInputBorder(
-                                                      borderSide: BorderSide(color: Colors.grey, width: 2),
+                                                    onPressed: () {}),
+                                                MaterialButton(
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(
+                                                          Icons.share,
+                                                          color: violet2,
+                                                        ),
+                                                        Padding(
+                                                          padding: EdgeInsets.only(left: 8.0),
+                                                          child: Text('Share'),
+                                                        ),
+                                                      ],
                                                     ),
-                                                    hintText: 'Add a comment',
-                                                    suffixIcon: IconButton(
-                                                        icon: Icon(Icons.send),
-                                                        color: violet2,
-                                                        onPressed: () async {
-                                                          print(contro.text);
-                                                          if (contro.text.isNotEmpty) {
-                                                            var response = await http.post('$baseUrl/post/comment',
-                                                                body: {"id": posts[index]['_id'], "comment": contro.text.toString(), "userName": User.userName});
+                                                    onPressed: () {
+                                                      Share.share(
+                                                        posts[index]['content'],
+                                                      );
+                                                    }),
+                                              ],
+                                            ),
+                                            posts[index]['commentEnabled']
+                                                ? Container(
+                                                    height: posts[index]['comments'].length != 0 ? 200 : 20,
+                                                    width: MediaQuery.of(context).size.width * 0.8,
+                                                    child: Column(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                      children: [
+                                                        Text(posts[index]['comments'].length != 0 ? 'Comments' : ''),
+                                                        posts[index]['comments'].length != 0
+                                                            ? Container(
+                                                                height: 180,
+                                                                child: ListView.builder(
+                                                                  shrinkWrap: true,
+                                                                  itemCount: posts[index]['comments'].length,
+                                                                  itemBuilder: (context, i) {
+                                                                    return Column(
+                                                                      children: [
+                                                                        ListTile(
+                                                                          title: Text(
+                                                                            posts[index]['comments'][i]['userName'],
+                                                                            style: TextStyle(color: violet2, fontWeight: FontWeight.bold),
+                                                                          ),
+                                                                          subtitle: Text(
+                                                                            posts[index]['comments'][i]['comment'],
+                                                                            style: TextStyle(color: Colors.black),
+                                                                          ),
+                                                                        ),
+                                                                        Divider(),
+                                                                      ],
+                                                                    );
+                                                                  },
+                                                                ),
+                                                              )
+                                                            : Container(),
+                                                      ],
+                                                    ),
+                                                  )
+                                                : Container(),
+                                            posts[index]['commentEnabled']
+                                                ? TextFormField(
+                                                    style: TextStyle(color: Colors.black),
+                                                    maxLines: 1,
+                                                    controller: contro,
+                                                    cursorRadius: Radius.circular(8),
+                                                    cursorColor: Colors.black,
+                                                    decoration: InputDecoration(
+                                                      enabledBorder: OutlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                        color: Colors.grey,
+                                                      )),
+                                                      isDense: true,
+                                                      focusedBorder: OutlineInputBorder(
+                                                        borderSide: BorderSide(color: Colors.grey, width: 2),
+                                                      ),
+                                                      hintText: 'Add a comment',
+                                                      suffixIcon: IconButton(
+                                                          icon: Icon(Icons.send),
+                                                          color: violet2,
+                                                          onPressed: () async {
+                                                            print(contro.text);
+                                                            if (contro.text.isNotEmpty) {
+                                                              var response = await http.post('$baseUrl/post/comment',
+                                                                  body: {"id": posts[index]['_id'], "comment": contro.text.toString(), "userName": User.userName});
 
-                                                            print(response.body);
-                                                            if (json.decode(response.body)['statusCode'] == 200) {
-                                                              Fluttertoast.showToast(context, msg: 'Comment posted');
-                                                              setState(() {
-                                                                _getAllPosts();
-                                                              });
+                                                              print(response.body);
+                                                              if (json.decode(response.body)['statusCode'] == 200) {
+                                                                Fluttertoast.showToast(context, msg: 'Comment posted');
+                                                                setState(() {
+                                                                  _getAllPosts();
+                                                                });
+                                                              }
+                                                            } else {
+                                                              Fluttertoast.showToast(context, msg: 'Comment can\'t be empty');
                                                             }
-                                                          } else {
-                                                            Fluttertoast.showToast(context, msg: 'Comment can\'t be empty');
-                                                          }
-                                                        }),
-                                                  ),
-                                                )
-                                              : Container(),
-                                        ],
+                                                          }),
+                                                    ),
+                                                  )
+                                                : Container(),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -660,7 +666,7 @@ class _DashBoardState extends State<DashBoard> {
                     icon: Icons.home,
                     title: "Home",
                     onTap: () {
-                      Navigator.push(context, PageTransition(child: DashBoard(), type: PageTransitionType.rightToLeft));
+                      Navigator.push(context, PageTransition(child: TempPage(), type: PageTransitionType.rightToLeft));
                     }),
                 User.userRole != 'superAdmin'
                     ? buildDrawerItemDashboard(
