@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -51,18 +52,24 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
   List gradeDivision = [];
   Future _registerUser() async {
     print('working');
-    var response = await http.post(widget.isEmployee ? '$baseUrl/employee/register' : '$baseUrl/customer/register', body: {
-      "role": "Employee",
-      "userName": _nameController.text,
-      "userID": _emailController.text,
-      "password": _passwordController.text,
-      "instituteName": _selectedInstitution,
-      "grade": _selectedGrade,
-      "division": _selectedDivision,
-      "adharNumber": _aadharController.text,
-      "contactNumber": _phoneController.text,
-      "fcmToken": User.userFcmToken,
-    });
+    var response = await http.post(widget.isEmployee ? '$baseUrl/employee/register' : '$baseUrl/customer/register',
+        body: json.encode(
+          {
+            "role": widget.isEmployee ? "Employee" : "customer",
+            "userName": _nameController.text,
+            "userID": _emailController.text,
+            "password": _passwordController.text,
+            "instituteName": _selectedInstitution,
+            "grade": _selectedGrade,
+            "division": _selectedDivision,
+            "adharNumber": _aadharController.text,
+            "contactNumber": _phoneController.text,
+            "fcmToken": User.userFcmToken,
+          },
+        ),
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+        });
     setState(() {
       _isLoading = false;
     });
@@ -227,7 +234,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
             child: ListView(
               children: [
                 Text(
-                  widget.isEmployee ? 'Employee Registration' : 'Customer Registration',
+                  widget.isEmployee ? 'Employee/Staff Registration' : 'Customer Registration',
                   style: TextStyle(
                     fontSize: 28,
                     color: Colors.white,
@@ -245,7 +252,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                 ),
                 InputField(
                   validate: _validateEmail,
-                  captial: TextCapitalization.none,
+                  capital: TextCapitalization.none,
                   controller: _emailController,
                   errorText: 'Please enter a valid email ID',
                   labelText: 'Email',

@@ -4,23 +4,14 @@ import 'package:flutter/services.dart';
 
 class InputField extends StatefulWidget {
   final int maxLines;
-  final TextCapitalization captial;
+  final TextCapitalization capital;
   final String errorText;
   final TextEditingController controller;
   Function validation;
   bool validate;
   final String labelText;
   final TextInputType textInputType;
-  InputField(
-      {Key key,
-      @required this.labelText,
-      this.textInputType,
-      this.controller,
-      this.validation,
-      this.validate,
-      this.errorText,
-      this.captial,
-      this.maxLines})
+  InputField({Key key, @required this.labelText, this.textInputType, this.controller, this.validation, this.validate, this.errorText, this.capital, this.maxLines})
       : super(key: key);
   @override
   _InputFieldState createState() => _InputFieldState();
@@ -46,7 +37,7 @@ class _InputFieldState extends State<InputField> {
           cursorRadius: Radius.circular(8),
           cursorColor: Colors.white,
           keyboardType: widget.textInputType ?? TextInputType.text,
-          textCapitalization: widget.captial ?? TextCapitalization.words,
+          textCapitalization: widget.capital ?? TextCapitalization.words,
           controller: widget.controller,
           style: TextStyle(
             fontSize: 18,

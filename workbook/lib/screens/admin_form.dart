@@ -220,7 +220,7 @@ class _AdminFormState extends State<AdminForm> {
                 ),
                 InputField(
                   validate: _validateEmail,
-                  captial: TextCapitalization.none,
+                  capital: TextCapitalization.none,
                   controller: _emailController,
                   errorText: 'Please enter a valid email ID',
                   labelText: 'Email',
@@ -425,7 +425,7 @@ class _AdminFormState extends State<AdminForm> {
                   validate: _validateMail,
                   maxLines: 5,
                   controller: _mailController,
-                  errorText: 'Please enter your mailing address',
+                  errorText: 'Please enter your institute\'s mailing address',
                   labelText: 'Mailing Address',
                 ),
                 InputField(

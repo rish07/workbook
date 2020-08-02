@@ -275,7 +275,7 @@ class _LoginPageState extends State<LoginPage> {
                         } else
                           return null;
                       },
-                      captial: TextCapitalization.none,
+                      capital: TextCapitalization.none,
                       controller: _emailController,
                       labelText: 'Email',
                       textInputType: TextInputType.emailAddress,

@@ -88,7 +88,7 @@ class _GenerateTicketState extends State<GenerateTicket> {
           child: ListView(
             children: [
               Text(
-                'Generate Ticket',
+                'Generate Enquiry',
                 style: TextStyle(
                   fontSize: 28,
                   color: Colors.white,
@@ -106,7 +106,7 @@ class _GenerateTicketState extends State<GenerateTicket> {
               ),
               InputField(
                 validate: _validateEmail,
-                captial: TextCapitalization.none,
+                capital: TextCapitalization.none,
                 controller: _emailController,
                 errorText: 'Please enter a valid email ID',
                 labelText: 'Email',

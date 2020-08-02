@@ -52,72 +52,208 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     ),
                   ),
                   SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.08,
+                    height: MediaQuery.of(context).size.height * 0.05,
                   ),
-                  registerButton(
-                      role: 'Admin',
-                      context: context,
-                      onPressed: () async {
-                        Navigator.push(
-                          context,
-                          PageTransition(child: AdminForm(), type: PageTransitionType.rightToLeft),
-                        );
-                      }),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.02,
-                  ),
-                  registerButton(
-                      role: 'Employee',
-                      context: context,
-                      onPressed: () async {
-                        setState(() {
-                          _isLoading = true;
-                        });
-                        var response = await http.get('$baseUrl/superAdmin/viewAllAdmin');
-                        setState(() {
-                          _isLoading = false;
-                        });
-                        Navigator.push(
-                          context,
-                          PageTransition(
-                              child: EmployeeCustomerForm(
-                                admins: json.decode(response.body)['payload']['admin'],
-                                isEmployee: true,
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 32),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    PageTransition(child: AdminForm(), type: PageTransitionType.rightToLeft),
+                                  );
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(right: 16),
+                                  height: MediaQuery.of(context).size.height * 0.18,
+                                  width: MediaQuery.of(context).size.width * 0.35,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(13),
+                                  ),
+                                  child: Center(
+                                    child: Container(
+                                      height: MediaQuery.of(context).size.height * 0.18,
+                                      child: Image.network('https://www.logolynx.com/images/logolynx/23/23938578fb8d88c02bc59906d12230f3.png'),
+                                    ),
+                                  ),
+                                ),
                               ),
-                              type: PageTransitionType.rightToLeft),
-                        );
-                      }),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.02,
-                  ),
-                  registerButton(
-                      role: 'Driver',
-                      context: context,
-                      onPressed: () async {
-                        Navigator.push(
-                          context,
-                          PageTransition(child: DriverForm(), type: PageTransitionType.rightToLeft),
-                        );
-                      }),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.02,
-                  ),
-                  registerButton(
-                      role: 'Customer',
-                      context: context,
-                      onPressed: () async {
-                        Navigator.push(
-                          context,
-                          PageTransition(
-                              child: EmployeeCustomerForm(
-                                isEmployee: false,
+                            ),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () async {
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
+                                  var response = await http.get('$baseUrl/superAdmin/viewAllAdmin');
+                                  print(response.body);
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+                                  Navigator.push(
+                                    context,
+                                    PageTransition(
+                                        child: EmployeeCustomerForm(
+                                          admins: json.decode(response.body)['payload']['admin'],
+                                          isEmployee: true,
+                                        ),
+                                        type: PageTransitionType.rightToLeft),
+                                  );
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(left: 16),
+                                  height: MediaQuery.of(context).size.height * 0.18,
+                                  width: MediaQuery.of(context).size.width * 0.35,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(13),
+                                  ),
+                                  child: Center(
+                                    child: Container(
+                                      height: MediaQuery.of(context).size.height * 0.18,
+                                      child: Image.network('https://www.logolynx.com/images/logolynx/23/23938578fb8d88c02bc59906d12230f3.png'),
+                                    ),
+                                  ),
+                                ),
                               ),
-                              type: PageTransitionType.rightToLeft),
-                        );
-                      }),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.02,
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.04,
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    PageTransition(child: DriverForm(), type: PageTransitionType.rightToLeft),
+                                  );
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(right: 16),
+                                  height: MediaQuery.of(context).size.height * 0.18,
+                                  width: MediaQuery.of(context).size.width * 0.35,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(13),
+                                  ),
+                                  child: Center(
+                                    child: Container(
+                                      height: MediaQuery.of(context).size.height * 0.18,
+                                      child: Image.network('https://www.logolynx.com/images/logolynx/23/23938578fb8d88c02bc59906d12230f3.png'),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    PageTransition(
+                                        child: EmployeeCustomerForm(
+                                          isEmployee: false,
+                                        ),
+                                        type: PageTransitionType.rightToLeft),
+                                  );
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(left: 16),
+                                  height: MediaQuery.of(context).size.height * 0.18,
+                                  width: MediaQuery.of(context).size.width * 0.35,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(13),
+                                  ),
+                                  child: Center(
+                                    child: Container(
+                                      height: MediaQuery.of(context).size.height * 0.18,
+                                      child: Image.network('https://www.logolynx.com/images/logolynx/23/23938578fb8d88c02bc59906d12230f3.png'),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
                   ),
+//                  registerButton(
+//                      role: 'Admin',
+//                      context: context,
+//                      onPressed: () async {
+//                        Navigator.push(
+//                          context,
+//                          PageTransition(child: AdminForm(), type: PageTransitionType.rightToLeft),
+//                        );
+//                      }),
+//                  SizedBox(
+//                    height: MediaQuery.of(context).size.height * 0.02,
+//                  ),
+//                  registerButton(
+//                      role: 'Employee',
+//                      context: context,
+//                      onPressed: () async {
+//                        setState(() {
+//                          _isLoading = true;
+//                        });
+//                        var response = await http.get('$baseUrl/superAdmin/viewAllAdmin');
+//                        print(response.body);
+//                        setState(() {
+//                          _isLoading = false;
+//                        });
+//                        Navigator.push(
+//                          context,
+//                          PageTransition(
+//                              child: EmployeeCustomerForm(
+//                                admins: json.decode(response.body)['payload']['admin'],
+//                                isEmployee: true,
+//                              ),
+//                              type: PageTransitionType.rightToLeft),
+//                        );
+//                      }),
+//                  SizedBox(
+//                    height: MediaQuery.of(context).size.height * 0.02,
+//                  ),
+//                  registerButton(
+//                      role: 'Driver',
+//                      context: context,
+//                      onPressed: () async {
+//                        Navigator.push(
+//                          context,
+//                          PageTransition(child: DriverForm(), type: PageTransitionType.rightToLeft),
+//                        );
+//                      }),
+//                  SizedBox(
+//                    height: MediaQuery.of(context).size.height * 0.02,
+//                  ),
+//                  registerButton(
+//                      role: 'Customer',
+//                      context: context,
+//                      onPressed: () async {
+//                        Navigator.push(
+//                          context,
+//                          PageTransition(
+//                              child: EmployeeCustomerForm(
+//                                isEmployee: false,
+//                              ),
+//                              type: PageTransitionType.rightToLeft),
+//                        );
+//                      }),
+//                  SizedBox(
+//                    height: MediaQuery.of(context).size.height * 0.02,
+//                  ),
                 ],
               ),
             ],

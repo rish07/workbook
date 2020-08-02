@@ -282,6 +282,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     child: AutoSizeText(
                                       location,
                                       maxLines: 1,
+                                      style: TextStyle(color: Colors.white),
                                     ),
                                     value: location,
                                   );
@@ -312,7 +313,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             child: Container(
                               padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.04),
                               child: Text(
-                                'City: ',
+                                User.city,
                                 style: TextStyle(fontSize: 20, color: violet2),
                               ),
                             ),
@@ -323,7 +324,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               data: Theme.of(context).copyWith(canvasColor: violet1),
                               child: DropdownButtonFormField(
                                 hint: Text(
-                                  'Select City',
+                                  User.state,
                                   style: TextStyle(color: violet1, fontSize: 18),
                                 ),
                                 decoration: InputDecoration(
@@ -336,6 +337,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     child: AutoSizeText(
                                       location,
                                       maxLines: 1,
+                                      style: TextStyle(color: Colors.white),
                                     ),
                                     value: location,
                                   );
@@ -370,7 +372,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     : Container(),
                 User.userRole != 'superAdmin'
                     ? buildFieldEntry(
-                        label: 'Mail Address',
+                        label: 'Institute Mail Address',
                         value: User.mailAddress ?? "-",
                       )
                     : Container(),

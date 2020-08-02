@@ -116,7 +116,7 @@ class _DriverFormState extends State<DriverForm> {
                 ),
                 InputField(
                   validate: _validateEmail,
-                  captial: TextCapitalization.none,
+                  capital: TextCapitalization.none,
                   controller: _emailController,
                   errorText: 'Please enter a valid email ID',
                   labelText: 'Email',
