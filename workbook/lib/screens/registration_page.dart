@@ -79,7 +79,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                   child: Center(
                                     child: Container(
                                       height: MediaQuery.of(context).size.height * 0.18,
-                                      child: Image.network('https://www.logolynx.com/images/logolynx/23/23938578fb8d88c02bc59906d12230f3.png'),
+                                      child: Image.asset('images/admin.png'),
                                     ),
                                   ),
                                 ),
@@ -117,7 +117,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                   child: Center(
                                     child: Container(
                                       height: MediaQuery.of(context).size.height * 0.18,
-                                      child: Image.network('https://www.logolynx.com/images/logolynx/23/23938578fb8d88c02bc59906d12230f3.png'),
+                                      child: Image.asset('images/admin.png'),
                                     ),
                                   ),
                                 ),
@@ -149,7 +149,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                   child: Center(
                                     child: Container(
                                       height: MediaQuery.of(context).size.height * 0.18,
-                                      child: Image.network('https://www.logolynx.com/images/logolynx/23/23938578fb8d88c02bc59906d12230f3.png'),
+                                      child: Image.asset('images/admin.png'),
                                     ),
                                   ),
                                 ),
@@ -178,7 +178,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                   child: Center(
                                     child: Container(
                                       height: MediaQuery.of(context).size.height * 0.18,
-                                      child: Image.network('https://www.logolynx.com/images/logolynx/23/23938578fb8d88c02bc59906d12230f3.png'),
+                                      child: Image.asset('images/admin.png'),
                                     ),
                                   ),
                                 ),
