@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:workbook/screens/landing_page.dart';
 import 'package:flutter/services.dart';
-import 'package:workbook/screens/map_screen.dart';
 
 void main() {
   runApp(MyApp());

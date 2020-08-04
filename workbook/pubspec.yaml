@@ -54,6 +54,7 @@ dependencies:
   intl:
   uuid:
   google_maps_webservice:
+  pinput: ^0.2.4
   flutter_google_places:
   geocoder:
   connectivity: ^0.4.8+2

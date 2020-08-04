@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:regexed_validator/regexed_validator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,6 +13,7 @@ import 'package:workbook/constants.dart';
 import 'package:workbook/screens/coming_soon.dart';
 import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/screens/guest_ticket.dart';
+import 'package:workbook/screens/otp_verification.dart';
 import 'dart:convert';
 import 'package:workbook/widget/first.dart';
 import 'package:workbook/widget/input_field.dart';
@@ -139,6 +141,24 @@ class _LoginPageState extends State<LoginPage> {
     });
     institutes = Set.of(institutes).toList();
     print(institutes);
+  }
+
+  Future _resetPassword(String email) async {
+    var response = await http.get('$baseUrl/forgot/$email');
+    print(response.body);
+    if (json.decode(response.body)['statusCode'] == 200) {
+      Fluttertoast.showToast(context, msg: 'Email sent', gravity: ToastGravity.CENTER);
+      Navigator.push(
+        context,
+        PageTransition(
+            child: OTPVerification(
+              email: email,
+            ),
+            type: PageTransitionType.fade),
+      );
+    } else {
+      Fluttertoast.showToast(context, msg: 'Error');
+    }
   }
 
   Future _loginUser() async {
@@ -299,7 +319,62 @@ class _LoginPageState extends State<LoginPage> {
                     padding: const EdgeInsets.only(left: 28.0),
                     child: GestureDetector(
                       onTap: () {
-                        print('working');
+                        final TextEditingController _controller = TextEditingController();
+                        bool _validate = false;
+                        return showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            // return object of type Dialog
+                            return AlertDialog(
+                              title: Center(
+                                  child: Text(
+                                'Trouble Logging in? ',
+                                style: TextStyle(color: violet1),
+                              )),
+                              content: TextFormField(
+                                cursorColor: Colors.black,
+                                controller: _controller,
+                                keyboardType: TextInputType.emailAddress,
+                                style: TextStyle(color: violet1),
+                                decoration: InputDecoration(
+                                  errorStyle: TextStyle(color: Colors.red),
+                                  errorText: _validate ? 'Please enter a valid email ID' : null,
+                                  focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: violet2)),
+                                  hintText: 'Enter your email ID',
+                                  hintStyle: TextStyle(
+                                    color: violet1,
+                                  ),
+                                ),
+                              ),
+                              actions: <Widget>[
+                                // usually buttons at the bottom of the dialog
+                                new MaterialButton(
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                                    color: violet2,
+                                    child: new Text(
+                                      'Reset',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      setState(() {
+                                        _loading = true;
+                                        validator.email(_controller.text) && _controller.text.isNotEmpty ? _validate = false : _validate = true;
+                                      });
+                                      if (!_validate) {
+                                        await _resetPassword(_controller.text);
+                                      } else {
+                                        Fluttertoast.showToast(context, msg: 'Please enter a valid email ID', gravity: ToastGravity.CENTER);
+                                      }
+                                      setState(() {
+                                        _loading = false;
+                                      });
+                                    }),
+                              ],
+                            );
+                          },
+                        );
                       },
                       child: Text(
                         'Trouble logging in? Click here',

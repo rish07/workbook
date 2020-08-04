@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/login_page.dart';
+import 'package:workbook/screens/reset_password.dart';
+import 'package:workbook/user.dart';
 import 'package:workbook/widget/popUpDialog.dart';
 
 class Settings extends StatefulWidget {
@@ -76,6 +78,26 @@ class _SettingsState extends State<Settings> {
               ),
               onTap: () async {
                 await launch('https://docs.google.com/document/d/1mzftgkkfC6WN8PhmgOi5bJeCobLrKw3O6F8eIb_TOn8/edit');
+              },
+            ),
+            Divider(
+              thickness: 2,
+            ),
+            ListTile(
+              title: Text(
+                'Reset Password',
+                style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  PageTransition(
+                    child: ResetPassword(
+                      email: User.userEmail,
+                    ),
+                    type: PageTransitionType.rightToLeft,
+                  ),
+                );
               },
             ),
             Divider(

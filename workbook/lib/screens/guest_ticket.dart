@@ -88,7 +88,7 @@ class _GenerateTicketState extends State<GenerateTicket> {
           child: ListView(
             children: [
               Text(
-                'Generate Enquiry',
+                'Submit Enquiry',
                 style: TextStyle(
                   fontSize: 28,
                   color: Colors.white,
