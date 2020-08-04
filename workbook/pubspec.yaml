@@ -62,7 +62,11 @@ dependencies:
 
 
 
-
+  webview_flutter: ^0.3.22+1
+  aad_oauth: ^0.1.9
+  flutter_webview_plugin: ^0.3.11
+  google_sign_in: ^4.5.1
+  simple_auth_flutter: ^2.0.7
   like_button:
   visibility_detector: ^0.1.5
   url_launcher:

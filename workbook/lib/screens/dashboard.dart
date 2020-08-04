@@ -21,10 +21,10 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 
 import 'dart:math';
+import 'package:wc_flutter_share/wc_flutter_share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:visibility_detector/visibility_detector.dart';
-import 'package:wc_flutter_share/wc_flutter_share.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/add_grade.dart';
 import 'package:workbook/screens/add_post.dart';
@@ -489,17 +489,30 @@ class _DashBoardState extends State<DashBoard> {
                                                       ],
                                                     ),
                                                     onPressed: () async {
-                                                      var request = await HttpClient().getUrl(Uri.parse(posts[index]['mediaUrl']));
-                                                      var response = await request.close();
-                                                      Uint8List bytes = await consolidateHttpClientResponseBytes(response);
-                                                      await WcFlutterShare.share(
-                                                        sharePopupTitle: 'Share',
-                                                        mimeType: 'image/png',
-                                                        text: posts[index]['content'],
-                                                        fileName: 'share.png',
-                                                        bytesOfFile: bytes,
+                                                      setState(() {
+                                                        _isLoading = true;
+                                                      });
+                                                      final String text = posts[index]['content'];
+                                                      var req = await HttpClient().getUrl(
+                                                        Uri.parse(
+                                                          posts[index]['mediaUrl'],
+                                                        ),
                                                       );
-                                                    }),
+                                                      var response = await req.close();
+
+                                                      setState(() {
+                                                        _isLoading = false;
+                                                      });
+                                                      Uint8List bytes = await consolidateHttpClientResponseBytes(response);
+                                                      await ImagePickerSaver.saveFile(fileData: bytes).whenComplete(() {
+                                                        WcFlutterShare.share(
+                                                            sharePopupTitle: 'Share',
+                                                            text: text,
+                                                            fileName: 'share.png',
+                                                            mimeType: 'image/png',
+                                                            bytesOfFile: bytes.buffer.asUint8List());
+                                                      });
+                                                    })
                                               ],
                                             ),
                                           ),
