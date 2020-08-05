@@ -7,6 +7,7 @@ import 'package:workbook/screens/add_grade.dart';
 
 import 'package:workbook/screens/approve_user.dart';
 import 'package:workbook/screens/active_users.dart';
+import 'package:workbook/screens/coming_soon.dart';
 import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/screens/login_page.dart';
 import 'package:workbook/screens/map_screen.dart';
@@ -114,10 +115,11 @@ Theme buildDrawer(BuildContext context) {
                     Navigator.push(
                       context,
                       PageTransition(
-                          child: GoogleMapScreen(
-                            routeName: User.userRoute,
-                            isEdit: false,
-                          ),
+                          child: ComingSoon(),
+//                          child: GoogleMapScreen(
+//                            routeName: User.userRoute,
+//                            isEdit: false,
+//                          ),
                           type: PageTransitionType.rightToLeft),
                     );
                   })

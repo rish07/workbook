@@ -229,105 +229,105 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
                   ),
                 ),
               ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: widget.isActive
-            ? FloatingActionButton.extended(
-                backgroundColor: violet2,
-                onPressed: () {
-                  if (widget.role == 'driver' && !_routeExists) {
-                    return showDialog(
-                        context: (context),
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Center(
-                                child: Text(
-                              'Add route name',
-                              style: TextStyle(color: violet1),
-                            )),
-                            content: TextFormField(
-                              autocorrect: true,
-                              autofocus: true,
-                              textCapitalization: TextCapitalization.words,
-                              cursorRadius: Radius.circular(8),
-                              cursorColor: violet1,
-                              style: TextStyle(color: Colors.black, fontSize: 18),
-                              controller: _routeNameController,
-                              decoration: InputDecoration(
-                                enabledBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: violet2),
-                                ),
-                                focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: violet2, width: 2),
-                                ),
-                              ),
-                            ),
-                            actions: <Widget>[
-                              // usually buttons at the bottom of the dialog
-                              new MaterialButton(
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                                  color: violet2,
-                                  child: new Text(
-                                    'Proceed',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    if (_routeNameController.text.isNotEmpty) {
-                                      Navigator.push(
-                                          context,
-                                          PageTransition(
-                                              child: GoogleMapScreen(
-                                                isEdit: _routeExists ? true : false,
-                                                driverID: widget.id,
-                                                routeName: _routeNameController.text,
-                                              ),
-                                              type: PageTransitionType.rightToLeft));
-                                      _routeNameController.clear();
-                                    } else {
-                                      Fluttertoast.showToast(context, msg: 'Route Name is required.');
-                                    }
-                                  }),
-                            ],
-                          );
-                        });
-                  } else if (widget.role == 'driver' && _routeExists) {
-                    return Navigator.push(
-                      context,
-                      PageTransition(
-                          child: GoogleMapScreen(routeID: _routeExists ? routeID : null, isEdit: _routeExists ? true : false, driverID: widget.id, routeName: routeName),
-                          type: PageTransitionType.rightToLeft),
-                    );
-                  } else {
-                    return showModalBottomSheet(
-                        backgroundColor: Colors.transparent,
-                        context: context,
-                        builder: (BuildContext context) {
-                          return OpenBottomModal(
-                            userRole: widget.role,
-                            regId: widget.id,
-                          );
-                        });
-                  }
-                },
-                label: Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(right: 8.0),
-                      child: Icon(
-                        Icons.location_on,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      widget.role == 'driver' && !_routeExists
-                          ? 'Add Route'
-                          : (widget.role == 'driver' && _routeExists) ? 'Edit Route' : (widget.routeExists) ? 'Edit Travel Service' : 'Add Travel Service',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ))
-            : null,
+//        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+//        floatingActionButton: widget.isActive
+//            ? FloatingActionButton.extended(
+//                backgroundColor: violet2,
+//                onPressed: () {
+//                  if (widget.role == 'driver' && !_routeExists) {
+//                    return showDialog(
+//                        context: (context),
+//                        builder: (BuildContext context) {
+//                          return AlertDialog(
+//                            title: Center(
+//                                child: Text(
+//                              'Add route name',
+//                              style: TextStyle(color: violet1),
+//                            )),
+//                            content: TextFormField(
+//                              autocorrect: true,
+//                              autofocus: true,
+//                              textCapitalization: TextCapitalization.words,
+//                              cursorRadius: Radius.circular(8),
+//                              cursorColor: violet1,
+//                              style: TextStyle(color: Colors.black, fontSize: 18),
+//                              controller: _routeNameController,
+//                              decoration: InputDecoration(
+//                                enabledBorder: UnderlineInputBorder(
+//                                  borderSide: BorderSide(color: violet2),
+//                                ),
+//                                focusedBorder: UnderlineInputBorder(
+//                                  borderSide: BorderSide(color: violet2, width: 2),
+//                                ),
+//                              ),
+//                            ),
+//                            actions: <Widget>[
+//                              // usually buttons at the bottom of the dialog
+//                              new MaterialButton(
+//                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+//                                  color: violet2,
+//                                  child: new Text(
+//                                    'Proceed',
+//                                    style: TextStyle(
+//                                      color: Colors.white,
+//                                    ),
+//                                  ),
+//                                  onPressed: () {
+//                                    if (_routeNameController.text.isNotEmpty) {
+//                                      Navigator.push(
+//                                          context,
+//                                          PageTransition(
+//                                              child: GoogleMapScreen(
+//                                                isEdit: _routeExists ? true : false,
+//                                                driverID: widget.id,
+//                                                routeName: _routeNameController.text,
+//                                              ),
+//                                              type: PageTransitionType.rightToLeft));
+//                                      _routeNameController.clear();
+//                                    } else {
+//                                      Fluttertoast.showToast(context, msg: 'Route Name is required.');
+//                                    }
+//                                  }),
+//                            ],
+//                          );
+//                        });
+//                  } else if (widget.role == 'driver' && _routeExists) {
+//                    return Navigator.push(
+//                      context,
+//                      PageTransition(
+//                          child: GoogleMapScreen(routeID: _routeExists ? routeID : null, isEdit: _routeExists ? true : false, driverID: widget.id, routeName: routeName),
+//                          type: PageTransitionType.rightToLeft),
+//                    );
+//                  } else {
+//                    return showModalBottomSheet(
+//                        backgroundColor: Colors.transparent,
+//                        context: context,
+//                        builder: (BuildContext context) {
+//                          return OpenBottomModal(
+//                            userRole: widget.role,
+//                            regId: widget.id,
+//                          );
+//                        });
+//                  }
+//                },
+//                label: Row(
+//                  children: <Widget>[
+//                    Padding(
+//                      padding: EdgeInsets.only(right: 8.0),
+//                      child: Icon(
+//                        Icons.location_on,
+//                        color: Colors.white,
+//                      ),
+//                    ),
+//                    Text(
+//                      widget.role == 'driver' && !_routeExists
+//                          ? 'Add Route'
+//                          : (widget.role == 'driver' && _routeExists) ? 'Edit Route' : (widget.routeExists) ? 'Edit Travel Service' : 'Add Travel Service',
+//                      style: TextStyle(fontWeight: FontWeight.bold),
+//                    ),
+//                  ],
+//                ))
+//            : null,
       ),
     );
   }

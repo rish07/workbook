@@ -338,10 +338,7 @@ class _DashBoardState extends State<DashBoard> {
                                 ? ApproveUser(
                                     isDriver: false,
                                   )
-                                : GoogleMapScreen(
-                                    driverID: User.userID,
-                                    isEdit: false,
-                                  ),
+                                : ComingSoon(),
                             type: PageTransitionType.rightToLeft),
                       );
                     },
