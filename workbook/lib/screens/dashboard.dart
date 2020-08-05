@@ -334,7 +334,7 @@ class _DashBoardState extends State<DashBoard> {
                       Navigator.push(
                         context,
                         PageTransition(
-                            child: User.userRole != 'driver'
+                            child: User.userRole != 'driver' && User.userRole != 'customer'
                                 ? ApproveUser(
                                     isDriver: false,
                                   )

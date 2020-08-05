@@ -77,9 +77,20 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                     borderRadius: BorderRadius.circular(13),
                                   ),
                                   child: Center(
-                                    child: Container(
-                                      height: MediaQuery.of(context).size.height * 0.18,
-                                      child: Image.asset('images/admin.png'),
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          height: MediaQuery.of(context).size.height * 0.14,
+                                          child: Image.asset('images/admin.png'),
+                                        ),
+                                        Text(
+                                          'Admin',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -115,9 +126,20 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                     borderRadius: BorderRadius.circular(13),
                                   ),
                                   child: Center(
-                                    child: Container(
-                                      height: MediaQuery.of(context).size.height * 0.18,
-                                      child: Image.asset('images/admin.png'),
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          height: MediaQuery.of(context).size.height * 0.14,
+                                          child: Image.asset('images/emp.png'),
+                                        ),
+                                        Text(
+                                          'Employee/Staff',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -147,9 +169,20 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                     borderRadius: BorderRadius.circular(13),
                                   ),
                                   child: Center(
-                                    child: Container(
-                                      height: MediaQuery.of(context).size.height * 0.18,
-                                      child: Image.asset('images/admin.png'),
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          height: MediaQuery.of(context).size.height * 0.14,
+                                          child: Image.asset('images/driver.jpeg'),
+                                        ),
+                                        Text(
+                                          'Driver',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -176,9 +209,20 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                     borderRadius: BorderRadius.circular(13),
                                   ),
                                   child: Center(
-                                    child: Container(
-                                      height: MediaQuery.of(context).size.height * 0.18,
-                                      child: Image.asset('images/admin.png'),
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          height: MediaQuery.of(context).size.height * 0.14,
+                                          child: Image.asset('images/cust.jpg'),
+                                        ),
+                                        Text(
+                                          'Customer',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),

@@ -33,9 +33,11 @@ Theme buildDrawer(BuildContext context) {
                         borderRadius: BorderRadius.circular(20),
                         image: DecorationImage(
                           fit: BoxFit.fill,
-                          image: NetworkImage(
-                            User.instituteImage,
-                          ),
+                          image: User.instituteImage != null
+                              ? NetworkImage(
+                                  User.instituteImage,
+                                )
+                              : AssetImage('images/userPhoto.jpg'),
                         ),
                       ),
                     ),

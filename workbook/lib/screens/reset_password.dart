@@ -33,9 +33,10 @@ class _ResetPasswordState extends State<ResetPassword> {
     print(response.body);
     if (json.decode(response.body)['statusCode'] == 200) {
       popDialog(
+          buttonTitle: 'Okay',
           title: 'Success',
           context: context,
-          content: 'Password reset successful! Please login now',
+          content: 'Password reset successful! Please login now.',
           onPress: () {
             Navigator.push(
               context,

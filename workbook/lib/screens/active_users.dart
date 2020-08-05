@@ -11,6 +11,8 @@ import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';
 import 'dart:convert';
 
+import 'package:workbook/widget/popUpDialog.dart';
+
 class ActiveUsers extends StatefulWidget {
   final bool isDriver;
 
@@ -24,20 +26,49 @@ class _ActiveUsersState extends State<ActiveUsers> {
   bool _loading = false;
   List _employeeList = [];
 
+//  Future _getUsers() async {
+//    var response = User.userRole != 'superAdmin'
+//        ? await http.post(
+//            User.userRole == 'admin' && !widget.isDriver
+//                ? "$baseUrl/admin/viewAllEmployees"
+//                : (User.userRole == 'admin' && widget.isDriver) ? "$baseUrl/admin/viewAllDrivers" : "$baseUrl/employee/activeCustomer",
+//            body: User.userRole == 'admin'
+//                ? {"userID": User.userEmail, "instituteName": User.instituteName, "jwtToken": User.userJwtToken}
+//                : {"employeeID": User.userEmail, "jwtToken": User.userJwtToken},
+//          )
+//        : await http.get('$baseUrl/superAdmin/viewAllAdmin');
+//    print('Response status: ${response.statusCode}');
+//    print(response.body);
+//    if (response.statusCode == 200) {
+//      setState(() {
+//        _loading = false;
+//      });
+//      var employees = User.userRole == 'admin' && !widget.isDriver
+//          ? json.decode(response.body)['payload']['employees']
+//          : (User.userRole == 'admin' && widget.isDriver)
+//              ? json.decode(response.body)['payload']['drivers']
+//              : (User.userRole == 'employee') ? json.decode(response.body)['payload']['customer'] : json.decode(response.body)['payload']['admin'];
+//      for (var employee in employees) {
+//        _employeeList.add(employee);
+//      }
+//    } else {
+//      throw Exception('Failed to load the employees');
+//    }
+//  }
   Future _getUsers() async {
+    print(widget.isDriver);
+    print(User.userJwtToken);
     var response = User.userRole != 'superAdmin'
         ? await http.post(
             User.userRole == 'admin' && !widget.isDriver
                 ? "$baseUrl/admin/viewAllEmployees"
-                : (User.userRole == 'admin' && widget.isDriver) ? "$baseUrl/admin/viewAllDrivers" : "$baseUrl/employee/activeCustomer",
-            body: User.userRole == 'admin'
-                ? {"userID": User.userEmail, "instituteName": User.instituteName, "jwtToken": User.userJwtToken}
-                : {"employeeID": User.userEmail, "jwtToken": User.userJwtToken},
+                : (User.userRole == 'admin' && widget.isDriver) ? "$baseUrl/admin/viewAllDrivers" : "$baseUrl/employee/viewAllCustomers",
+            body: {"userID": User.userEmail, "instituteName": User.instituteName, "jwtToken": User.userJwtToken},
           )
         : await http.get('$baseUrl/superAdmin/viewAllAdmin');
     print('Response status: ${response.statusCode}');
-    print(response.body);
-    if (response.statusCode == 200) {
+
+    if (json.decode(response.body)["statusCode"] == 200) {
       setState(() {
         _loading = false;
       });
@@ -49,7 +80,16 @@ class _ActiveUsersState extends State<ActiveUsers> {
       for (var employee in employees) {
         _employeeList.add(employee);
       }
+      print(_employeeList);
     } else {
+      popDialog(
+          title: 'Error',
+          content: 'There was an error, please try again',
+          buttonTitle: 'Okay',
+          context: context,
+          onPress: () {
+            Navigator.pop(context);
+          });
       throw Exception('Failed to load the employees');
     }
   }

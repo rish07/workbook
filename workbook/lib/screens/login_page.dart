@@ -146,18 +146,39 @@ class _LoginPageState extends State<LoginPage> {
   Future _resetPassword(String email) async {
     var response = await http.get('$baseUrl/forgot/$email');
     print(response.body);
+    Navigator.pop(context);
     if (json.decode(response.body)['statusCode'] == 200) {
       Fluttertoast.showToast(context, msg: 'Email sent', gravity: ToastGravity.CENTER);
       Navigator.push(
         context,
         PageTransition(
             child: OTPVerification(
+              isEmailVerify: false,
               email: email,
             ),
             type: PageTransitionType.fade),
       );
+    } else if (json.decode(response.body)['statusCode'] == 400) {
+      popDialog(
+          title: 'Error',
+          content: 'The user with this email ID does not exist, please create an account first!',
+          buttonTitle: 'Okay',
+          onPress: () {
+            Navigator.pop(context);
+          },
+          context: context);
     } else {
       Fluttertoast.showToast(context, msg: 'Error');
+    }
+  }
+
+  Future _getInstituteImage() async {
+    var response = await http.get("$baseUrl/getInstituteProfile/${User.instituteName}");
+    print(response.body);
+    if (json.decode(response.body)['statusCode'] == 200) {
+      setState(() {
+        User.instituteImage = json.decode(response.body)['payload']['instituteImageUrl'];
+      });
     }
   }
 
@@ -174,14 +195,17 @@ class _LoginPageState extends State<LoginPage> {
       var tempo = resp['user'];
 
       setState(() {
-        User.userRoute = resp['user']['route'] != null ? resp['user']['route'][0]['routeName'] : null;
         User.userJwtToken = resp['jwtToken'];
         User.userName = tempo['userName'] ?? null;
         User.userID = tempo['_id'] ?? null;
         User.userRole = tempo['role'] ?? null;
         User.userEmail = tempo['userID'] ?? null;
+        if (User.userRole != 'superAdmin') {
+          User.userRoute = resp['user']['route'] != null ? (resp['user']['route'].length != 0 ? resp['user']['route'][0]['routeName'] : null) : null;
+        }
+
         User.instituteName = tempo['instituteName'] ?? null;
-        User.instituteImage = tempo['instituteImageUrl'];
+        User.instituteImage = tempo['instituteImageUrl'] ?? null;
         User.userInstituteType = tempo['instituteType'] ?? null;
         User.numberOfMembers = tempo['numberOfMembers'] ?? null;
         User.state = tempo['state'] ?? null;
@@ -195,6 +219,9 @@ class _LoginPageState extends State<LoginPage> {
         User.profilePicExists = tempo['profilePictureUrl'] == null ? false : true;
         User.carNumber = tempo['carNumber'] ?? null;
       });
+      if (User.userRole != 'superAdmin') {
+        await _getInstituteImage();
+      }
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('userName', User.userName);
@@ -218,9 +245,9 @@ class _LoginPageState extends State<LoginPage> {
 
       Navigator.push(
         context,
-        PageTransition(child: User.userRole == 'customer' ? ComingSoon() : DashBoard(), type: PageTransitionType.rightToLeft),
+        PageTransition(child: DashBoard(), type: PageTransitionType.rightToLeft),
       );
-    } else if (json.decode(response.body)['statusCode'] == 401) {
+    } else if (json.decode(response.body)['statusCode'] == 400) {
       popDialog(
         onPress: () {
           Navigator.pop(context);

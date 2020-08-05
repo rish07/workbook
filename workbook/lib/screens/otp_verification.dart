@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -7,18 +8,22 @@ import 'package:page_transition/page_transition.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/reset_password.dart';
+import 'package:workbook/widget/popUpDialog.dart';
 import 'package:workbook/widget/registerButton.dart';
 import 'package:http/http.dart' as http;
 
 class OTPVerification extends StatefulWidget {
+  final String otp;
+  final bool isEmailVerify;
   final String email;
 
-  const OTPVerification({Key key, this.email}) : super(key: key);
+  const OTPVerification({Key key, this.email, @required this.isEmailVerify, this.otp}) : super(key: key);
   @override
   _OTPVerificationState createState() => _OTPVerificationState();
 }
 
 class _OTPVerificationState extends State<OTPVerification> {
+  bool _time = false;
   bool _isLoading = false;
   final TextEditingController _pinPutController = TextEditingController();
   final FocusNode _pinPutFocusNode = FocusNode();
@@ -33,8 +38,28 @@ class _OTPVerificationState extends State<OTPVerification> {
     );
   }
 
+  Future _resetPassword(String email) async {
+    var response = await http.get('$baseUrl/forgot/$email');
+    print(response.body);
+    Navigator.pop(context);
+    if (json.decode(response.body)['statusCode'] == 200) {
+      Fluttertoast.showToast(context, msg: 'Email sent', gravity: ToastGravity.CENTER);
+    } else if (json.decode(response.body)['statusCode'] == 400) {
+      popDialog(
+          title: 'Error',
+          content: 'The user with this email ID does not exist, please create an account first!',
+          buttonTitle: 'Okay',
+          onPress: () {
+            Navigator.pop(context);
+          },
+          context: context);
+    } else {
+      Fluttertoast.showToast(context, msg: 'Error');
+    }
+  }
+
   Future _verifyOTP(String otp) async {
-    var response = await http.post('$baseUrl/verifyOTP', body: {
+    var response = await http.post(widget.isEmailVerify ? '$baseUrl/verifyUser' : '$baseUrl/verifyOTP', body: {
       'userID': widget.email,
       'token': otp,
     });
@@ -42,14 +67,22 @@ class _OTPVerificationState extends State<OTPVerification> {
     print(response.body);
     if (json.decode(response.body)['statusCode'] == 200) {
       Fluttertoast.showToast(context, msg: 'Success', gravity: ToastGravity.CENTER);
-      Navigator.push(
-        context,
-        PageTransition(
-            child: ResetPassword(
-              email: widget.email,
-            ),
-            type: PageTransitionType.fade),
-      );
+
+      if (!widget.isEmailVerify) {
+        Navigator.push(
+          context,
+          PageTransition(
+              child: ResetPassword(
+                email: widget.email,
+              ),
+              type: PageTransitionType.fade),
+        );
+      } else {
+        Navigator.pop(context);
+        setState(() {
+          isEmailVerified = true;
+        });
+      }
     } else {
       print('ERROR');
       Fluttertoast.showToast(context, msg: 'Try again', gravity: ToastGravity.CENTER);
@@ -60,6 +93,11 @@ class _OTPVerificationState extends State<OTPVerification> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    Timer(Duration(minutes: 5), () {
+      setState(() {
+        _time = true;
+      });
+    });
   }
 
   @override
@@ -87,7 +125,7 @@ class _OTPVerificationState extends State<OTPVerification> {
               Padding(
                 padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.14, horizontal: MediaQuery.of(context).size.width * 0.12),
                 child: Text(
-                  'Create Account',
+                  widget.isEmailVerify ? 'Verify Email' : 'Reset Password',
                   style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.w900),
                 ),
               ),
@@ -138,7 +176,24 @@ class _OTPVerificationState extends State<OTPVerification> {
                                   });
 
                                   try {
-                                    await _verifyOTP(pin);
+                                    if (!widget.isEmailVerify) {
+                                      await _verifyOTP(pin);
+                                    } else {
+                                      if (widget.otp == pin) {
+                                        Fluttertoast.showToast(context, msg: 'Success', gravity: ToastGravity.CENTER);
+
+                                        setState(() {
+                                          isEmailVerified = true;
+                                        });
+                                        Navigator.pop(context);
+                                      } else {
+                                        Fluttertoast.showToast(
+                                          context,
+                                          msg: 'Wrong OTP',
+                                          gravity: ToastGravity.CENTER,
+                                        );
+                                      }
+                                    }
                                   } catch (e) {
                                     print(e);
                                   }
@@ -160,7 +215,20 @@ class _OTPVerificationState extends State<OTPVerification> {
                               ),
                             ),
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () async {
+                                if (_time) {
+                                  await _resetPassword(widget.email);
+                                } else {
+                                  popDialog(
+                                      title: 'Wait',
+                                      context: context,
+                                      content: 'Please wait for 5 minutes before trying for new otp!',
+                                      buttonTitle: 'Okay',
+                                      onPress: () {
+                                        Navigator.pop(context);
+                                      });
+                                }
+                              },
                               child: Container(
                                 height: 30,
                                 child: Text(

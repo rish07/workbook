@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/login_page.dart';
+import 'package:workbook/screens/otp_verification.dart';
 import 'package:workbook/widget/input_field.dart';
 import 'package:workbook/widget/password.dart';
 import 'package:workbook/widget/popUpDialog.dart';
@@ -17,6 +18,7 @@ import 'package:regexed_validator/regexed_validator.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+
 import 'package:workbook/user.dart';
 import 'dart:math' as math;
 import 'package:path/path.dart' as p;
@@ -28,6 +30,7 @@ class AdminForm extends StatefulWidget {
 
 class _AdminFormState extends State<AdminForm> {
   final math.Random random = math.Random();
+  bool _showEmail = false;
   bool _isLoading = false;
   String imageAsB64;
   final picker = ImagePicker();
@@ -73,6 +76,36 @@ class _AdminFormState extends State<AdminForm> {
       _uploadFile();
     } catch (e) {
       print(e);
+    }
+  }
+
+  Future _sendEmailVerification(String email) async {
+    var response = await http.get('$baseUrl/sendVerification/$email');
+    print(response.body);
+
+    if (json.decode(response.body)['statusCode'] == 200) {
+      Fluttertoast.showToast(context, msg: 'Email sent', gravity: ToastGravity.CENTER);
+      Navigator.push(
+        context,
+        PageTransition(
+            child: OTPVerification(
+              otp: json.decode(response.body)['payload']['token'].toString(),
+              isEmailVerify: true,
+              email: email,
+            ),
+            type: PageTransitionType.fade),
+      );
+    } else if (json.decode(response.body)['statusCode'] == 400) {
+      popDialog(
+          title: 'Error',
+          content: 'There was some error,please try again!',
+          buttonTitle: 'Okay',
+          onPress: () {
+            Navigator.pop(context);
+          },
+          context: context);
+    } else {
+      Fluttertoast.showToast(context, msg: 'Error');
     }
   }
 
@@ -219,6 +252,11 @@ class _AdminFormState extends State<AdminForm> {
                   ),
                 ),
                 InputField(
+                  onChange: () {
+                    setState(() {
+                      _showEmail = true;
+                    });
+                  },
                   validate: _validateEmail,
                   capital: TextCapitalization.none,
                   controller: _emailController,
@@ -226,6 +264,46 @@ class _AdminFormState extends State<AdminForm> {
                   labelText: 'Email',
                   textInputType: TextInputType.emailAddress,
                 ),
+                _showEmail
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+                        child: GestureDetector(
+                          onTap: () async {
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            if (_emailController.text.isNotEmpty && validator.email(_emailController.text)) {
+                              _sendEmailVerification(_emailController.text.toString());
+                            } else {
+                              Fluttertoast.showToast(
+                                context,
+                                msg: 'Please enter a valid email ID',
+                                gravity: ToastGravity.CENTER,
+                              );
+                            }
+                            setState(() {
+                              _isLoading = false;
+                            });
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            margin: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.2),
+                            height: 40,
+                            width: 150,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(32),
+                              color: Colors.white,
+                            ),
+                            child: Center(
+                              child: Text(
+                                isEmailVerified ? 'Email verified!' : 'Verify Email',
+                                style: TextStyle(color: violet1),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    : Container(),
                 PasswordInput(
                   validate: _validatePassword,
                   controller: _passwordController,
@@ -426,7 +504,7 @@ class _AdminFormState extends State<AdminForm> {
                   maxLines: 5,
                   controller: _mailController,
                   errorText: 'Please enter your institute\'s mailing address',
-                  labelText: 'Mailing Address',
+                  labelText: 'Institute Mailing Address',
                 ),
                 InputField(
                   validate: _validateAadhar,
@@ -450,6 +528,16 @@ class _AdminFormState extends State<AdminForm> {
                       context: context,
                       onPressed: () async {
                         setState(() {
+                          if (!isEmailVerified) {
+                            popDialog(
+                                title: 'Verify',
+                                content: 'Please verify your email ID first',
+                                context: context,
+                                onPress: () {
+                                  Navigator.pop(context);
+                                },
+                                buttonTitle: 'Okay');
+                          }
                           _nameController.text.isEmpty ? _validateName = true : _validateName = false;
                           _selectedCityLocation == 'Others' ? _cityNameController.text.isEmpty ? _validateCityName = true : _validateCityName = false : Container();
                           (_emailController.text.isEmpty || !validator.email(_emailController.text)) ? _validateEmail = true : _validateEmail = false;
@@ -488,6 +576,7 @@ class _AdminFormState extends State<AdminForm> {
                                 !_validateOrganization &&
                                 !_validatePassword &&
                                 !_validateMail &&
+                                isEmailVerified &&
                                 !_validateRePassword &&
                                 _file != null) {
                           setState(() {

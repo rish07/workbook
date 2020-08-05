@@ -6,12 +6,13 @@ class InputField extends StatefulWidget {
   final int maxLines;
   final TextCapitalization capital;
   final String errorText;
+  final Function onChange;
   final TextEditingController controller;
   Function validation;
   bool validate;
   final String labelText;
   final TextInputType textInputType;
-  InputField({Key key, @required this.labelText, this.textInputType, this.controller, this.validation, this.validate, this.errorText, this.capital, this.maxLines})
+  InputField({Key key, @required this.labelText, this.textInputType, this.controller, this.validation, this.validate, this.errorText, this.capital, this.maxLines, this.onChange})
       : super(key: key);
   @override
   _InputFieldState createState() => _InputFieldState();
@@ -29,11 +30,7 @@ class _InputFieldState extends State<InputField> {
           validator: widget.validation,
           autocorrect: true,
           maxLines: widget.maxLines,
-          onTap: () {
-            setState(() {
-              widget.validate = false;
-            });
-          },
+          onTap: widget.onChange,
           cursorRadius: Radius.circular(8),
           cursorColor: Colors.white,
           keyboardType: widget.textInputType ?? TextInputType.text,

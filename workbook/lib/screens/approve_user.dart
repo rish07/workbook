@@ -29,6 +29,7 @@ class _ApproveUserState extends State<ApproveUser> {
   List _employeeList = [];
 
   Future _getUsers() async {
+    print(widget.isDriver);
     print(User.userJwtToken);
     var response = User.userRole != 'superAdmin'
         ? await http.post(
@@ -40,7 +41,7 @@ class _ApproveUserState extends State<ApproveUser> {
         : await http.get('$baseUrl/superAdmin/viewAllAdmin');
     print('Response status: ${response.statusCode}');
 
-    if (response.statusCode == 200) {
+    if (json.decode(response.body)["statusCode"] == 200) {
       setState(() {
         _loading = false;
       });
@@ -54,6 +55,14 @@ class _ApproveUserState extends State<ApproveUser> {
       }
       print(_employeeList);
     } else {
+      popDialog(
+          title: 'Error',
+          content: 'There was an error, please try again',
+          buttonTitle: 'Okay',
+          context: context,
+          onPress: () {
+            Navigator.pop(context);
+          });
       throw Exception('Failed to load the employees');
     }
   }
@@ -83,13 +92,21 @@ class _ApproveUserState extends State<ApproveUser> {
     setState(() {
       _loading = false;
     });
-    if (response.statusCode == 200) {
+    if (json.decode(response.body)['statusCode'] == 200) {
       setState(() {
         _loading = true;
         _employeeList.clear();
       });
       _getUsers();
     } else {
+      popDialog(
+          title: 'Error',
+          content: 'There was an error, please try again',
+          buttonTitle: 'Okay',
+          context: context,
+          onPress: () {
+            Navigator.pop(context);
+          });
       throw Exception('Failed to load the employees');
     }
   }
