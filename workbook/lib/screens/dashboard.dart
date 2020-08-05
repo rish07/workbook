@@ -122,13 +122,117 @@ class _DashBoardState extends State<DashBoard> {
       child: Scaffold(
         key: _scaffoldKey,
         endDrawer: Drawer(
-          child: ListView(
+          child: Column(
             children: [
+              Flexible(
+                child: ListView(
+                  children: [
+                    ListTile(
+                      leading: CircleAvatar(
+                        radius: 30,
+                        backgroundImage: !User.profilePicExists ? AssetImage('images/userPhoto.jpg') : NetworkImage((User.userPhotoData)),
+                      ),
+                      title: Text(
+                        User.userName,
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        User.userEmail,
+                        style: TextStyle(fontSize: 14),
+                      ),
+                      trailing: IconButton(
+                          icon: Icon(Icons.navigate_next),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              PageTransition(child: ProfilePage(), type: PageTransitionType.rightToLeft),
+                            );
+                          }),
+                    ),
+                    Divider(),
+                    User.userRole == 'admin'
+                        ? ListTile(
+                            leading: Icon(
+                              Icons.arrow_downward,
+                              color: violet2,
+                            ),
+                            title: Text(
+                              'Grades and Divisions',
+                              style: TextStyle(fontSize: 16, color: violet2, fontWeight: FontWeight.w600),
+                            ),
+                            onTap: () {
+                              Navigator.push(context, PageTransition(child: AddGrade(), type: PageTransitionType.rightToLeft));
+                            },
+                            trailing: Icon(Icons.navigate_next),
+                          )
+                        : Container(),
+                    User.userRole == 'admin'
+                        ? ListTile(
+                            leading: Icon(
+                              Icons.directions_car,
+                              color: violet2,
+                            ),
+                            title: Text(
+                              'Drivers',
+                              style: TextStyle(fontSize: 16, color: violet2, fontWeight: FontWeight.w600),
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                PageTransition(
+                                    child: ApproveUser(
+                                      isDriver: true,
+                                    ),
+                                    type: PageTransitionType.rightToLeft),
+                              );
+                            },
+                            trailing: Icon(Icons.navigate_next),
+                          )
+                        : Container(),
+                    User.userRole == 'employee' || User.userRole == 'customer' || User.userRole == 'driver'
+                        ? ListTile(
+                            leading: Icon(
+                              Icons.map,
+                              color: violet2,
+                            ),
+                            title: Text(
+                              'Travel',
+                              style: TextStyle(fontSize: 16, color: violet2, fontWeight: FontWeight.w600),
+                            ),
+                            onTap: () {
+                              Navigator.push(context, PageTransition(child: ComingSoon(), type: PageTransitionType.rightToLeft));
+                            },
+                            trailing: Icon(Icons.navigate_next),
+                          )
+                        : Container(),
+                    ListTile(
+                      leading: Icon(
+                        Icons.fingerprint,
+                        color: violet2,
+                      ),
+                      title: Text(
+                        'Leave and Attendance',
+                        style: TextStyle(fontSize: 16, color: violet2, fontWeight: FontWeight.w600),
+                      ),
+                      onTap: () {
+                        Navigator.push(context, PageTransition(child: ComingSoon(), type: PageTransitionType.rightToLeft));
+                      },
+                      trailing: Icon(Icons.navigate_next),
+                    )
+                  ],
+                ),
+              ),
+              Divider(),
               ListTile(
-                leading: Image.network(User.userPhotoData),
-                title: Text(User.userName),
-                subtitle: Text(User.userEmail),
-              )
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    PageTransition(child: Settings(), type: PageTransitionType.rightToLeft),
+                  );
+                },
+                leading: Icon(Icons.settings),
+                title: Text('Settings'),
+              ),
             ],
           ),
         ),
@@ -677,137 +781,25 @@ class _DashBoardState extends State<DashBoard> {
     );
   }
 
-  Widget openBottomDrawer(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.4,
-      child: Theme(
-        data: Theme.of(context).copyWith(
-          canvasColor: Colors.transparent,
-        ),
-        child: Drawer(
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(32),
-              color: Colors.white,
-            ),
-            child: ListView(
-              shrinkWrap: true,
-              padding: EdgeInsets.symmetric(vertical: 40, horizontal: 8),
-              children: [
-                buildDrawerItemDashboard(
-                    icon: Icons.home,
-                    title: "Home",
-                    onTap: () {
-                      Navigator.push(context, PageTransition(child: DashBoard(), type: PageTransitionType.rightToLeft));
-                    }),
-                User.userRole != 'superAdmin'
-                    ? buildDrawerItemDashboard(
-                        icon: Icons.account_circle,
-                        title: "Profile",
-                        onTap: () {
-                          Navigator.push(context, PageTransition(child: ProfilePage(), type: PageTransitionType.rightToLeft));
-                        })
-                    : Container(),
-                User.userRole == 'admin'
-                    ? buildDrawerItemDashboard(
-                        icon: Icons.arrow_downward,
-                        title: 'Grades and Divisions',
-                        onTap: () {
-                          Navigator.push(context, PageTransition(child: AddGrade(), type: PageTransitionType.rightToLeft));
-                        })
-                    : Container(),
-                buildDrawerItemDashboard(
-                    icon: Icons.person,
-                    title: User.userRole == 'admin' ? "Employees" : (User.userRole == 'employee') ? 'Customers' : 'Admins',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        PageTransition(
-                            child: ApproveUser(
-                              isDriver: false,
-                            ),
-                            type: PageTransitionType.rightToLeft),
-                      );
-                    }),
-                User.userRole == 'admin'
-                    ? buildDrawerItemDashboard(
-                        icon: Icons.directions_car,
-                        title: 'Drivers',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            PageTransition(
-                                child: ApproveUser(
-                                  isDriver: true,
-                                ),
-                                type: PageTransitionType.rightToLeft),
-                          );
-                        })
-                    : Container(),
-                User.userRole == 'admin'
-                    ? buildDrawerItemDashboard(
-                        icon: Icons.question_answer,
-                        title: 'Queries',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            PageTransition(child: QueryData(), type: PageTransitionType.rightToLeft),
-                          );
-                        })
-                    : Container(),
-                User.userRole == 'employee' || User.userRole == 'customer' || User.userRole == 'driver'
-                    ? buildDrawerItemDashboard(
-                        icon: Icons.map,
-                        title: 'Travel',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            PageTransition(
-                                child: GoogleMapScreen(
-                                  driverID: User.userRole == 'driver' ? User.userID : null,
-                                  routeName: User.userRoute,
-                                  isEdit: false,
-                                ),
-                                type: PageTransitionType.rightToLeft),
-                          );
-                        })
-                    : Container(),
-                buildDrawerItemDashboard(
-                    icon: Icons.settings,
-                    title: 'Settings',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        PageTransition(child: Settings(), type: PageTransitionType.rightToLeft),
-                      );
-                    }),
-              ],
+  ListTile buildDrawerItemDashboard({IconData icon, String title, Function onTap}) {
+    return ListTile(
+      onTap: onTap,
+      title: Row(
+        children: [
+          Icon(
+            icon,
+            size: 24,
+            color: violet2,
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 12),
+            child: Text(
+              title,
+              style: TextStyle(color: violet2, fontSize: 18),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
-}
-
-ListTile buildDrawerItemDashboard({IconData icon, String title, Function onTap}) {
-  return ListTile(
-    onTap: onTap,
-    title: Row(
-      children: [
-        Icon(
-          icon,
-          size: 24,
-          color: violet2,
-        ),
-        Padding(
-          padding: EdgeInsets.only(left: 12),
-          child: Text(
-            title,
-            style: TextStyle(color: violet2, fontSize: 18),
-          ),
-        ),
-      ],
-    ),
-  );
 }
