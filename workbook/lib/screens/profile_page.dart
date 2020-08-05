@@ -1,8 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image/network.dart';
+import 'package:path/path.dart' as p;
+
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:workbook/constants.dart';
@@ -20,49 +26,61 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   bool _isLoading = false;
-  String imagePath;
+  String fileName = '';
   final picker = ImagePicker();
-  String imageAsB64;
-  File _image;
+  String mediaUrl = '';
+  File _file;
+  final math.Random random = math.Random();
 
   Future getImage() async {
-    final pickedImage = await picker.getImage(source: ImageSource.gallery);
-    setState(() {
-      _image = File(pickedImage.path);
-      imagePath = pickedImage.path;
-    });
-    List<int> temp = _image.readAsBytesSync();
-    imageAsB64 = base64Encode(temp);
-    print(imageAsB64);
+    try {
+      _file = await FilePicker.getFile(type: FileType.image);
+      setState(() {
+        fileName = p.basename(_file.path);
+      });
+      print(fileName);
+      _uploadFile().whenComplete(
+        () async {
+          await _updateImage('$baseUrl/uploadPicture');
+        },
+      );
+    } catch (e) {
+      print(e);
+    }
   }
 
-  Future<String> _updateImage(filename, url) async {
+  Future _updateImage(url) async {
     print('update image');
     print(User.userID);
-    var request = http.MultipartRequest('POST', Uri.parse(url));
-    request.fields['userID'] = User.userEmail;
-    request.files.add(
-      await http.MultipartFile.fromPath('profilePicture', filename),
-    );
-    var res = await request.send();
-    String response = await res.stream.bytesToString();
-    print(response);
-    if (res.statusCode == 200) {
+    var request = await http.post(url, body: {
+      "userID": User.userEmail,
+      "profilePictureUrl": mediaUrl,
+    });
+    print(request.body);
+    if (json.decode(request.body)['statusCode'] == 200) {
       print('worked');
     } else {
-      print(res.statusCode);
+      print('Error');
     }
-    return res.reasonPhrase;
   }
 
-  Future _updatePhoto() async {
-    print('update working');
-    var res = await _updateImage(imagePath, '$baseUrl/uploadPicture');
+  Future<void> _uploadFile() async {
     setState(() {
-      state = res;
-      _isLoading = false;
-      print(res);
+      _isLoading = true;
     });
+    StorageReference storageReference;
+    int rand = random.nextInt(1000);
+    storageReference = FirebaseStorage.instance.ref().child("images/$rand");
+
+    final StorageUploadTask uploadTask = storageReference.putFile(_file);
+    final StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
+    final String url = (await downloadUrl.ref.getDownloadURL());
+    setState(() {
+      mediaUrl = url;
+      _isLoading = false;
+      Fluttertoast.showToast(context, msg: 'File attached successfully');
+    });
+    print("URL is $url");
   }
 
   Future _updateProfile() async {
@@ -175,8 +193,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                   _isLoading = true;
                                   _isEdit = false;
                                 });
-                                if (_image != null) {
-                                  await _updatePhoto();
+                                if (_file != null) {
+                                  await getImage();
                                 }
                                 await _updateProfile();
                               }),

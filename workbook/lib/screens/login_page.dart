@@ -191,8 +191,8 @@ class _LoginPageState extends State<LoginPage> {
         User.grade = tempo['grade'] ?? null;
         User.division = tempo['division'] ?? null;
         User.contactNumber = tempo['contactNumber'] ?? null;
-        User.userPhotoData = "$baseUrl/getUserProfile/${User.userRole}/${User.userID}";
-        User.profilePicExists = tempo['profilePicture'] == null ? false : true;
+        User.userPhotoData = tempo['profilePictureUrl'] ?? null;
+        User.profilePicExists = tempo['profilePictureUrl'] == null ? false : true;
         User.carNumber = tempo['carNumber'] ?? null;
       });
 

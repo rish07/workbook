@@ -49,7 +49,8 @@ class DashBoard extends StatefulWidget {
 }
 
 class _DashBoardState extends State<DashBoard> {
-  String _localPath;
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>(); // ADD THIS LINE
+
   static final Random random = Random();
   bool _isLoading = false;
   List posts = [];
@@ -104,6 +105,12 @@ class _DashBoardState extends State<DashBoard> {
     print(response.body);
   }
 
+  void onTabTapped() {
+    setState(() {
+      _scaffoldKey.currentState.openEndDrawer(); // CHANGE THIS LINE
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return ModalProgressHUD(
@@ -113,6 +120,18 @@ class _DashBoardState extends State<DashBoard> {
       ),
       inAsyncCall: _isLoading,
       child: Scaffold(
+        key: _scaffoldKey,
+        endDrawer: Drawer(
+          child: ListView(
+            children: [
+              ListTile(
+                leading: Image.network(User.userPhotoData),
+                title: Text(User.userName),
+                subtitle: Text(User.userEmail),
+              )
+            ],
+          ),
+        ),
         backgroundColor: Color(0xFFF5F5F5),
         bottomNavigationBar: BottomAppBar(
           child: Container(
@@ -241,7 +260,7 @@ class _DashBoardState extends State<DashBoard> {
                   child: MaterialButton(
                     minWidth: 1,
                     onPressed: () {
-                      return showModalBottomSheet(backgroundColor: Colors.transparent, context: context, builder: (BuildContext context) => openBottomDrawer(context));
+                      onTabTapped();
                     },
                     child: Column(
                       children: [
@@ -267,24 +286,10 @@ class _DashBoardState extends State<DashBoard> {
             style: TextStyle(color: violet2, fontSize: 30, fontWeight: FontWeight.bold),
           ),
           automaticallyImplyLeading: false,
-          actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(context, PageTransition(child: ProfilePage(), type: PageTransitionType.rightToLeft));
-                },
-                child: Hero(
-                  tag: "profile",
-                  child: CircleAvatar(
-                    radius: 23,
-                    backgroundImage: !User.profilePicExists ? AssetImage('images/userPhoto.jpg') : NetworkImageWithRetry((User.userPhotoData)),
-                  ),
-                ),
-              ),
-            ),
-          ],
           elevation: 0,
+          actions: [
+            Container(),
+          ],
           backgroundColor: Colors.transparent,
           iconTheme: IconThemeData(color: violet2),
         ),
