@@ -161,18 +161,20 @@ class _OTPVerificationState extends State<OTPVerification> {
           context: context,
           buttonTitle: 'Close',
           content: 'Your form has been submitted. Please wait for 24 hours for it to get approved');
-    } else if (json.decode(response.body)['payload']['err']['keyValue'] != null) {
-      popDialog(
-          title: 'Duplicate user',
-          context: context,
-          content: 'Admin with email ID ${json.decode(response.body)['payload']['err']['keyValue']['userID']} already exists. Please login in!',
-          onPress: () {
-            Navigator.push(
-              context,
-              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
-            );
-          },
-          buttonTitle: 'Login');
+    } else if (json.decode(response.body)['payload']['err'] != null) {
+      if (json.decode(response.body)['payload']['err']['keyValue'] != null) {
+        popDialog(
+            title: 'Duplicate user',
+            context: context,
+            content: 'Admin with email ID ${json.decode(response.body)['payload']['err']['keyValue']['userID']} already exists. Please login in!',
+            onPress: () {
+              Navigator.push(
+                context,
+                PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
+              );
+            },
+            buttonTitle: 'Login');
+      }
     } else {
       popDialog(
           title: 'Error',

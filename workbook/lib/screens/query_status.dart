@@ -226,26 +226,26 @@ class _QueryStatusState extends State<QueryStatus> {
                                                   ),
                                                 )
                                               : Container(),
-                                          pending[index]['comment'] != null
-                                              ? Padding(
-                                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                                  child: Text(
-                                                    'Comment:',
-                                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                                                  ),
-                                                )
-                                              : Container(),
-                                          pending[index]['comment'] != null
-                                              ? Padding(
-                                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                                  child: Container(
-                                                    child: Text(
-                                                      pending[index]['comment'],
-                                                      textAlign: TextAlign.justify,
-                                                    ),
-                                                  ),
-                                                )
-                                              : Container(),
+//                                          unregistered[index]['comment'] != null
+//                                              ? Padding(
+//                                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+//                                                  child: Text(
+//                                                    'Comment:',
+//                                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+//                                                  ),
+//                                                )
+//                                              : Container(),
+//                                          unregistered[index]['comment'] != null
+//                                              ? Padding(
+//                                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+//                                                  child: Container(
+//                                                    child: Text(
+//                                                      pending[index]['comment'],
+//                                                      textAlign: TextAlign.justify,
+//                                                    ),
+//                                                  ),
+//                                                )
+//                                              : Container(),
                                           widget.isPending
                                               ? Padding(
                                                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
@@ -322,7 +322,7 @@ class _QueryStatusState extends State<QueryStatus> {
                                               child: ListView(
                                                 children: [
                                                   Text(
-                                                    'Add Comment',
+                                                    widget.isPending && pending[index]['comment'] == null ? 'Add Comment' : 'Edit Comment',
                                                     style: TextStyle(color: violet1, fontSize: 20),
                                                     textAlign: TextAlign.center,
                                                   ),

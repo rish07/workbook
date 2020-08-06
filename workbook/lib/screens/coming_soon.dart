@@ -7,7 +7,7 @@ class ComingSoon extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: Text(
-          'Coming Soon',
+          'More features\nComing Soon',
           style: TextStyle(fontSize: 50, color: violet2),
         ),
       ),

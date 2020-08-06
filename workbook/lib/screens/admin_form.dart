@@ -80,7 +80,10 @@ class _AdminFormState extends State<AdminForm> {
   }
 
   Future _sendEmailVerification(String email) async {
-    var response = await http.get('$baseUrl/sendVerification/$email');
+    var response = await http.post('$baseUrl/sendVerification', body: {
+      "userID": email,
+      "role": "admin",
+    });
     print(response.body);
 
     if (json.decode(response.body)['statusCode'] == 200) {
@@ -108,6 +111,18 @@ class _AdminFormState extends State<AdminForm> {
             ),
             type: PageTransitionType.fade),
       );
+    } else if (json.decode(response.body)['statusCode'] == 401) {
+      popDialog(
+          title: 'Duplicate User',
+          content: 'The user with email id $email already exists. Please login or click on forgot password!',
+          buttonTitle: 'Okay',
+          onPress: () {
+            Navigator.push(
+              context,
+              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
+            );
+          },
+          context: context);
     } else if (json.decode(response.body)['statusCode'] == 400) {
       popDialog(
           title: 'Error',

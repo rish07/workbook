@@ -99,7 +99,10 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
   }
 
   Future _sendEmailVerification(String email) async {
-    var response = await http.get('$baseUrl/sendVerification/$email');
+    var response = await http.post('$baseUrl/sendVerification', body: {
+      "userID": email,
+      "role": widget.isEmployee ? "employee" : "customer",
+    });
     print(response.body);
 
     if (json.decode(response.body)['statusCode'] == 200) {
@@ -123,6 +126,18 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
             ),
             type: PageTransitionType.fade),
       );
+    } else if (json.decode(response.body)['statusCode'] == 401) {
+      popDialog(
+          title: 'Duplicate User',
+          content: 'The user with email id $email already exists. Please login or click on forgot password!',
+          buttonTitle: 'Okay',
+          onPress: () {
+            Navigator.push(
+              context,
+              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
+            );
+          },
+          context: context);
     } else if (json.decode(response.body)['statusCode'] == 400) {
       popDialog(
           title: 'Error',
@@ -423,9 +438,6 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                             !_validateAadhar &&
                             !_validatePassword &&
                             !_validateRePassword) {
-                          setState(() {
-                            _isLoading = true;
-                          });
                           await _sendEmailVerification(_emailController.text.toString());
                         }
                       },

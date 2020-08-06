@@ -68,24 +68,11 @@ class _QueryDashboardState extends State<QueryDashboard> {
                   sliceFillColors: [Colors.tealAccent, Colors.red, Colors.cyan],
                   legendItemPadding: EdgeInsets.all(8),
                   legendIconShape: LegendIconShape.Circle,
-                  size: Size(MediaQuery.of(context).size.height * 0.3,
-                      MediaQuery.of(context).size.width * 0.9),
+                  size: Size(MediaQuery.of(context).size.height * 0.3, MediaQuery.of(context).size.width * 0.9),
                   values: [
-                    _registered.length /
-                        (_pending.length +
-                            _unregistered.length +
-                            _registered.length) *
-                        100,
-                    _unregistered.length /
-                        (_pending.length +
-                            _unregistered.length +
-                            _registered.length) *
-                        100,
-                    _pending.length /
-                        (_pending.length +
-                            _unregistered.length +
-                            _registered.length) *
-                        100
+                    _registered.length / (_pending.length + _unregistered.length + _registered.length) * 100,
+                    _unregistered.length / (_pending.length + _unregistered.length + _registered.length) * 100,
+                    _pending.length / (_pending.length + _unregistered.length + _registered.length) * 100
                   ],
                   labels: ['Registered', 'Unregistered', 'Pending'],
                   legendPosition: LegendPosition.Bottom,
