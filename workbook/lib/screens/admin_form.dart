@@ -89,9 +89,22 @@ class _AdminFormState extends State<AdminForm> {
         context,
         PageTransition(
             child: OTPVerification(
+              role: 'admin',
+              name: _nameController.text,
+              password: _passwordController.text,
+              instituteName: _organizationController.text,
+              instituteImageUrl: mediaUrl,
+              instituteType: _selectedInstitutionType,
+              numberOfMembers: _organizationNumberController.text.toString(),
+              state: _selectedStateLocation,
+              city: _selectedCityLocation,
+              mail: _mailController.text,
+              fcm: User.userFcmToken,
+              aadhar: _aadharController.text.toString(),
+              phone: _phoneController.text.toString(),
               otp: json.decode(response.body)['payload']['token'].toString(),
               isEmailVerify: true,
-              email: email,
+              email: _emailController.text,
             ),
             type: PageTransitionType.fade),
       );
@@ -126,75 +139,6 @@ class _AdminFormState extends State<AdminForm> {
       Fluttertoast.showToast(context, msg: 'File attached successfully');
     });
     print("URL is $url");
-  }
-
-  Future _registerUser() async {
-    var response = await http.post("$baseUrl/admin/register", body: {
-      "userName": _nameController.text.toString(),
-      "userID": _emailController.text.toString(),
-      "password": _passwordController.text,
-      "instituteName": _organizationController.text,
-      "instituteType": _selectedInstitutionType,
-      "instituteImageUrl": mediaUrl,
-      "numberOfMembers": _organizationNumberController.text,
-      "state": _selectedStateLocation,
-      "city": _selectedCityLocation,
-      "mailAddress": _mailController.text.toString(),
-      "adharNumber": _aadharController.text,
-      "contactNumber": _phoneController.text,
-      "fcmToken": User.userFcmToken,
-    });
-    print(response.body);
-    setState(() {
-      _isLoading = false;
-    });
-    if (json.decode(response.body)['statusCode'] == 200) {
-      popDialog(
-          onPress: () {
-            Navigator.push(
-              context,
-              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
-            );
-          },
-          title: 'Registration Successful',
-          context: context,
-          buttonTitle: 'Close',
-          content: 'Your form has been submitted. Please wait for 24 hours for it to get approved');
-
-      _nameController.clear();
-      _emailController.clear();
-      _passwordController.clear();
-      _passwordReController.clear();
-      _organizationController.clear();
-      _cityNameController.clear();
-      _selectedCityLocation = null;
-      _selectedStateLocation = null;
-      _organizationNumberController.clear();
-      _mailController.clear();
-      _aadharController.clear();
-      _phoneController.clear();
-    } else if (json.decode(response.body)['payload']['err']['keyValue'] != null) {
-      popDialog(
-          title: 'Duplicate user',
-          context: context,
-          content: 'Admin with email ID ${json.decode(response.body)['payload']['err']['keyValue']['userID']} already exists. Please login in!',
-          onPress: () {
-            Navigator.push(
-              context,
-              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
-            );
-          },
-          buttonTitle: 'Login');
-    } else {
-      popDialog(
-          title: 'Error',
-          content: "Registration failed, please try again!",
-          context: context,
-          onPress: () {
-            Navigator.pop(context);
-          },
-          buttonTitle: 'Okay');
-    }
   }
 
   @override
@@ -264,46 +208,6 @@ class _AdminFormState extends State<AdminForm> {
                   labelText: 'Email',
                   textInputType: TextInputType.emailAddress,
                 ),
-                _showEmail
-                    ? Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-                        child: GestureDetector(
-                          onTap: () async {
-                            setState(() {
-                              _isLoading = true;
-                            });
-                            if (_emailController.text.isNotEmpty && validator.email(_emailController.text)) {
-                              _sendEmailVerification(_emailController.text.toString());
-                            } else {
-                              Fluttertoast.showToast(
-                                context,
-                                msg: 'Please enter a valid email ID',
-                                gravity: ToastGravity.CENTER,
-                              );
-                            }
-                            setState(() {
-                              _isLoading = false;
-                            });
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(8),
-                            margin: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.2),
-                            height: 40,
-                            width: 150,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(32),
-                              color: Colors.white,
-                            ),
-                            child: Center(
-                              child: Text(
-                                isEmailVerified ? 'Email verified!' : 'Verify Email',
-                                style: TextStyle(color: violet1),
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    : Container(),
                 PasswordInput(
                   validate: _validatePassword,
                   controller: _passwordController,
@@ -528,16 +432,6 @@ class _AdminFormState extends State<AdminForm> {
                       context: context,
                       onPressed: () async {
                         setState(() {
-                          if (!isEmailVerified) {
-                            popDialog(
-                                title: 'Verify',
-                                content: 'Please verify your email ID first',
-                                context: context,
-                                onPress: () {
-                                  Navigator.pop(context);
-                                },
-                                buttonTitle: 'Okay');
-                          }
                           _nameController.text.isEmpty ? _validateName = true : _validateName = false;
                           _selectedCityLocation == 'Others' ? _cityNameController.text.isEmpty ? _validateCityName = true : _validateCityName = false : Container();
                           (_emailController.text.isEmpty || !validator.email(_emailController.text)) ? _validateEmail = true : _validateEmail = false;
@@ -576,14 +470,9 @@ class _AdminFormState extends State<AdminForm> {
                                 !_validateOrganization &&
                                 !_validatePassword &&
                                 !_validateMail &&
-                                isEmailVerified &&
                                 !_validateRePassword &&
                                 _file != null) {
-                          setState(() {
-                            _isLoading = true;
-                          });
-
-                          await _registerUser();
+                          await _sendEmailVerification(_emailController.text.toString());
                         }
                       },
                     ),

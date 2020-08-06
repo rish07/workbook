@@ -42,7 +42,6 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
   bool _validateDivision = false;
   bool _validateAadhar = false;
   bool _validatePhoneNumber = false;
-  bool _showEmail = false;
 
   String _selectedInstitution;
   String _selectedGrade;
@@ -54,83 +53,6 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordReController = TextEditingController();
   List gradeDivision = [];
-  Future _registerUser() async {
-    print('working');
-    var response = await http.post(widget.isEmployee ? '$baseUrl/employee/register' : '$baseUrl/customer/register',
-        body: json.encode(
-          {
-            "role": widget.isEmployee ? "Employee" : "customer",
-            "userName": _nameController.text,
-            "userID": _emailController.text,
-            "password": _passwordController.text,
-            "instituteName": _selectedInstitution,
-            "grade": _selectedGrade,
-            "division": _selectedDivision,
-            "adharNumber": _aadharController.text,
-            "contactNumber": _phoneController.text,
-            "fcmToken": User.userFcmToken,
-          },
-        ),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        });
-    setState(() {
-      _isLoading = false;
-    });
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-    if (json.decode(response.body)['statusCode'] == 200) {
-      if (widget.isEmployee) {
-        sendNotificationAdmin(_nameController.text);
-      } else {
-        await getEmployee();
-        sendNotificationEmployee(_nameController.text);
-      }
-      popDialog(
-          onPress: () {
-            Navigator.push(
-              context,
-              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
-            );
-          },
-          title: 'Registration Successful',
-          context: context,
-          buttonTitle: 'Close',
-          content: 'Your form has been submitted. Please wait for 24 hours for it to get approved');
-      _nameController.clear();
-      _emailController.clear();
-      _passwordController.clear();
-      _passwordReController.clear();
-      _selectedInstitution = null;
-      _selectedGrade = null;
-      _selectedDivision = null;
-      _aadharController.clear();
-      _phoneController.clear();
-    } else if (json.decode(response.body)['payload']['err'] != null) {
-      if (json.decode(response.body)['payload']['err']['keyValue'] != null) {
-        popDialog(
-            title: 'Duplicate user',
-            context: context,
-            content: 'User with email ID ${json.decode(response.body)['payload']['err']['keyValue']['userID']} already exists. Please login in!',
-            onPress: () {
-              Navigator.push(
-                context,
-                PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
-              );
-            },
-            buttonTitle: 'Login');
-      }
-    } else {
-      popDialog(
-          title: 'Error',
-          content: "Registration failed, please try again!",
-          context: context,
-          onPress: () {
-            Navigator.pop(context);
-          },
-          buttonTitle: 'Okay');
-    }
-  }
 
   Future getGrades({String instituteName}) async {
     var response = await http.get("$baseUrl/fetchGrade/$instituteName");
@@ -186,8 +108,18 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
         context,
         PageTransition(
             child: OTPVerification(
+              role: widget.isEmployee ? 'employee' : 'customer',
+              name: _nameController.text,
+              password: _passwordController.text,
+              instituteName: _selectedInstitution,
+              grade: _selectedGrade,
+              division: _selectedDivision,
+              fcm: User.userFcmToken,
+              aadhar: _aadharController.text.toString(),
+              phone: _phoneController.text.toString(),
+              otp: json.decode(response.body)['payload']['token'].toString(),
               isEmailVerify: true,
-              email: email,
+              email: _emailController.text,
             ),
             type: PageTransitionType.fade),
       );
@@ -293,40 +225,6 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                   labelText: 'Email',
                   textInputType: TextInputType.emailAddress,
                 ),
-                _showEmail
-                    ? Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-                        child: GestureDetector(
-                          onTap: () async {
-                            if (_emailController.text.isNotEmpty && validator.email(_emailController.text)) {
-                              _sendEmailVerification(_emailController.text.toString());
-                            } else {
-                              Fluttertoast.showToast(
-                                context,
-                                msg: 'Please enter a valid email ID',
-                                gravity: ToastGravity.CENTER,
-                              );
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(8),
-                            margin: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.2),
-                            height: 40,
-                            width: 150,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(32),
-                              color: Colors.white,
-                            ),
-                            child: Center(
-                              child: Text(
-                                isEmailVerified ? 'Email verified!' : 'Verify Email',
-                                style: TextStyle(color: violet1),
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    : Container(),
                 PasswordInput(
                   validate: _validatePassword,
                   controller: _passwordController,
@@ -496,16 +394,6 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                       context: context,
                       onPressed: () async {
                         setState(() {
-                          if (!isEmailVerified) {
-                            popDialog(
-                                title: 'Verify',
-                                content: 'Please verify your email ID first',
-                                context: context,
-                                onPress: () {
-                                  Navigator.pop(context);
-                                },
-                                buttonTitle: 'Okay');
-                          }
                           _nameController.text.isEmpty ? _validateName = true : _validateName = false;
                           (_emailController.text.isEmpty || !validator.email(_emailController.text)) ? _validateEmail = true : _validateEmail = false;
                           (_passwordController.text.isEmpty || !validator.password(_passwordController.text)) ? _validatePassword = true : _validatePassword = false;
@@ -530,7 +418,6 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                             !_validateEmail &&
                             !_validatePhoneNumber &&
                             !_validateGrade &&
-                            isEmailVerified &&
                             !_validateInstitution &&
                             !_validateDivision &&
                             !_validateAadhar &&
@@ -539,7 +426,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                           setState(() {
                             _isLoading = true;
                           });
-                          await _registerUser();
+                          await _sendEmailVerification(_emailController.text.toString());
                         }
                       },
                     ),

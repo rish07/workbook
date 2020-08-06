@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:regexed_validator/regexed_validator.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/login_page.dart';
+import 'package:workbook/screens/otp_verification.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/input_field.dart';
 import 'package:workbook/widget/password.dart';
@@ -38,36 +41,41 @@ class _DriverFormState extends State<DriverForm> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordReController = TextEditingController();
 
-  Future _registerUser() async {
-    print('working');
-    var response = await http.post('$baseUrl/driver/register', body: {
-      "role": "driver",
-      "userName": _nameController.text,
-      "userID": _emailController.text,
-      "password": _passwordController.text,
-      "instituteName": _selectedInstitution,
-      "carNumber": _selectedCar,
-      "adharNumber": _aadharController.text,
-      "contactNumber": _phoneController.text,
-      "fcmToken": User.userFcmToken,
-    });
-    setState(() {
-      _isLoading = false;
-    });
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-    if (response.statusCode == 200) {
+  Future _sendEmailVerification(String email) async {
+    var response = await http.get('$baseUrl/sendVerification/$email');
+    print(response.body);
+
+    if (json.decode(response.body)['statusCode'] == 200) {
+      Fluttertoast.showToast(context, msg: 'Email sent', gravity: ToastGravity.CENTER);
+      Navigator.push(
+        context,
+        PageTransition(
+            child: OTPVerification(
+              carNumber: _selectedCar,
+              role: 'driver',
+              name: _nameController.text,
+              password: _passwordController.text,
+              instituteName: _selectedInstitution,
+              fcm: User.userFcmToken,
+              aadhar: _aadharController.text.toString(),
+              phone: _phoneController.text.toString(),
+              otp: json.decode(response.body)['payload']['token'].toString(),
+              isEmailVerify: true,
+              email: _emailController.text,
+            ),
+            type: PageTransitionType.fade),
+      );
+    } else if (json.decode(response.body)['statusCode'] == 400) {
       popDialog(
+          title: 'Error',
+          content: 'There was some error,please try again!',
+          buttonTitle: 'Okay',
           onPress: () {
-            Navigator.push(
-              context,
-              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
-            );
+            Navigator.pop(context);
           },
-          title: 'Registration Successful',
-          context: context,
-          buttonTitle: 'Close',
-          content: 'Your form has been submitted. Please wait for 24 hours for it to get approved');
+          context: context);
+    } else {
+      Fluttertoast.showToast(context, msg: 'Error');
     }
   }
 
@@ -273,16 +281,7 @@ class _DriverFormState extends State<DriverForm> {
                           setState(() {
                             _isLoading = true;
                           });
-                          await _registerUser();
-                          _nameController.clear();
-                          _emailController.clear();
-                          _passwordController.clear();
-                          _passwordReController.clear();
-                          _selectedInstitution = null;
-                          _selectedCar = null;
-
-                          _aadharController.clear();
-                          _phoneController.clear();
+                          await _sendEmailVerification(_emailController.text.toString());
                         }
                       },
                     ),

@@ -7,17 +7,56 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:workbook/constants.dart';
+import 'package:workbook/screens/login_page.dart';
 import 'package:workbook/screens/reset_password.dart';
+import 'package:workbook/user.dart';
 import 'package:workbook/widget/popUpDialog.dart';
 import 'package:workbook/widget/registerButton.dart';
 import 'package:http/http.dart' as http;
 
 class OTPVerification extends StatefulWidget {
+  final String name;
+  final String password;
+  final String instituteName;
+  final String instituteType;
+  final String instituteImageUrl;
+  final String numberOfMembers;
+  final String state;
+  final String city;
+  final String carNumber;
+  final String grade;
+  final String division;
+  final String mail;
+  final String aadhar;
+  final String phone;
+  final String fcm;
+  final String role;
   final String otp;
   final bool isEmailVerify;
   final String email;
 
-  const OTPVerification({Key key, this.email, @required this.isEmailVerify, this.otp}) : super(key: key);
+  const OTPVerification(
+      {Key key,
+      this.email,
+      @required this.isEmailVerify,
+      this.otp,
+      this.name,
+      this.password,
+      this.instituteName,
+      this.instituteType,
+      this.instituteImageUrl,
+      this.numberOfMembers,
+      this.state,
+      this.city,
+      this.mail,
+      this.aadhar,
+      this.phone,
+      this.fcm,
+      this.role,
+      this.grade,
+      this.division,
+      this.carNumber})
+      : super(key: key);
   @override
   _OTPVerificationState createState() => _OTPVerificationState();
 }
@@ -55,6 +94,94 @@ class _OTPVerificationState extends State<OTPVerification> {
           context: context);
     } else {
       Fluttertoast.showToast(context, msg: 'Error');
+    }
+  }
+
+  Future _registerUser() async {
+    var response = await http.post(
+      widget.role == 'admin'
+          ? "$baseUrl/admin/register"
+          : (widget.role == 'employee')
+              ? "$baseUrl/employee/register"
+              : (widget.role == 'customer') ? "$baseUrl/customer/register" : (widget.role == 'driver') ? "$baseUrl/driver/register" : "",
+      body: widget.role == 'admin'
+          ? {
+              "userName": widget.name,
+              "userID": widget.email,
+              "password": widget.password,
+              "instituteName": widget.instituteName,
+              "instituteType": widget.instituteType,
+              "instituteImageUrl": widget.instituteImageUrl,
+              "numberOfMembers": widget.numberOfMembers,
+              "state": widget.state,
+              "city": widget.city,
+              "mailAddress": widget.mail,
+              "adharNumber": widget.aadhar,
+              "contactNumber": widget.phone,
+              "fcmToken": widget.fcm,
+            }
+          : (widget.role == 'customer' || widget.role == 'employee')
+              ? {
+                  "role": widget.role == 'employee' ? "Employee" : "customer",
+                  "userName": widget.name,
+                  "userID": widget.email,
+                  "password": widget.password,
+                  "instituteName": widget.instituteName,
+                  "grade": widget.grade,
+                  "division": widget.division,
+                  "adharNumber": widget.aadhar,
+                  "contactNumber": widget.phone,
+                  "fcmToken": User.userFcmToken,
+                }
+              : {
+                  "role": "driver",
+                  "userName": widget.name,
+                  "userID": widget.email,
+                  "password": widget.password,
+                  "instituteName": widget.instituteName,
+                  "carNumber": widget.carNumber,
+                  "adharNumber": widget.aadhar,
+                  "contactNumber": widget.phone,
+                  "fcmToken": User.userFcmToken,
+                },
+    );
+    print(response.body);
+    setState(() {
+      _isLoading = false;
+    });
+    if (json.decode(response.body)['statusCode'] == 200) {
+      popDialog(
+          onPress: () {
+            Navigator.push(
+              context,
+              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
+            );
+          },
+          title: 'Registration Successful',
+          context: context,
+          buttonTitle: 'Close',
+          content: 'Your form has been submitted. Please wait for 24 hours for it to get approved');
+    } else if (json.decode(response.body)['payload']['err']['keyValue'] != null) {
+      popDialog(
+          title: 'Duplicate user',
+          context: context,
+          content: 'Admin with email ID ${json.decode(response.body)['payload']['err']['keyValue']['userID']} already exists. Please login in!',
+          onPress: () {
+            Navigator.push(
+              context,
+              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
+            );
+          },
+          buttonTitle: 'Login');
+    } else {
+      popDialog(
+          title: 'Error',
+          content: "Registration failed, please try again!",
+          context: context,
+          onPress: () {
+            Navigator.pop(context);
+          },
+          buttonTitle: 'Okay');
     }
   }
 
@@ -185,7 +312,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                                         setState(() {
                                           isEmailVerified = true;
                                         });
-                                        Navigator.pop(context);
+                                        await _registerUser();
                                       } else {
                                         Fluttertoast.showToast(
                                           context,
