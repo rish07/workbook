@@ -30,6 +30,7 @@ class _GenerateTicketState extends State<GenerateTicket> {
   bool _validateInstitution = false;
   String _selectedInstitution;
 
+  // Generate query
   Future createTicket() async {
     var response = await http.post('$baseUrl/guest/createQuery', body: {
       "userName": _nameController.text.toString(),

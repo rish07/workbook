@@ -11,8 +11,6 @@ import 'package:workbook/widget/signup.dart';
 import 'package:workbook/widget/textNew.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:workbook/widget/registerButton.dart';
-
 class RegistrationPage extends StatefulWidget {
   @override
   _RegistrationPageState createState() => _RegistrationPageState();

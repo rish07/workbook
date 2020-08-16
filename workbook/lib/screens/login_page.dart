@@ -10,7 +10,6 @@ import 'package:page_transition/page_transition.dart';
 import 'package:regexed_validator/regexed_validator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workbook/constants.dart';
-import 'package:workbook/screens/coming_soon.dart';
 import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/screens/guest_ticket.dart';
 import 'package:workbook/screens/otp_verification.dart';
@@ -46,6 +45,8 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  //Local notifications
   void registerNotification() {
     firebaseMessaging.requestNotificationPermissions();
 
@@ -120,6 +121,7 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  // Get the FCM token
   void getFCMToken() async {
     fcmToken = await _firebaseMessaging.getToken();
     setState(() {
@@ -129,6 +131,7 @@ class _LoginPageState extends State<LoginPage> {
     print(fcmToken);
   }
 
+  // Get institutes
   Future getInstitutes() async {
     print('working ins');
     var response = await http.get("$baseUrl/superAdmin/viewAllAdmin");
@@ -143,6 +146,7 @@ class _LoginPageState extends State<LoginPage> {
     print(institutes);
   }
 
+  // Reset password
   Future _resetPassword(String email) async {
     var response = await http.get('$baseUrl/forgot/$email');
     print(response.body);
@@ -172,6 +176,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  // Get institute image
   Future _getInstituteImage() async {
     var response = await http.get("$baseUrl/getInstituteProfile/${User.instituteName}");
     print(response.body);
@@ -182,6 +187,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  // Login user
   Future _loginUser() async {
     print('working');
     var response = await http.post('$baseUrl/login', body: {"userID": _emailController.text, "password": _passwordController.text, "fcmToken": fcmToken});

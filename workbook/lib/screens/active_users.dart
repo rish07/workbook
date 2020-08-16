@@ -55,6 +55,8 @@ class _ActiveUsersState extends State<ActiveUsers> {
 //      throw Exception('Failed to load the employees');
 //    }
 //  }
+
+  // Gets all the employees/admins/customers
   Future _getUsers() async {
     print(widget.isDriver);
     print(User.userJwtToken);

@@ -66,6 +66,7 @@ class _AdminFormState extends State<AdminForm> {
   String fileName = '';
   String mediaUrl = '';
 
+  // Picks the file from local storage
   Future filePicker(BuildContext context) async {
     try {
       _file = await FilePicker.getFile(type: FileType.image);
@@ -79,6 +80,7 @@ class _AdminFormState extends State<AdminForm> {
     }
   }
 
+  // Send email verification OTP
   Future _sendEmailVerification(String email) async {
     var response = await http.post('$baseUrl/sendVerification', body: {
       "userID": email,
@@ -137,6 +139,7 @@ class _AdminFormState extends State<AdminForm> {
     }
   }
 
+  // Upload the files to firebase storage
   Future<void> _uploadFile() async {
     setState(() {
       _isLoading = true;
@@ -176,6 +179,7 @@ class _AdminFormState extends State<AdminForm> {
     super.dispose();
   }
 
+  //UI Block
   @override
   Widget build(BuildContext context) {
     return Scaffold(

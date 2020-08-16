@@ -1,14 +1,9 @@
 import 'dart:convert';
 
-import 'package:intl/intl.dart';
-
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:basic_utils/basic_utils.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_image/network.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -16,12 +11,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/active_users.dart';
-import 'package:workbook/screens/map_screen.dart';
 import 'package:workbook/user.dart';
-import 'package:workbook/widget/drawer.dart';
-import 'package:workbook/widget/input_field.dart';
-import 'package:workbook/widget/registerButton.dart';
-import 'package:workbook/widget/travel_modal.dart';
 
 class RequestProfilePage extends StatefulWidget {
   final String carNumber;
@@ -68,6 +58,7 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
   bool _routeExists = false;
   bool _loading = false;
   final TextEditingController _routeNameController = TextEditingController();
+  // Delete user
   Future _deleteUser() async {
     print('working');
     var response = await http.post('$baseUrl/${User.userRole}/delete${StringUtils.capitalize(widget.role)}', body: {
@@ -88,6 +79,7 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
     }
   }
 
+  // Get routes
   Future _getRoutes() async {
     var response = await http.get('$baseUrl/getRoutes');
     print(response.body);

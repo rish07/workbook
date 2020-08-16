@@ -5,7 +5,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image/network.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:fluttertoast/fluttertoast.dart';
@@ -49,6 +48,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  //Update profile image
   Future _updateImage(url) async {
     print('update image');
     print(User.userID);
@@ -64,6 +64,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // Upload image
   Future<void> _uploadFile() async {
     setState(() {
       _isLoading = true;
@@ -83,6 +84,7 @@ class _ProfilePageState extends State<ProfilePage> {
     print("URL is $url");
   }
 
+  // Update profile
   Future _updateProfile() async {
     print('working');
     print(User.userRole);

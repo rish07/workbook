@@ -27,6 +27,7 @@ class _AddPostState extends State<AddPost> {
   List notificationList = [];
   String mediaUrl = '';
 
+  // Get all the roles available
   Future getRoles() async {
     var response = await http.get('$baseUrl/getRoles');
     print(response.body);
@@ -39,6 +40,7 @@ class _AddPostState extends State<AddPost> {
     print(notificationList);
   }
 
+  // Send Notification
   Future sendNotification() async {
     notificationList.forEach((element) async {
       var response = await http.post('$baseUrl/sendNotification', body: {
@@ -50,6 +52,7 @@ class _AddPostState extends State<AddPost> {
     });
   }
 
+  // Create a new post
   Future createPost() async {
     if (_controller.text.isEmpty && mediaUrl.isEmpty) {
       Fluttertoast.showToast(context, msg: 'The post can not be empty!');
@@ -86,6 +89,7 @@ class _AddPostState extends State<AddPost> {
     }
   }
 
+  // Choosing the file from phone storage
   Future filePicker(BuildContext context) async {
     try {
       if (fileType == 'image') {
@@ -111,6 +115,7 @@ class _AddPostState extends State<AddPost> {
     }
   }
 
+  // Upload the image/doc to firebase storage
   Future<void> _uploadFile(File file, String filename) async {
     setState(() {
       _loading = true;
@@ -151,6 +156,7 @@ class _AddPostState extends State<AddPost> {
     _controller.dispose();
   }
 
+  //UI Block
   @override
   Widget build(BuildContext context) {
     return ModalProgressHUD(

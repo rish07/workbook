@@ -7,7 +7,6 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:regexed_validator/regexed_validator.dart';
 import 'package:workbook/constants.dart';
-import 'package:workbook/screens/login_page.dart';
 import 'package:workbook/screens/otp_verification.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/input_field.dart';
@@ -41,6 +40,7 @@ class _DriverFormState extends State<DriverForm> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordReController = TextEditingController();
 
+  // Send email verification
   Future _sendEmailVerification(String email) async {
     var response = await http.post('$baseUrl/sendVerification', body: {
       "userID": email,
@@ -100,6 +100,7 @@ class _DriverFormState extends State<DriverForm> {
     super.initState();
   }
 
+  //UI Block
   @override
   Widget build(BuildContext context) {
     return Scaffold(

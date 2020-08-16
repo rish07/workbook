@@ -16,6 +16,7 @@ class _QueryDashboardState extends State<QueryDashboard> {
   List _registered = [];
   List _unregistered = [];
 
+  // Get all the queries
   Future getAllQuery() async {
     var response = await http.post('$baseUrl/guest/getAllQuery', body: {
       "instituteName": "IEEE",

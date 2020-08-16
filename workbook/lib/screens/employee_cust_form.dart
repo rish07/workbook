@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -54,6 +53,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
   final TextEditingController _passwordReController = TextEditingController();
   List gradeDivision = [];
 
+  // Get grades
   Future getGrades({String instituteName}) async {
     var response = await http.get("$baseUrl/fetchGrade/$instituteName");
     print('Response status: ${response.statusCode}');
@@ -67,6 +67,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
     });
   }
 
+  //Get Employee
   Future getEmployee() async {
     var response = await http.post(
       "$baseUrl/admin/viewAllEmployees",
@@ -90,6 +91,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
     print(employees);
   }
 
+  //Send noti to employee
   Future sendNotificationEmployee(String name) async {
     employees.forEach((element) async {
       var response = await http
@@ -98,6 +100,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
     });
   }
 
+  // Send email verification
   Future _sendEmailVerification(String email) async {
     var response = await http.post('$baseUrl/sendVerification', body: {
       "userID": email,
@@ -152,6 +155,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
     }
   }
 
+  // Send noti to admin
   Future sendNotificationAdmin(String name) async {
     String adminFcm = "";
     widget.admins.forEach((element) {
@@ -166,6 +170,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
     print(response.body);
   }
 
+  // Get divisions
   Future getDivision({String instituteName}) async {
     var response = await http.get("$baseUrl/fetchDivision/$instituteName");
     print('Response status: ${response.statusCode}');
@@ -198,6 +203,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
     super.initState();
   }
 
+  //UI Block
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -77,6 +77,7 @@ class _OTPVerificationState extends State<OTPVerification> {
     );
   }
 
+  // send OTP again
   Future _resetPassword(String email) async {
     var response = await http.get('$baseUrl/forgot/$email');
     print(response.body);
@@ -97,6 +98,7 @@ class _OTPVerificationState extends State<OTPVerification> {
     }
   }
 
+  // Register
   Future _registerUser() async {
     var response = await http.post(
       widget.role == 'admin'
@@ -187,6 +189,7 @@ class _OTPVerificationState extends State<OTPVerification> {
     }
   }
 
+  // Verify OTP
   Future _verifyOTP(String otp) async {
     var response = await http.post(widget.isEmailVerify ? '$baseUrl/verifyUser' : '$baseUrl/verifyOTP', body: {
       'userID': widget.email,

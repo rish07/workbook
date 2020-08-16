@@ -28,6 +28,7 @@ class _ApproveUserState extends State<ApproveUser> {
   bool _loading = false;
   List _employeeList = [];
 
+  //Get all the users
   Future _getUsers() async {
     print(widget.isDriver);
     print(User.userJwtToken);
@@ -67,6 +68,7 @@ class _ApproveUserState extends State<ApproveUser> {
     }
   }
 
+  //Approve User
   Future _approveUser({String id}) async {
     print('working');
     var response = await http.post(
@@ -111,6 +113,7 @@ class _ApproveUserState extends State<ApproveUser> {
     }
   }
 
+  // Reject the user
   Future _rejectUser({String id}) async {
     print('working');
     var response = await http.post(
@@ -142,6 +145,7 @@ class _ApproveUserState extends State<ApproveUser> {
     }
   }
 
+  //Send Notification
   Future _sendNotification({String fcmToken, String message, String title}) async {
     var response = await http.post('$baseUrl/sendNotification', body: {"fcmToken": fcmToken, "message": message, "title": title});
     print('Response status: ${response.statusCode}');
@@ -166,6 +170,7 @@ class _ApproveUserState extends State<ApproveUser> {
     super.initState();
   }
 
+  // UI block
   @override
   Widget build(BuildContext context) {
     return Scaffold(

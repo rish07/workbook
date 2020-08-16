@@ -3,18 +3,13 @@ import 'dart:math' as math;
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker_saver/image_picker_saver.dart';
-import 'package:like_button/like_button.dart';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:basic_utils/basic_utils.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_image/network.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -30,14 +25,10 @@ import 'package:workbook/screens/add_grade.dart';
 import 'package:workbook/screens/add_post.dart';
 import 'package:workbook/screens/approve_user.dart';
 import 'package:workbook/screens/coming_soon.dart';
-import 'package:workbook/screens/login_page.dart';
-import 'package:workbook/screens/map_screen.dart';
 import 'package:workbook/screens/profile_page.dart';
 import 'package:workbook/screens/query_data.dart';
 import 'package:workbook/screens/settings.dart';
 import 'package:workbook/user.dart';
-import 'package:workbook/widget/drawer.dart';
-import 'package:workbook/widget/popUpDialog.dart';
 import 'package:http/http.dart' as http;
 
 class DashBoard extends StatefulWidget {
@@ -65,6 +56,7 @@ class _DashBoardState extends State<DashBoard> {
     super.initState();
   }
 
+  //Make local copies of the response from JSON
   Future _setData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -89,6 +81,7 @@ class _DashBoardState extends State<DashBoard> {
     });
   }
 
+  // Fetch all posts
   Future _getAllPosts() async {
     var response = await http.get('$baseUrl/post/viewAllPost');
     print(response.statusCode);
@@ -99,18 +92,21 @@ class _DashBoardState extends State<DashBoard> {
     });
   }
 
+  // Like Post
   Future _likePost({String postId, String userName}) async {
     var response = await http.post("$baseUrl/post/like", body: {"id": postId, "userName": User.userName, "userID": User.userEmail});
     print(json.decode(response.body)['statusCode']);
     print(response.body);
   }
 
+  //Open end drawer
   void onTabTapped() {
     setState(() {
       _scaffoldKey.currentState.openEndDrawer(); // CHANGE THIS LINE
     });
   }
 
+  //UI Block
   @override
   Widget build(BuildContext context) {
     return ModalProgressHUD(
@@ -778,6 +774,7 @@ class _DashBoardState extends State<DashBoard> {
     );
   }
 
+  // Item component
   ListTile buildDrawerItemDashboard({IconData icon, String title, Function onTap}) {
     return ListTile(
       onTap: onTap,

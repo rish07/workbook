@@ -13,6 +13,7 @@ class ViewDivisions extends StatefulWidget {
 class _ViewDivisionsState extends State<ViewDivisions> {
   List gradeDivision = [];
 
+  // Store local divisions
   void _div() {
     print(widget.gradeName);
     print('working div');

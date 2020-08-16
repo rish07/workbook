@@ -24,6 +24,8 @@ class AddGrade extends StatefulWidget {
 class _AddGradeState extends State<AddGrade> {
   bool _isLoading = false;
   List toBeUploadedGrade = [];
+
+  // Get the grades for the particular institutes
   Future getGrades({String instituteName}) async {
     var response = await http.get("$baseUrl/fetchGrade/$instituteName");
     print('Response status: ${response.statusCode}');
@@ -39,6 +41,7 @@ class _AddGradeState extends State<AddGrade> {
     });
   }
 
+  // Update Grades and Divisions
   Future updateGD() async {
     grades.forEach((gra) {
       toBeUploadedGrade.add({"grade": gra});
@@ -62,6 +65,7 @@ class _AddGradeState extends State<AddGrade> {
     }
   }
 
+  // Get all the divisions of the institute
   Future getDivision({String instituteName}) async {
     var response = await http.get("$baseUrl/fetchDivision/$instituteName");
     print('Response status: ${response.statusCode}');
@@ -80,6 +84,7 @@ class _AddGradeState extends State<AddGrade> {
     getGrades(instituteName: User.instituteName);
   }
 
+  //Local storage of Divisions
   Future addDivision({BuildContext context, String label, int index, List division}) {
     final controller = TextEditingController();
     String name;
@@ -164,6 +169,8 @@ class _AddGradeState extends State<AddGrade> {
     // TODO: implement dispose
     super.dispose();
   }
+
+  //UI block
 
   @override
   Widget build(BuildContext context) {
@@ -320,6 +327,7 @@ class _AddGradeState extends State<AddGrade> {
     );
   }
 
+  //Local storage of grades
   Future addGrade({BuildContext context, String label}) {
     final controller = TextEditingController();
     String name;

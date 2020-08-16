@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -26,6 +25,7 @@ class _QueryStatusState extends State<QueryStatus> {
   List total = [];
   bool _isLoading = false;
 
+  // Get all queries
   Future getAllQuery() async {
     var response = await http.post('$baseUrl/guest/getAllQuery', body: {
       "instituteName": "IEEE",
