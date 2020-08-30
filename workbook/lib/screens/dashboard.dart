@@ -29,6 +29,7 @@ import 'package:workbook/screens/create_tasks.dart';
 import 'package:workbook/screens/profile_page.dart';
 import 'package:workbook/screens/query_data.dart';
 import 'package:workbook/screens/settings.dart';
+import 'package:workbook/screens/view_tasks.dart';
 import 'package:workbook/user.dart';
 import 'package:http/http.dart' as http;
 
@@ -201,9 +202,11 @@ class _DashBoardState extends State<DashBoard> {
                           Navigator.push(
                             context,
                             PageTransition(
-                                child: CreateTask(
-                                  isAdmin: User.userRole == 'admin' ? true : false,
-                                ),
+                                child: User.userRole == 'admin' || User.userRole == 'employee'
+                                    ? CreateTask(
+                                        isAdmin: User.userRole == 'admin' ? true : false,
+                                      )
+                                    : ViewTasks(),
                                 type: PageTransitionType.rightToLeft),
                           );
                         },
