@@ -1,110 +1,90 @@
-import 'dart:async';
-
-import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:regexed_validator/regexed_validator.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:workbook/constants.dart';
-import 'package:workbook/screens/login_page.dart';
-import 'package:workbook/screens/otp_verification.dart';
-import 'package:workbook/user.dart';
+import 'package:workbook/screens/auth/login_page.dart';
+import 'package:workbook/screens/auth/otp_verification.dart';
 import 'package:workbook/widget/input_field.dart';
 import 'package:workbook/widget/password.dart';
 import 'package:workbook/widget/popUpDialog.dart';
 import 'package:workbook/widget/registerButton.dart';
+import 'package:regexed_validator/regexed_validator.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
-class EmployeeCustomerForm extends StatefulWidget {
-  final bool isEmployee;
-  final List admins;
+import 'package:workbook/user.dart';
+import 'dart:math' as math;
+import 'package:path/path.dart' as p;
 
-  const EmployeeCustomerForm({
-    Key key,
-    this.isEmployee,
-    this.admins,
-  }) : super(key: key);
+class AdminForm extends StatefulWidget {
   @override
-  _EmployeeCustomerFormState createState() => _EmployeeCustomerFormState();
+  _AdminFormState createState() => _AdminFormState();
 }
 
-class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
-  List employees = [];
+class _AdminFormState extends State<AdminForm> {
+  final math.Random random = math.Random();
+  bool _showEmail = false;
   bool _isLoading = false;
+  String imageAsB64;
+  final picker = ImagePicker();
+  String _selectedStateLocation;
+  String _selectedCityLocation;
+  String _selectedInstitutionType;
+  bool _validateCityName = false;
   bool _validateName = false;
   bool _validateEmail = false;
   bool _validatePassword = false;
   bool _validateRePassword = false;
-  bool _validateInstitution = false;
-  bool _validateGrade = false;
-  bool _validateDivision = false;
+  bool _validateOrganization = false;
+  bool _validateNumberOrganization = false;
   bool _validateAadhar = false;
   bool _validatePhoneNumber = false;
-
-  String _selectedInstitution;
-  String _selectedGrade;
-  String _selectedDivision;
+  bool _validateMail = false;
+  bool _validateState = false;
+  bool _validateCity = false;
+  bool _validateInstituteType = false;
+  String imagePath;
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _aadharController = TextEditingController();
+  final TextEditingController _cityNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordReController = TextEditingController();
-  List gradeDivision = [];
+  final TextEditingController _organizationController = TextEditingController();
+  final TextEditingController _organizationNumberController = TextEditingController();
+  final TextEditingController _aadharController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _mailController = TextEditingController();
+  String fileType = '';
+  File _file;
+  String fileName = '';
+  String mediaUrl = '';
 
-  // Get grades
-  Future getGrades({String instituteName}) async {
-    var response = await http.get("$baseUrl/fetchGrade/$instituteName");
-    print('Response status: ${response.statusCode}');
-    List temp = json.decode(response.body)['payload']['grades'];
-    temp.forEach((resp) {
-      grades.add(resp);
-    });
-    grades = Set.of(grades).toList();
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  //Get Employee
-  Future getEmployee() async {
-    var response = await http.post(
-      "$baseUrl/admin/viewAllEmployees",
-      body: {
-        "userID": User.userEmail,
-        "jwtToken": User.userJwtToken,
-        "instituteName": _selectedInstitution,
-      },
-    );
-    print(response.body);
-    if (json.decode(response.body)['statusCode'] == 200) {
-      List temp = json.decode(response.body)['payload']['employees'];
-      temp.forEach((element) {
-        if (element['approved'] == true) {
-          setState(() {
-            employees.add(element);
-          });
-        }
+  // Picks the file from local storage
+  Future filePicker(BuildContext context) async {
+    try {
+      _file = await FilePicker.getFile(type: FileType.image);
+      setState(() {
+        fileName = p.basename(_file.path);
       });
+      print(fileName);
+      _uploadFile();
+    } catch (e) {
+      print(e);
     }
-    print(employees);
   }
 
-  //Send noti to employee
-  Future sendNotificationEmployee(String name) async {
-    employees.forEach((element) async {
-      var response = await http
-          .post("$baseUrl/sendNotification", body: {"fcmToken": element['fcmToken'], "message": "New employee request from $name. Please login now", "title": "New Registration"});
-      print(response.body);
-    });
-  }
-
-  // Send email verification
+  // Send email verification OTP
   Future _sendEmailVerification(String email) async {
     var response = await http.post('$baseUrl/sendVerification', body: {
       "userID": email,
-      "role": widget.isEmployee ? "employee" : "customer",
+      "role": "admin",
     });
     print(response.body);
 
@@ -114,12 +94,16 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
         context,
         PageTransition(
             child: OTPVerification(
-              role: widget.isEmployee ? 'employee' : 'customer',
+              role: 'admin',
               name: _nameController.text,
               password: _passwordController.text,
-              instituteName: _selectedInstitution,
-              grade: _selectedGrade,
-              division: _selectedDivision,
+              instituteName: _organizationController.text,
+              instituteImageUrl: mediaUrl,
+              instituteType: _selectedInstitutionType,
+              numberOfMembers: _organizationNumberController.text.toString(),
+              state: _selectedStateLocation,
+              city: _selectedCityLocation,
+              mail: _mailController.text,
               fcm: User.userFcmToken,
               aadhar: _aadharController.text.toString(),
               phone: _phoneController.text.toString(),
@@ -155,52 +139,44 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
     }
   }
 
-  // Send noti to admin
-  Future sendNotificationAdmin(String name) async {
-    String adminFcm = "";
-    widget.admins.forEach((element) {
-      if (element['instituteName'] == _selectedInstitution) {
-        setState(() {
-          adminFcm = element['fcmToken'];
-        });
-      }
-    });
-    var response =
-        await http.post('$baseUrl/sendNotification', body: {"fcmToken": adminFcm, "message": "New employee request from $name. Please login now", "title": "New Registration"});
-    print(response.body);
-  }
-
-  // Get divisions
-  Future getDivision({String instituteName}) async {
-    var response = await http.get("$baseUrl/fetchDivision/$instituteName");
-    print('Response status: ${response.statusCode}');
+  // Upload the files to firebase storage
+  Future<void> _uploadFile() async {
     setState(() {
-      divisionData = json.decode(response.body)['payload']['divisions'];
+      _isLoading = true;
     });
-  }
+    StorageReference storageReference;
+    int rand = random.nextInt(1000);
+    storageReference = FirebaseStorage.instance.ref().child("images/$rand");
 
-  Future _div() async {
-    await getDivision(instituteName: _selectedInstitution);
-    gradeDivision.clear();
-    print(divisionData);
-    divisionData.forEach((element) {
-      if (element['grade'] == _selectedGrade) {
-        gradeDivision.add(element['division']);
-      }
+    final StorageUploadTask uploadTask = storageReference.putFile(_file);
+    final StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
+    final String url = (await downloadUrl.ref.getDownloadURL());
+    setState(() {
+      mediaUrl = url;
+      _isLoading = false;
+      Fluttertoast.showToast(context, msg: 'File attached successfully');
     });
-    gradeDivision = Set.of(gradeDivision).toList();
-    print(gradeDivision);
+    print("URL is $url");
   }
 
   @override
   void initState() {
-    Timer(Duration(seconds: 5), () {
-      setState(() {});
-    });
-    print(institutes);
-
     print(User.userFcmToken);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _mailController.dispose();
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _passwordReController.dispose();
+    _organizationController.dispose();
+    _organizationNumberController.dispose();
+    _aadharController.dispose();
+    _phoneController.dispose();
+    super.dispose();
   }
 
   //UI Block
@@ -222,7 +198,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
             child: ListView(
               children: [
                 Text(
-                  widget.isEmployee ? 'Employee/Staff Registration' : 'Customer Registration',
+                  'Admin Registration',
                   style: TextStyle(
                     fontSize: 28,
                     color: Colors.white,
@@ -239,6 +215,11 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                   ),
                 ),
                 InputField(
+                  onChange: () {
+                    setState(() {
+                      _showEmail = true;
+                    });
+                  },
                   validate: _validateEmail,
                   capital: TextCapitalization.none,
                   controller: _emailController,
@@ -258,6 +239,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                   labelText: 'Re-enter Password',
                   errorText: 'Passwords don\'t match',
                 ),
+                InputField(validate: _validateOrganization, controller: _organizationController, errorText: 'Max length is 50', labelText: 'Institution Name'),
                 Padding(
                   padding: EdgeInsets.all(16),
                   child: Theme(
@@ -265,11 +247,11 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                     child: DropdownButtonFormField(
                       onTap: () {
                         setState(() {
-                          _validateInstitution = false;
+                          _validateInstituteType = false;
                         });
                       },
                       decoration: InputDecoration(
-                        errorText: _validateInstitution ? 'Please choose an option' : null,
+                        errorText: _validateInstituteType ? 'Please choose an option' : null,
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white70),
                         ),
@@ -284,107 +266,99 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                         color: Colors.white70,
                       ),
                       hint: Text(
-                        'Select Institution',
+                        'Select Institution Type',
                         style: TextStyle(color: Colors.white70),
                       ),
-                      value: _selectedInstitution,
-                      onChanged: (newValue) async {
-                        setState(() {
-                          _isLoading = true;
-                          _selectedInstitution = newValue;
-                        });
-                        await getGrades(instituteName: newValue);
-                      },
-                      items: institutes.map((type) {
-                        return DropdownMenuItem(
-                          child: Text(type),
-                          value: type,
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Theme(
-                    data: Theme.of(context).copyWith(canvasColor: violet1),
-                    child: DropdownButtonFormField(
-                      onTap: () {
-                        setState(() {
-                          _validateGrade = false;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        errorText: _validateGrade ? 'Please choose an option' : null,
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white70),
-                        ),
-                      ),
-                      icon: Icon(Icons.keyboard_arrow_down),
-                      iconDisabledColor: Colors.white,
-                      iconEnabledColor: Colors.white,
-                      iconSize: 24,
-                      style: TextStyle(
-                        fontFamily: 'Montserrat',
-                        fontSize: 20,
-                        color: Colors.white70,
-                      ),
-                      hint: Text(
-                        'Select Grade',
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                      value: _selectedGrade,
-                      onChanged: (newValue) async {
-                        setState(() {
-                          _selectedGrade = newValue;
-                        });
-                        await _div();
-                      },
-                      items: grades.map((type) {
-                        return DropdownMenuItem(
-                          child: Text(type),
-                          value: type,
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Theme(
-                    data: Theme.of(context).copyWith(canvasColor: violet1),
-                    child: DropdownButtonFormField(
-                      onTap: () {
-                        setState(() {
-                          _validateDivision = false;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        errorText: _validateDivision ? 'Please choose an option' : null,
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white70),
-                        ),
-                      ),
-                      icon: Icon(Icons.keyboard_arrow_down),
-                      iconDisabledColor: Colors.white,
-                      iconEnabledColor: Colors.white,
-                      iconSize: 24,
-                      style: TextStyle(
-                        fontFamily: 'Montserrat',
-                        fontSize: 20,
-                        color: Colors.white70,
-                      ),
-                      hint: Text(
-                        'Select Division',
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                      value: _selectedDivision,
+                      value: _selectedInstitutionType,
                       onChanged: (newValue) {
                         setState(() {
-                          _selectedDivision = newValue;
+                          _selectedInstitutionType = newValue;
                         });
                       },
-                      items: gradeDivision.map((location) {
+                      items: instituteType.map((type) {
+                        return DropdownMenuItem(
+                          child: Text(type),
+                          value: type,
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Container(
+                    height: 60,
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.white70)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Institution Image',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white70,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 16.0),
+                          child: MaterialButton(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            color: Colors.white,
+                            onPressed: () {
+                              filePicker(context);
+                            },
+                            child: _file == null ? Text('Choose a file') : Text('Uploaded!'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                InputField(
+                  validate: _validateNumberOrganization,
+                  errorText: 'Please enter the number of members',
+                  controller: _organizationNumberController,
+                  labelText: 'Number of members',
+                  textInputType: TextInputType.number,
+                ),
+                Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(canvasColor: violet1),
+                    child: DropdownButtonFormField(
+                      onTap: () {
+                        setState(() {
+                          _validateState = false;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        errorText: _validateState ? 'Please choose an option' : null,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
+                      ),
+                      icon: Icon(Icons.keyboard_arrow_down),
+                      iconDisabledColor: Colors.white,
+                      iconEnabledColor: Colors.white,
+                      iconSize: 24,
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 20,
+                        color: Colors.white70,
+                      ),
+                      hint: Text(
+                        'Select State',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      value: _selectedStateLocation,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedStateLocation = newValue;
+                        });
+                      },
+                      items: states.map((location) {
                         return DropdownMenuItem(
                           child: Text(location),
                           value: location,
@@ -392,6 +366,68 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                       }).toList(),
                     ),
                   ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(canvasColor: violet1),
+                    child: DropdownButtonFormField(
+                      onTap: () {
+                        setState(() {
+                          _validateCity = false;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        errorText: _validateCity ? 'Please choose an option' : null,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
+                      ),
+                      icon: Icon(Icons.keyboard_arrow_down),
+                      iconDisabledColor: Colors.white,
+                      iconEnabledColor: Colors.white,
+                      iconSize: 24,
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 20,
+                        color: Colors.white70,
+                      ),
+                      hint: Text(
+                        'Select City',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      value: _selectedCityLocation,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedCityLocation = newValue;
+                        });
+                      },
+                      items: cities[_selectedStateLocation ?? 'Madhya Pradesh'].map((location) {
+                        return DropdownMenuItem(
+                          child: AutoSizeText(
+                            location,
+                            maxLines: 1,
+                          ),
+                          value: location,
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+                _selectedCityLocation == 'Others'
+                    ? InputField(
+                        validate: _validateCityName,
+                        controller: _cityNameController,
+                        errorText: 'Please enter your city name',
+                        labelText: 'City Name',
+                      )
+                    : Container(),
+                InputField(
+                  validate: _validateMail,
+                  maxLines: 5,
+                  controller: _mailController,
+                  errorText: 'Please enter your institute\'s mailing address',
+                  labelText: 'Institute Mailing Address',
                 ),
                 InputField(
                   validate: _validateAadhar,
@@ -416,34 +452,45 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                       onPressed: () async {
                         setState(() {
                           _nameController.text.isEmpty ? _validateName = true : _validateName = false;
+                          _selectedCityLocation == 'Others' ? _cityNameController.text.isEmpty ? _validateCityName = true : _validateCityName = false : Container();
                           (_emailController.text.isEmpty || !validator.email(_emailController.text)) ? _validateEmail = true : _validateEmail = false;
                           (_passwordController.text.isEmpty || !validator.password(_passwordController.text)) ? _validatePassword = true : _validatePassword = false;
                           (_passwordReController.text.isEmpty || !validator.password(_passwordController.text)) ? _validateRePassword = true : _validateRePassword = false;
-
+                          (_organizationController.text.isEmpty || _organizationController.text.length > 50) ? _validateOrganization = true : _validateOrganization = false;
+                          _organizationNumberController.text.isEmpty ? _validateNumberOrganization = true : _validateNumberOrganization = false;
+                          _mailController.text.isEmpty ? _validateMail = true : _validateMail = false;
                           (_aadharController.text.isEmpty || _aadharController.text.length != 12) ? _validateAadhar = true : _validateAadhar = false;
                           (_phoneController.text.isEmpty || _phoneController.text.length != 10) ? _validatePhoneNumber = true : _validatePhoneNumber = false;
-                          if (_selectedDivision == null) {
-                            _validateDivision = true;
+                          if (_selectedStateLocation == null) {
+                            _validateState = true;
                           }
-                          if (_selectedGrade == null) {
-                            _validateGrade = true;
+                          if (_selectedInstitutionType == null) {
+                            _validateInstituteType = true;
                           }
-                          if (_selectedInstitution == null) {
-                            _validateInstitution = true;
+                          if (_selectedCityLocation == null) {
+                            _validateCity = true;
                           }
                           if (_passwordController.text != _passwordReController.text) {
                             _validateRePassword = true;
                           }
+                          if (_file == null) {
+                            Scaffold.of(context).showSnackBar(SnackBar(
+                              content: Text('Please upload the institution image!'),
+                              action: SnackBarAction(label: 'Okay', onPressed: () {}),
+                            ));
+                          }
                         });
-                        if (!_validateName &&
-                            !_validateEmail &&
-                            !_validatePhoneNumber &&
-                            !_validateGrade &&
-                            !_validateInstitution &&
-                            !_validateDivision &&
-                            !_validateAadhar &&
-                            !_validatePassword &&
-                            !_validateRePassword) {
+                        if (!_validateName && !_validateEmail && !_validatePhoneNumber && !_validateNumberOrganization && !_validateMail && _selectedCityLocation == 'Other'
+                            ? _validateCityName
+                            : true &&
+                                !_validateCity &&
+                                !_validateState &&
+                                !_validateAadhar &&
+                                !_validateOrganization &&
+                                !_validatePassword &&
+                                !_validateMail &&
+                                !_validateRePassword &&
+                                _file != null) {
                           await _sendEmailVerification(_emailController.text.toString());
                         }
                       },

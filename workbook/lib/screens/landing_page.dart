@@ -5,7 +5,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/dashboard.dart';
-import 'package:workbook/screens/login_page.dart';
+import 'package:workbook/screens/auth/login_page.dart';
 
 class LandingPage extends StatefulWidget {
   @override

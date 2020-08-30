@@ -7,7 +7,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 
 import 'package:workbook/constants.dart';
-import 'package:workbook/screens/active_users.dart';
+import 'package:workbook/screens/auth/active_users.dart';
 import 'package:workbook/screens/request_profile_page.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';

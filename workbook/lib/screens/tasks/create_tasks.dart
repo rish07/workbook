@@ -11,7 +11,7 @@ import 'package:workbook/constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/widget/popUpDialog.dart';
-import '../user.dart';
+import '../../user.dart';
 
 class CreateTask extends StatefulWidget {
   final bool isAdmin;

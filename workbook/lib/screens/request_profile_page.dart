@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:workbook/constants.dart';
-import 'package:workbook/screens/active_users.dart';
+import 'package:workbook/screens/auth/active_users.dart';
 import 'package:workbook/user.dart';
 
 class RequestProfilePage extends StatefulWidget {

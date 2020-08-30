@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -7,44 +6,105 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:regexed_validator/regexed_validator.dart';
 import 'package:workbook/constants.dart';
-import 'package:workbook/screens/otp_verification.dart';
+import 'package:workbook/screens/auth/login_page.dart';
+import 'package:workbook/screens/auth/otp_verification.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/input_field.dart';
 import 'package:workbook/widget/password.dart';
 import 'package:workbook/widget/popUpDialog.dart';
 import 'package:workbook/widget/registerButton.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class DriverForm extends StatefulWidget {
+class EmployeeCustomerForm extends StatefulWidget {
+  final bool isEmployee;
+  final List admins;
+
+  const EmployeeCustomerForm({
+    Key key,
+    this.isEmployee,
+    this.admins,
+  }) : super(key: key);
   @override
-  _DriverFormState createState() => _DriverFormState();
+  _EmployeeCustomerFormState createState() => _EmployeeCustomerFormState();
 }
 
-class _DriverFormState extends State<DriverForm> {
+class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
+  List employees = [];
   bool _isLoading = false;
   bool _validateName = false;
   bool _validateEmail = false;
   bool _validatePassword = false;
   bool _validateRePassword = false;
   bool _validateInstitution = false;
-  bool _validateCar = false;
-
+  bool _validateGrade = false;
+  bool _validateDivision = false;
   bool _validateAadhar = false;
   bool _validatePhoneNumber = false;
+
   String _selectedInstitution;
-  String _selectedCar;
+  String _selectedGrade;
+  String _selectedDivision;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _aadharController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordReController = TextEditingController();
+  List gradeDivision = [];
+
+  // Get grades
+  Future getGrades({String instituteName}) async {
+    var response = await http.get("$baseUrl/fetchGrade/$instituteName");
+    print('Response status: ${response.statusCode}');
+    List temp = json.decode(response.body)['payload']['grades'];
+    temp.forEach((resp) {
+      grades.add(resp);
+    });
+    grades = Set.of(grades).toList();
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  //Get Employee
+  Future getEmployee() async {
+    var response = await http.post(
+      "$baseUrl/admin/viewAllEmployees",
+      body: {
+        "userID": User.userEmail,
+        "jwtToken": User.userJwtToken,
+        "instituteName": _selectedInstitution,
+      },
+    );
+    print(response.body);
+    if (json.decode(response.body)['statusCode'] == 200) {
+      List temp = json.decode(response.body)['payload']['employees'];
+      temp.forEach((element) {
+        if (element['approved'] == true) {
+          setState(() {
+            employees.add(element);
+          });
+        }
+      });
+    }
+    print(employees);
+  }
+
+  //Send noti to employee
+  Future sendNotificationEmployee(String name) async {
+    employees.forEach((element) async {
+      var response = await http
+          .post("$baseUrl/sendNotification", body: {"fcmToken": element['fcmToken'], "message": "New employee request from $name. Please login now", "title": "New Registration"});
+      print(response.body);
+    });
+  }
 
   // Send email verification
   Future _sendEmailVerification(String email) async {
     var response = await http.post('$baseUrl/sendVerification', body: {
       "userID": email,
-      "role": "driver",
+      "role": widget.isEmployee ? "employee" : "customer",
     });
     print(response.body);
 
@@ -54,11 +114,12 @@ class _DriverFormState extends State<DriverForm> {
         context,
         PageTransition(
             child: OTPVerification(
-              carNumber: _selectedCar,
-              role: 'driver',
+              role: widget.isEmployee ? 'employee' : 'customer',
               name: _nameController.text,
               password: _passwordController.text,
               instituteName: _selectedInstitution,
+              grade: _selectedGrade,
+              division: _selectedDivision,
               fcm: User.userFcmToken,
               aadhar: _aadharController.text.toString(),
               phone: _phoneController.text.toString(),
@@ -74,7 +135,10 @@ class _DriverFormState extends State<DriverForm> {
           content: 'The user with email id $email already exists. Please login or click on forgot password!',
           buttonTitle: 'Okay',
           onPress: () {
-            Navigator.pop(context);
+            Navigator.push(
+              context,
+              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
+            );
           },
           context: context);
     } else if (json.decode(response.body)['statusCode'] == 400) {
@@ -91,11 +155,50 @@ class _DriverFormState extends State<DriverForm> {
     }
   }
 
+  // Send noti to admin
+  Future sendNotificationAdmin(String name) async {
+    String adminFcm = "";
+    widget.admins.forEach((element) {
+      if (element['instituteName'] == _selectedInstitution) {
+        setState(() {
+          adminFcm = element['fcmToken'];
+        });
+      }
+    });
+    var response =
+        await http.post('$baseUrl/sendNotification', body: {"fcmToken": adminFcm, "message": "New employee request from $name. Please login now", "title": "New Registration"});
+    print(response.body);
+  }
+
+  // Get divisions
+  Future getDivision({String instituteName}) async {
+    var response = await http.get("$baseUrl/fetchDivision/$instituteName");
+    print('Response status: ${response.statusCode}');
+    setState(() {
+      divisionData = json.decode(response.body)['payload']['divisions'];
+    });
+  }
+
+  Future _div() async {
+    await getDivision(instituteName: _selectedInstitution);
+    gradeDivision.clear();
+    print(divisionData);
+    divisionData.forEach((element) {
+      if (element['grade'] == _selectedGrade) {
+        gradeDivision.add(element['division']);
+      }
+    });
+    gradeDivision = Set.of(gradeDivision).toList();
+    print(gradeDivision);
+  }
+
   @override
   void initState() {
     Timer(Duration(seconds: 5), () {
       setState(() {});
     });
+    print(institutes);
+
     print(User.userFcmToken);
     super.initState();
   }
@@ -119,7 +222,7 @@ class _DriverFormState extends State<DriverForm> {
             child: ListView(
               children: [
                 Text(
-                  'Driver Registration',
+                  widget.isEmployee ? 'Employee/Staff Registration' : 'Customer Registration',
                   style: TextStyle(
                     fontSize: 28,
                     color: Colors.white,
@@ -185,10 +288,12 @@ class _DriverFormState extends State<DriverForm> {
                         style: TextStyle(color: Colors.white70),
                       ),
                       value: _selectedInstitution,
-                      onChanged: (newValue) {
+                      onChanged: (newValue) async {
                         setState(() {
+                          _isLoading = true;
                           _selectedInstitution = newValue;
                         });
+                        await getGrades(instituteName: newValue);
                       },
                       items: institutes.map((type) {
                         return DropdownMenuItem(
@@ -206,11 +311,11 @@ class _DriverFormState extends State<DriverForm> {
                     child: DropdownButtonFormField(
                       onTap: () {
                         setState(() {
-                          _validateCar = false;
+                          _validateGrade = false;
                         });
                       },
                       decoration: InputDecoration(
-                        errorText: _validateCar ? 'Please choose an option' : null,
+                        errorText: _validateGrade ? 'Please choose an option' : null,
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white70),
                         ),
@@ -225,19 +330,64 @@ class _DriverFormState extends State<DriverForm> {
                         color: Colors.white70,
                       ),
                       hint: Text(
-                        'Select Car Number',
+                        'Select Grade',
                         style: TextStyle(color: Colors.white70),
                       ),
-                      value: _selectedCar,
-                      onChanged: (newValue) {
+                      value: _selectedGrade,
+                      onChanged: (newValue) async {
                         setState(() {
-                          _selectedCar = newValue;
+                          _selectedGrade = newValue;
                         });
+                        await _div();
                       },
-                      items: carNumber.map((type) {
+                      items: grades.map((type) {
                         return DropdownMenuItem(
                           child: Text(type),
                           value: type,
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(canvasColor: violet1),
+                    child: DropdownButtonFormField(
+                      onTap: () {
+                        setState(() {
+                          _validateDivision = false;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        errorText: _validateDivision ? 'Please choose an option' : null,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
+                      ),
+                      icon: Icon(Icons.keyboard_arrow_down),
+                      iconDisabledColor: Colors.white,
+                      iconEnabledColor: Colors.white,
+                      iconSize: 24,
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 20,
+                        color: Colors.white70,
+                      ),
+                      hint: Text(
+                        'Select Division',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      value: _selectedDivision,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedDivision = newValue;
+                        });
+                      },
+                      items: gradeDivision.map((location) {
+                        return DropdownMenuItem(
+                          child: Text(location),
+                          value: location,
                         );
                       }).toList(),
                     ),
@@ -272,9 +422,11 @@ class _DriverFormState extends State<DriverForm> {
 
                           (_aadharController.text.isEmpty || _aadharController.text.length != 12) ? _validateAadhar = true : _validateAadhar = false;
                           (_phoneController.text.isEmpty || _phoneController.text.length != 10) ? _validatePhoneNumber = true : _validatePhoneNumber = false;
-
-                          if (_selectedCar == null) {
-                            _validateCar = true;
+                          if (_selectedDivision == null) {
+                            _validateDivision = true;
+                          }
+                          if (_selectedGrade == null) {
+                            _validateGrade = true;
                           }
                           if (_selectedInstitution == null) {
                             _validateInstitution = true;
@@ -286,8 +438,9 @@ class _DriverFormState extends State<DriverForm> {
                         if (!_validateName &&
                             !_validateEmail &&
                             !_validatePhoneNumber &&
-                            !_validateCar &&
+                            !_validateGrade &&
                             !_validateInstitution &&
+                            !_validateDivision &&
                             !_validateAadhar &&
                             !_validatePassword &&
                             !_validateRePassword) {

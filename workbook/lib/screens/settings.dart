@@ -3,7 +3,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:workbook/constants.dart';
-import 'package:workbook/screens/login_page.dart';
+import 'package:workbook/screens/auth/login_page.dart';
 import 'package:workbook/screens/reset_password.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/popUpDialog.dart';

@@ -21,15 +21,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:workbook/constants.dart';
-import 'package:workbook/screens/add_grade.dart';
-import 'package:workbook/screens/add_post.dart';
-import 'package:workbook/screens/approve_user.dart';
+import 'package:workbook/screens/grade_and_divisions/add_grade.dart';
+import 'package:workbook/screens/posts/add_post.dart';
+import 'package:workbook/screens/auth/approve_user.dart';
 import 'package:workbook/screens/coming_soon.dart';
-import 'package:workbook/screens/create_tasks.dart';
+import 'package:workbook/screens/schedule/create_schedule.dart';
+import 'package:workbook/screens/schedule/view_schedule.dart';
+import 'package:workbook/screens/tasks/create_tasks.dart';
 import 'package:workbook/screens/profile_page.dart';
-import 'package:workbook/screens/query_data.dart';
+import 'package:workbook/screens/queries/query_data.dart';
 import 'package:workbook/screens/settings.dart';
-import 'package:workbook/screens/view_tasks.dart';
+import 'package:workbook/screens/tasks/view_tasks.dart';
 import 'package:workbook/user.dart';
 import 'package:http/http.dart' as http;
 
@@ -208,6 +210,48 @@ class _DashBoardState extends State<DashBoard> {
                                       )
                                     : ViewTasks(),
                                 type: PageTransitionType.rightToLeft),
+                          );
+                        },
+                        trailing: Icon(Icons.navigate_next),
+                      ),
+                      User.userRole == 'admin'
+                          ? ListTile(
+                              leading: Icon(
+                                Icons.access_time,
+                                color: violet2,
+                              ),
+                              title: Text(
+                                'Create Schedules',
+                                style: TextStyle(fontSize: 16, color: violet2, fontWeight: FontWeight.w600),
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  PageTransition(
+                                    child: CreateSchedule(),
+                                    type: PageTransitionType.rightToLeft,
+                                  ),
+                                );
+                              },
+                              trailing: Icon(Icons.navigate_next),
+                            )
+                          : Container(),
+                      ListTile(
+                        leading: Icon(
+                          Icons.access_time,
+                          color: violet2,
+                        ),
+                        title: Text(
+                          'View Schedules',
+                          style: TextStyle(fontSize: 16, color: violet2, fontWeight: FontWeight.w600),
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            PageTransition(
+                              child: ViewSchedule(),
+                              type: PageTransitionType.rightToLeft,
+                            ),
                           );
                         },
                         trailing: Icon(Icons.navigate_next),

@@ -6,7 +6,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:regexed_validator/regexed_validator.dart';
 import 'package:workbook/constants.dart';
-import 'package:workbook/screens/login_page.dart';
+import 'package:workbook/screens/auth/login_page.dart';
 import 'package:workbook/widget/input_field.dart';
 import 'package:http/http.dart' as http;
 import 'package:workbook/user.dart';
