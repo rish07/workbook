@@ -8,6 +8,10 @@ import 'package:http/http.dart' as http;
 import '../../user.dart';
 
 class ViewSchedule extends StatefulWidget {
+  final String url;
+  final String grade;
+  final String division;
+  const ViewSchedule({Key key, this.url, this.grade, this.division}) : super(key: key);
   @override
   _ViewScheduleState createState() => _ViewScheduleState();
 }
@@ -43,14 +47,18 @@ class _ViewScheduleState extends State<ViewSchedule> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _fetchUrl();
-    setState(() {
-      _isLoading = true;
-    });
+    if (User.userRole != 'admin') {
+      _fetchUrl();
+      setState(() {
+        _exists = true;
+        _isLoading = true;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    print(widget.url);
     return ModalProgressHUD(
       inAsyncCall: _isLoading,
       child: Scaffold(
@@ -75,16 +83,18 @@ class _ViewScheduleState extends State<ViewSchedule> {
         body: Container(
           height: MediaQuery.of(context).size.height * 0.7,
           padding: EdgeInsets.all(16),
-          child: !_exists
+          child: User.userRole != 'admin' && !_exists
               ? Center(
                   child: Text(
                     'No Schedule Allotted',
                     style: TextStyle(color: Colors.grey, fontSize: 20),
                   ),
                 )
-              : Image.network(
-                  imageUrl,
-                  fit: BoxFit.fill,
+              : Center(
+                  child: Image.network(
+                    User.userRole != 'admin' ? imageUrl : widget.url,
+                    fit: BoxFit.fill,
+                  ),
                 ),
         ),
       ),

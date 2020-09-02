@@ -1,16 +1,22 @@
 import 'dart:convert';
-
+import 'dart:io';
+import 'dart:math' as math;
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:workbook/constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:workbook/screens/dashboard.dart';
+import 'package:workbook/screens/tasks/created_tasks.dart';
 import 'package:workbook/widget/popUpDialog.dart';
+import 'package:path/path.dart' as p;
 import '../../user.dart';
 
 class CreateTask extends StatefulWidget {
@@ -36,6 +42,12 @@ class _CreateTaskState extends State<CreateTask> {
   bool _validateGrade = false;
   bool _validateDivision = false;
   bool _validateType = false;
+  final picker = ImagePicker();
+  String mediaUrl = '';
+  File _file;
+  String fileName = '';
+  final math.Random random = math.Random();
+  bool uploaded = false;
 
   List types = ['Task', 'Meeting', 'Other'];
   Future getGrades() async {
@@ -72,6 +84,39 @@ class _CreateTaskState extends State<CreateTask> {
     print(gradeDivision);
   }
 
+  Future getImage() async {
+    try {
+      _file = await FilePicker.getFile(type: FileType.image);
+      setState(() {
+        fileName = p.basename(_file.path);
+      });
+      print(fileName);
+      await _uploadFile();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> _uploadFile() async {
+    setState(() {
+      _isLoading = true;
+    });
+    StorageReference storageReference;
+    int rand = random.nextInt(1000);
+    storageReference = FirebaseStorage.instance.ref().child("tasks/$rand");
+
+    final StorageUploadTask uploadTask = storageReference.putFile(_file);
+    final StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
+    final String url = (await downloadUrl.ref.getDownloadURL());
+    setState(() {
+      mediaUrl = url;
+      uploaded = true;
+      _isLoading = false;
+      Fluttertoast.showToast(context, msg: 'File attached successfully');
+    });
+    print("URL is $url");
+  }
+
   Future _createTask() async {
     setState(() {
       _isLoading = true;
@@ -88,6 +133,7 @@ class _CreateTaskState extends State<CreateTask> {
               "topic": "${User.instituteName.replaceAll(RegExp(r' '), '_')}",
               "description": _descriptionController.text.toString(),
               "name": _taskNameController.text.toString().isEmpty ? _selectedType : _taskNameController.text.toString(),
+              "mediaUrl": mediaUrl,
             }
           : {
               "userID": User.userEmail,
@@ -99,6 +145,7 @@ class _CreateTaskState extends State<CreateTask> {
               "grade": _selectedGrade,
               "division": _selectedDivision,
               "name": _taskNameController.text.toString().isEmpty ? _selectedType : _taskNameController.text.toString(),
+              "mediaUrl": mediaUrl,
             },
     );
     print(response.body);
@@ -145,6 +192,33 @@ class _CreateTaskState extends State<CreateTask> {
       inAsyncCall: _isLoading,
       child: Scaffold(
         appBar: AppBar(
+          actions: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: MaterialButton(
+                color: violet2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(32),
+                ),
+                onPressed: () async {
+                  setState(() {
+                    isOther ? (_taskNameController.text.isEmpty ? _validateTaskName = true : _validateTaskName = false) : {};
+                    _selectedType == null ? _validateType = true : _validateType = false;
+                    User.userRole == 'employee' ? (_selectedGrade == null ? _validateGrade = true : _validateGrade = false) : {};
+                    User.userRole == 'employee' ? (_selectedDivision == null ? _validateDivision = true : _validateDivision = false) : {};
+                    _descriptionController.text.isEmpty ? _validateDescription = true : _validateDescription = false;
+                  });
+                  if (!_validateDescription && !_validateTaskName && !_validateType && !_validateGrade && !_validateDivision) {
+                    await _createTask();
+                  }
+                },
+                child: Text(
+                  'Send',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
           leading: IconButton(
               icon: Icon(
                 Icons.arrow_back,
@@ -157,11 +231,12 @@ class _CreateTaskState extends State<CreateTask> {
           elevation: 0,
           backgroundColor: Colors.transparent,
           title: Text(
-            'Create Task/Meeting',
+            'Create Task',
             style: TextStyle(color: violet1),
           ),
         ),
         body: Container(
+          height: MediaQuery.of(context).size.height,
           padding: EdgeInsets.all(16),
           child: ListView(
             children: [
@@ -236,16 +311,10 @@ class _CreateTaskState extends State<CreateTask> {
                           child: TextFormField(
                             autocorrect: true,
                             controller: _taskNameController,
-                            onTap: () {
-//                  setState(() {
-//                    _validateDescription = false;
-//                  });
-                            },
                             cursorRadius: Radius.circular(8),
                             cursorColor: violet1,
                             keyboardType: TextInputType.text,
                             textCapitalization: TextCapitalization.sentences,
-//                controller: _descriptionController,
                             style: TextStyle(
                               fontSize: 18,
                               color: violet1,
@@ -260,7 +329,6 @@ class _CreateTaskState extends State<CreateTask> {
                               ),
                               errorStyle: TextStyle(height: 0, fontSize: 10),
                               floatingLabelBehavior: FloatingLabelBehavior.auto,
-//                  errorText: _validateDescription ? "This field can't be empty" : null,
                               enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(color: violet1, width: 1),
                               ),
@@ -405,11 +473,6 @@ class _CreateTaskState extends State<CreateTask> {
                 child: TextFormField(
                   autocorrect: true,
                   maxLines: 10,
-                  onTap: () {
-//                  setState(() {
-//                    _validateDescription = false;
-//                  });
-                  },
                   cursorRadius: Radius.circular(8),
                   cursorColor: violet1,
                   keyboardType: TextInputType.text,
@@ -447,34 +510,52 @@ class _CreateTaskState extends State<CreateTask> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 100.0),
-                child: MaterialButton(
-                  padding: EdgeInsets.all(16),
-                  color: violet2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(32),
-                  ),
-                  onPressed: () async {
-                    setState(() {
-                      isOther ? (_taskNameController.text.isEmpty ? _validateTaskName = true : _validateTaskName = false) : {};
-                      _selectedType == null ? _validateType = true : _validateType = false;
-                      User.userRole == 'employee' ? (_selectedGrade == null ? _validateGrade = true : _validateGrade = false) : {};
-                      User.userRole == 'employee' ? (_selectedDivision == null ? _validateDivision = true : _validateDivision = false) : {};
-                      _descriptionController.text.isEmpty ? _validateDescription = true : _validateDescription = false;
-                    });
-                    if (!_validateDescription && !_validateTaskName && !_validateType && !_validateGrade && !_validateDivision) {
-                      await _createTask();
-                    }
-                  },
-                  child: Text(
-                    User.userRole == 'admin' ? 'Send to all' : 'Send to Customer',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Attachments: ',
+                      style: TextStyle(fontSize: 20, color: violet2),
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.15,
+                    ),
+                    MaterialButton(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32),
+                      ),
+                      onPressed: () async {
+                        await getImage();
+                      },
+                      color: violet1,
+                      child: Text(
+                        uploaded ? 'Uploaded!' : 'Select File',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    )
+                  ],
                 ),
-              )
+              ),
             ],
           ),
         ),
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: FloatingActionButton.extended(
+            backgroundColor: violet2,
+            onPressed: () {
+              Navigator.push(
+                context,
+                PageTransition(child: CreatedTasks(), type: PageTransitionType.rightToLeft),
+              );
+            },
+            label: Text('History'),
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
   }

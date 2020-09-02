@@ -85,22 +85,29 @@ class _ViewTasksState extends State<ViewTasks> {
               : ListView.builder(
                   itemCount: _taskList.length,
                   itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(_taskList[index]['name']),
-                      subtitle: Text(_taskList[index]['description']),
-                      trailing: Container(
-                        padding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-                        decoration: BoxDecoration(
-                          color: _taskList[index]['type'] == 'Meeting' ? Colors.deepPurple : (_taskList[index]['type'] == 'Task') ? Colors.teal : Colors.lightGreen,
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Text(
-                          _taskList[index]['type'],
-                          style: TextStyle(
-                            color: Colors.white,
+                    return Column(
+                      children: [
+                        ListTile(
+                          title: Text(_taskList[index]['name']),
+                          subtitle: Text(_taskList[index]['description']),
+                          trailing: Container(
+                            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+                            decoration: BoxDecoration(
+                              color: _taskList[index]['type'] == 'Meeting' ? Colors.deepPurple : (_taskList[index]['type'] == 'Task') ? Colors.teal : Colors.lightGreen,
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: Text(
+                              _taskList[index]['type'],
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        Divider(
+                          thickness: 2,
+                        ),
+                      ],
                     );
                   }),
         ),

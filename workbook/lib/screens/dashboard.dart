@@ -31,6 +31,7 @@ import 'package:workbook/screens/tasks/create_tasks.dart';
 import 'package:workbook/screens/profile_page.dart';
 import 'package:workbook/screens/queries/query_data.dart';
 import 'package:workbook/screens/settings.dart';
+import 'package:workbook/screens/schedule/view_schedules_admin.dart';
 import 'package:workbook/screens/tasks/view_tasks.dart';
 import 'package:workbook/user.dart';
 import 'package:http/http.dart' as http;
@@ -249,7 +250,7 @@ class _DashBoardState extends State<DashBoard> {
                           Navigator.push(
                             context,
                             PageTransition(
-                              child: ViewSchedule(),
+                              child: User.userRole != 'admin' ? ViewSchedule() : ViewScheduleAdmin(),
                               type: PageTransitionType.rightToLeft,
                             ),
                           );
