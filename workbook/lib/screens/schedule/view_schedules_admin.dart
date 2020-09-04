@@ -40,6 +40,7 @@ class _ViewScheduleAdminState extends State<ViewScheduleAdmin> {
     // TODO: implement initState
     super.initState();
     _getAllSchedules();
+    print(User.userJwtToken);
     setState(() {
       _isLoading = true;
     });
@@ -82,15 +83,15 @@ class _ViewScheduleAdminState extends State<ViewScheduleAdmin> {
                   itemCount: _schedules.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                        title: Text(_schedules[index]['grade']),
-                        subtitle: Text(_schedules[index]['division']),
+                        title: Text(_schedules[index]['grade_division'].split("_")[0]),
+                        subtitle: Text(_schedules[index]['grade_division'].split("_")[1]),
                         onTap: () {
-                          if (_schedules[index]['schedule'] != null) {
+                          if (_schedules[index]['scheduleUrl'] != null) {
                             Navigator.push(
                               context,
                               PageTransition(
                                   child: ViewSchedule(
-                                    url: _schedules[index]['schedule'],
+                                    url: _schedules[index]['scheduleUrl'],
                                   ),
                                   type: PageTransitionType.rightToLeft),
                             );

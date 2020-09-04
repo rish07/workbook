@@ -60,25 +60,31 @@ class _CreateScheduleState extends State<CreateSchedule> {
     }
   }
 
-  Future _updateImage(url) async {
+  Future _updateSchedule(url) async {
     print('update schedule');
     print(User.userID);
-    var request = await http.post(
-      url,
-      body: {"userID": User.userEmail, "jwtToken": User.userJwtToken, "schedule": mediaUrl, "grade": _selectedGrade, "division": _selectedDivision},
-    );
+    var body = {
+      "userID": User.userEmail,
+      "jwtToken": User.userJwtToken,
+      "schedule": mediaUrl,
+      "grade": _selectedGrade,
+      "division": _selectedDivision,
+      "instituteName": User.instituteName,
+    };
+    var request = await http.post(url, body: body);
+    print(body);
     print(request.body);
+    setState(() {
+      _isLoading = false;
+    });
     if (json.decode(request.body)['statusCode'] == 200) {
       popDialog(
           title: 'Upload Successful',
           buttonTitle: 'Okay',
           context: context,
-          content: 'The schedule was updated successful',
+          content: 'The schedule was updated successfully',
           onPress: () {
-            Navigator.push(
-              context,
-              PageTransition(child: CreateSchedule(), type: PageTransitionType.fade),
-            );
+            Navigator.pop(context);
           });
     } else {
       print('Error');
@@ -314,7 +320,7 @@ class _CreateScheduleState extends State<CreateSchedule> {
                       _selectedDivision == null ? _validateDivision = true : _validateDivision = false;
                     });
                     if (!_validateGrade && !_validateDivision) {
-                      await _updateImage('$baseUrl/admin/createSchedule');
+                      await _updateSchedule('$baseUrl/admin/createSchedule');
                     }
                   },
                   child: Text(

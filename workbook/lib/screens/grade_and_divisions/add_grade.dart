@@ -252,6 +252,7 @@ class _AddGradeState extends State<AddGrade> {
                                           setState(() {
                                             grades.removeAt(index);
                                           });
+                                          Navigator.pop(context);
                                         });
                                   }
                                 },
