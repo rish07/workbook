@@ -22,6 +22,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/grade_and_divisions/add_grade.dart';
+import 'package:workbook/screens/leave_attendance/holiday_calendar/create_holiday.dart';
 import 'package:workbook/screens/posts/add_post.dart';
 import 'package:workbook/screens/auth/approve_user.dart';
 import 'package:workbook/screens/coming_soon.dart';
@@ -283,7 +284,7 @@ class _DashBoardState extends State<DashBoard> {
                           style: TextStyle(fontSize: 16, color: violet2, fontWeight: FontWeight.w600),
                         ),
                         onTap: () {
-                          Navigator.push(context, PageTransition(child: ComingSoon(), type: PageTransitionType.rightToLeft));
+                          Navigator.push(context, PageTransition(child: CreateHoliday(), type: PageTransitionType.rightToLeft));
                         },
                         trailing: Icon(Icons.navigate_next),
                       )
