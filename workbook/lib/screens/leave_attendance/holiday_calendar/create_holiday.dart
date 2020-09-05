@@ -74,11 +74,42 @@ class _CreateHolidayState extends State<CreateHoliday> {
     });
   }
 
+  Future _getInstituteHolidays() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      var response = await http.post("$baseUrl/getHolidays", body: {
+        "instituteName": User.instituteName,
+      });
+      print(response.body);
+      if (json.decode(response.body)['statusCode'] == 200) {
+        json.decode(response.body)['payload']['holidays'].forEach((holi) {
+          _holidays.forEach((element) {
+            if (element['name'] == holi['name']) {
+              setState(() {
+                _isSelected[_holidays.indexOf(element)] = true;
+                _toSend.add(element);
+              });
+            }
+          });
+        });
+      } else {}
+    } catch (e) {
+      print(e);
+    }
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _getHolidays();
+    _getHolidays().whenComplete(() async {
+      await _getInstituteHolidays();
+    });
     setState(() {
       _isLoading = true;
     });

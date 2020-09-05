@@ -98,25 +98,27 @@ class _ViewHolidaysState extends State<ViewHolidays> {
       child: Scaffold(
         appBar: AppBar(
           actions: [
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: MaterialButton(
-                color: violet2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(32),
-                ),
-                onPressed: () async {
-                  Navigator.push(
-                    context,
-                    PageTransition(child: CreateHoliday(), type: PageTransitionType.rightToLeft),
-                  );
-                },
-                child: Text(
-                  'Edit',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
+            User.userRole == 'admin'
+                ? Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: MaterialButton(
+                      color: violet2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32),
+                      ),
+                      onPressed: () async {
+                        Navigator.push(
+                          context,
+                          PageTransition(child: CreateHoliday(), type: PageTransitionType.rightToLeft),
+                        );
+                      },
+                      child: Text(
+                        'Edit',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  )
+                : Container(),
           ],
           leading: IconButton(
               icon: Icon(
