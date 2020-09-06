@@ -62,7 +62,8 @@ dependencies:
   like_button:
   visibility_detector: ^0.1.5
   url_launcher:
-
+  universal_io: ^1.0.1
+  firebase_admob: any
 
 
 

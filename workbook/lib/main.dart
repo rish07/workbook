@@ -1,6 +1,9 @@
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:workbook/screens/landing_page.dart';
 import 'package:flutter/services.dart';
+
+import 'ad_manager.dart';
 
 void main() {
   runApp(MyApp());

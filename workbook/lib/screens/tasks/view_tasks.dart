@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -7,12 +8,21 @@ import 'package:http/http.dart' as http;
 import '../../constants.dart';
 import '../../user.dart';
 
+const String testDevice = null;
+
 class ViewTasks extends StatefulWidget {
   @override
   _ViewTasksState createState() => _ViewTasksState();
 }
 
 class _ViewTasksState extends State<ViewTasks> {
+  static const MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
+    testDevices: testDevice != null ? <String>[testDevice] : null,
+    keywords: <String>['foo', 'bar'],
+    contentUrl: 'http://foo.com/bar.html',
+    childDirected: true,
+    nonPersonalizedAds: true,
+  );
   Future _getTasks() async {
     var response = await http.post(
       "$baseUrl/task/fetch",
@@ -40,6 +50,18 @@ class _ViewTasksState extends State<ViewTasks> {
     }
   }
 
+  BannerAd createBannerAd() {
+    return BannerAd(
+      adUnitId: BannerAd.testAdUnitId,
+      size: AdSize.banner,
+      targetingInfo: targetingInfo,
+      listener: (MobileAdEvent event) {
+        print("BannerAd event $event");
+      },
+    );
+  }
+
+  BannerAd _bannerAd;
   bool _loading = false;
   List _taskList = [];
 
@@ -51,6 +73,16 @@ class _ViewTasksState extends State<ViewTasks> {
     setState(() {
       _loading = true;
     });
+    _bannerAd = createBannerAd()
+      ..load()
+      ..show();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _bannerAd?.dispose();
   }
 
   @override

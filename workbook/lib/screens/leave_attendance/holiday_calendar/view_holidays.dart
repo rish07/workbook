@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
@@ -10,12 +11,33 @@ import 'package:http/http.dart' as http;
 import '../../../constants.dart';
 import '../../../user.dart';
 
+const String testDevice = null;
+
 class ViewHolidays extends StatefulWidget {
   @override
   _ViewHolidaysState createState() => _ViewHolidaysState();
 }
 
 class _ViewHolidaysState extends State<ViewHolidays> {
+  BannerAd createBannerAd() {
+    return BannerAd(
+      adUnitId: BannerAd.testAdUnitId,
+      size: AdSize.banner,
+      targetingInfo: targetingInfo,
+      listener: (MobileAdEvent event) {
+        print("BannerAd event $event");
+      },
+    );
+  }
+
+  static const MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
+    testDevices: testDevice != null ? <String>[testDevice] : null,
+    keywords: <String>['foo', 'bar'],
+    contentUrl: 'http://foo.com/bar.html',
+    childDirected: true,
+    nonPersonalizedAds: true,
+  );
+  BannerAd _bannerAd;
   List<TableRow> _rows = [
     TableRow(children: [
       Container(
@@ -89,6 +111,16 @@ class _ViewHolidaysState extends State<ViewHolidays> {
     // TODO: implement initState
     super.initState();
     _getInstituteHolidays();
+    _bannerAd = createBannerAd()
+      ..load()
+      ..show();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _bannerAd?.dispose();
   }
 
   @override

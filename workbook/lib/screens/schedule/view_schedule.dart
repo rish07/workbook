@@ -1,11 +1,15 @@
 import 'dart:convert';
 
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:workbook/constants.dart';
 import 'package:http/http.dart' as http;
 
+import '../../ad_manager.dart';
 import '../../user.dart';
+
+const String testDevice = null;
 
 class ViewSchedule extends StatefulWidget {
   final String url;
@@ -17,6 +21,15 @@ class ViewSchedule extends StatefulWidget {
 }
 
 class _ViewScheduleState extends State<ViewSchedule> {
+  static const MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
+    testDevices: testDevice != null ? <String>[testDevice] : null,
+    keywords: <String>['foo', 'bar'],
+    contentUrl: 'http://foo.com/bar.html',
+    childDirected: true,
+    nonPersonalizedAds: true,
+  );
+
+  BannerAd _bannerAd;
   bool _exists = false;
   bool _isLoading = false;
   String imageUrl = '';
@@ -43,6 +56,17 @@ class _ViewScheduleState extends State<ViewSchedule> {
     }
   }
 
+  BannerAd createBannerAd() {
+    return BannerAd(
+      adUnitId: BannerAd.testAdUnitId,
+      size: AdSize.banner,
+      targetingInfo: targetingInfo,
+      listener: (MobileAdEvent event) {
+        print("BannerAd event $event");
+      },
+    );
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -54,6 +78,19 @@ class _ViewScheduleState extends State<ViewSchedule> {
         _isLoading = true;
       });
     }
+
+    _bannerAd = createBannerAd()
+      ..load()
+      ..show();
+
+    // TODO: Load a Banner Ad
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _bannerAd?.dispose();
   }
 
   @override

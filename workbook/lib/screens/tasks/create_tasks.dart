@@ -15,6 +15,7 @@ import 'package:workbook/constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/screens/tasks/created_tasks.dart';
+import 'package:workbook/screens/tasks/view_tasks.dart';
 import 'package:workbook/widget/popUpDialog.dart';
 import 'package:path/path.dart' as p;
 import '../../user.dart';
@@ -544,15 +545,37 @@ class _CreateTaskState extends State<CreateTask> {
         ),
         floatingActionButton: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: FloatingActionButton.extended(
-            backgroundColor: violet2,
-            onPressed: () {
-              Navigator.push(
-                context,
-                PageTransition(child: CreatedTasks(), type: PageTransitionType.rightToLeft),
-              );
-            },
-            label: Text('History'),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FloatingActionButton.extended(
+                heroTag: null,
+                backgroundColor: violet2,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageTransition(child: CreatedTasks(), type: PageTransitionType.rightToLeft),
+                  );
+                },
+                label: Text('History'),
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              User.userRole == 'employee'
+                  ? FloatingActionButton.extended(
+                      heroTag: null,
+                      backgroundColor: violet2,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          PageTransition(child: ViewTasks(), type: PageTransitionType.rightToLeft),
+                        );
+                      },
+                      label: Text('My Tasks'),
+                    )
+                  : Container(),
+            ],
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
