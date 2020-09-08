@@ -61,56 +61,52 @@ class _CreatedTasksState extends State<CreatedTasks> {
           ),
         ),
         body: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
           padding: EdgeInsets.all(16),
           child: _tasks.length != 0
-              ? ListView.builder(
+              ? ListView.separated(
+                  separatorBuilder: (BuildContext context, int index) => Divider(),
                   itemCount: _tasks.length,
                   itemBuilder: (context, index) {
-                    return Column(
-                      children: [
-                        ListTile(
-                            title: Text(_tasks[index]['name']),
-                            subtitle: Text(_tasks[index]['description']),
-                            trailing: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
+                    return ListTile(
+                        title: Text(_tasks[index]['name']),
+                        subtitle: Text(_tasks[index]['description']),
+                        trailing: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            User.userRole == 'employee'
+                                ? Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text('Grade: '),
+                                      Text(_tasks[index]['grade']),
+                                    ],
+                                  )
+                                : Container(),
+                            User.userRole == 'employee'
+                                ? Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text('Div: '),
+                                      Text(_tasks[index]['division']),
+                                    ],
+                                  )
+                                : Container(),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                User.userRole == 'employee'
-                                    ? Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text('Grade: '),
-                                          Text(_tasks[index]['grade']),
-                                        ],
-                                      )
-                                    : Container(),
-                                User.userRole == 'employee'
-                                    ? Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text('Div: '),
-                                          Text(_tasks[index]['division']),
-                                        ],
-                                      )
-                                    : Container(),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text('Created at: '),
-                                    Text(
-                                      DateFormat.yMd().add_jm().format(
-                                            DateTime.fromMillisecondsSinceEpoch(_tasks[index]['createdAt']),
-                                          ),
-                                    ),
-                                  ],
+                                Text('Created at: '),
+                                Text(
+                                  DateFormat.yMd().add_jm().format(
+                                        DateTime.fromMillisecondsSinceEpoch(_tasks[index]['createdAt']),
+                                      ),
                                 ),
                               ],
-                            )),
-                        Divider(
-                          thickness: 2,
-                        )
-                      ],
-                    );
+                            ),
+                          ],
+                        ));
                   })
               : Center(
                   child: Text('No History Available'),

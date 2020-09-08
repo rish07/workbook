@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:universal_io/io.dart' show Platform;
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +26,8 @@ import 'package:workbook/user.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -44,7 +46,6 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   //Local notifications
   void registerNotification() {
@@ -91,11 +92,15 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-    getFCMToken();
+    if (Platform.isAndroid) {
+      getFCMToken();
+      registerNotification();
+      configLocalNotification();
+    }
+
     getInstitutes();
     super.initState();
-    registerNotification();
-    configLocalNotification();
+
     connectivity = new Connectivity();
     subscription = connectivity.onConnectivityChanged.listen((ConnectivityResult result) {
       _connectionStatus = result.toString();
@@ -187,10 +192,20 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // Login user
+  //Login user
   Future _loginUser() async {
     print('working');
-    var response = await http.post('$baseUrl/login', body: {"userID": _emailController.text, "password": _passwordController.text, "fcmToken": fcmToken});
+    var response = await http.post('$baseUrl/login',
+        body: Platform.isAndroid
+            ? {
+                "userID": _emailController.text,
+                "password": _passwordController.text,
+                "fcmToken": fcmToken,
+              }
+            : {
+                "userID": _emailController.text,
+                "password": _passwordController.text,
+              });
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
     setState(() {
@@ -444,6 +459,8 @@ class _LoginPageState extends State<LoginPage> {
                               if (_formKey.currentState.validate()) {
                                 print('working');
                                 setState(() {
+                                  print(_emailController.text);
+                                  print(_passwordController.text);
                                   _loading = true;
                                 });
                                 await _loginUser();

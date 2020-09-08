@@ -59,6 +59,7 @@ class _DashBoardState extends State<DashBoard> {
     _setData();
 
     _getAllPosts();
+    print(User.instituteName);
     // TODO: implement initState
     super.initState();
   }

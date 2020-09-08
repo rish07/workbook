@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:http/http.dart' as http;
 import 'package:page_transition/page_transition.dart';
 import 'package:workbook/screens/schedule/view_schedule.dart';
+import '../../ad_manager.dart';
 import '../../constants.dart';
 import '../../user.dart';
 
@@ -17,6 +19,25 @@ class ViewScheduleAdmin extends StatefulWidget {
 class _ViewScheduleAdminState extends State<ViewScheduleAdmin> {
   bool _isLoading = false;
   List _schedules = [];
+
+  static const MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
+    testDevices: testDevice != null ? <String>[testDevice] : null,
+    keywords: <String>['foo', 'bar'],
+    contentUrl: 'http://foo.com/bar.html',
+    childDirected: true,
+    nonPersonalizedAds: true,
+  );
+
+  BannerAd createBannerAd() {
+    return BannerAd(
+      adUnitId: AdManager.bannerAdUnitId,
+      size: AdSize.banner,
+      targetingInfo: targetingInfo,
+      listener: (MobileAdEvent event) {
+        print("BannerAd event $event");
+      },
+    );
+  }
 
   Future _getAllSchedules() async {
     var response = await http.post("$baseUrl/admin/fetchAllSchedule", body: {
@@ -35,6 +56,8 @@ class _ViewScheduleAdminState extends State<ViewScheduleAdmin> {
     }
   }
 
+  BannerAd _bannerAd;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -44,6 +67,16 @@ class _ViewScheduleAdminState extends State<ViewScheduleAdmin> {
     setState(() {
       _isLoading = true;
     });
+    _bannerAd = createBannerAd()
+      ..load()
+      ..show();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _bannerAd?.dispose();
   }
 
   @override

@@ -40,17 +40,17 @@ class _LandingPageState extends State<LandingPage> {
 
   @override
   void initState() {
-    _initAdMob();
     Timer(Duration(seconds: 4), () {
-      if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      if (Platform.isAndroid) {
+        _initAdMob();
+        _loginExists();
+      } else {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ViewTasks(),
+            builder: (context) => LoginPage(),
           ),
         );
-      } else {
-        _loginExists();
       }
     });
 
@@ -71,7 +71,10 @@ class _LandingPageState extends State<LandingPage> {
               width: MediaQuery.of(context).size.width * 0.7,
               child: AutoSizeText('Workbook', maxLines: 1, textAlign: TextAlign.center, style: TextStyle(fontSize: 70, color: Colors.white)),
             ),
-            Image.asset('images/book.gif'),
+            Container(
+              child: Image.asset('images/book.gif'),
+              height: MediaQuery.of(context).size.height * 0.3,
+            ),
           ],
         ),
       ),

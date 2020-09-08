@@ -36,7 +36,7 @@ class _GenerateTicketState extends State<GenerateTicket> {
       "userName": _nameController.text.toString(),
       "userID": _emailController.text.toString(),
       "message": _descriptionController.text.toString(),
-      "fcmToken": User.userFcmToken,
+      "fcmToken": User.userFcmToken ?? 'fcmToken',
       "instituteName": _selectedInstitution,
       "contactNumber": _phoneController.text
     });

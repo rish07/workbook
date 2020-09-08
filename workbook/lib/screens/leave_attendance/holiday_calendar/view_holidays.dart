@@ -6,6 +6,8 @@ import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:universal_io/io.dart';
+import 'package:workbook/ad_manager.dart';
 import 'package:workbook/screens/leave_attendance/holiday_calendar/create_holiday.dart';
 import 'package:http/http.dart' as http;
 import '../../../constants.dart';
@@ -21,7 +23,7 @@ class ViewHolidays extends StatefulWidget {
 class _ViewHolidaysState extends State<ViewHolidays> {
   BannerAd createBannerAd() {
     return BannerAd(
-      adUnitId: BannerAd.testAdUnitId,
+      adUnitId: AdManager.bannerAdUnitId,
       size: AdSize.banner,
       targetingInfo: targetingInfo,
       listener: (MobileAdEvent event) {
@@ -111,9 +113,11 @@ class _ViewHolidaysState extends State<ViewHolidays> {
     // TODO: implement initState
     super.initState();
     _getInstituteHolidays();
-    _bannerAd = createBannerAd()
-      ..load()
-      ..show();
+    if (Platform.isAndroid) {
+      _bannerAd = createBannerAd()
+        ..load()
+        ..show();
+    }
   }
 
   @override

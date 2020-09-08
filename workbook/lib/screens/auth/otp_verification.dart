@@ -120,7 +120,7 @@ class _OTPVerificationState extends State<OTPVerification> {
               "mailAddress": widget.mail,
               "adharNumber": widget.aadhar,
               "contactNumber": widget.phone,
-              "fcmToken": widget.fcm,
+              "fcmToken": widget.fcm ?? 'fcmToken',
             }
           : (widget.role == 'customer' || widget.role == 'employee')
               ? {
@@ -133,7 +133,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                   "division": widget.division,
                   "adharNumber": widget.aadhar,
                   "contactNumber": widget.phone,
-                  "fcmToken": User.userFcmToken,
+                  "fcmToken": User.userFcmToken ?? 'fcmToken',
                 }
               : {
                   "role": "driver",
@@ -144,7 +144,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                   "carNumber": widget.carNumber,
                   "adharNumber": widget.aadhar,
                   "contactNumber": widget.phone,
-                  "fcmToken": User.userFcmToken,
+                  "fcmToken": User.userFcmToken ?? 'fcmToken',
                 },
     );
     print(response.body);
