@@ -43,15 +43,10 @@ class _LandingPageState extends State<LandingPage> {
     Timer(Duration(seconds: 4), () {
       if (Platform.isAndroid) {
         _initAdMob();
-        _loginExists();
-      } else {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => LoginPage(),
-          ),
-        );
       }
+      _loginExists();
+
+      // }
     });
 
     super.initState();
