@@ -4,9 +4,11 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:universal_io/io.dart';
 
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/request_profile_page.dart';
+import 'package:workbook/screens/responsive_widget.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';
 import 'dart:convert';
@@ -107,6 +109,7 @@ class _ActiveUsersState extends State<ActiveUsers> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -128,137 +131,143 @@ class _ActiveUsersState extends State<ActiveUsers> {
           backgroundColor: Colors.transparent,
         ),
         inAsyncCall: _loading,
-        child: Center(
-          child: ListView.builder(
-              itemCount: _employeeList.length,
-              itemBuilder: (context, index) {
-                if (_employeeList[index]['approved'] == true) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: GestureDetector(
-                      onTap: () async {
-                        Navigator.push(
-                            context,
-                            PageTransition(
-                                child: RequestProfilePage(
-                                  routeExists: _employeeList[index]['route']?.length == 0 ? false : true,
-                                  carNumber: _employeeList[index]['carNumber'],
-                                  isDriver: widget.isDriver ? true : false,
-                                  instituteType: _employeeList[index]['instituteType'],
-                                  instituteName: _employeeList[index]['instituteName'],
-                                  isActive: true,
-                                  profilePicExists: _employeeList[index]['profilePicture'] == null ? false : true,
-                                  id: _employeeList[index]['_id'],
-                                  role: _employeeList[index]['role'],
-                                  userName: _employeeList[index]['userName'],
-                                  aadharNumber: _employeeList[index]['adharNumber'].toString(),
-                                  contactNumber: _employeeList[index]['contactNumber'].toString(),
-                                  division: _employeeList[index]['division'],
-                                  grade: _employeeList[index]['grade'],
-                                  emailID: _employeeList[index]['userID'],
+        child: Container(
+          padding: Platform.isAndroid
+              ? null
+              : EdgeInsets.symmetric(
+                  vertical: 20, horizontal: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.2 : ResponsiveWidget.isLargeScreen(context) ? size.width * 0.3 : 10),
+          child: Center(
+            child: ListView.builder(
+                itemCount: _employeeList.length,
+                itemBuilder: (context, index) {
+                  if (_employeeList[index]['approved'] == true) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GestureDetector(
+                        onTap: () async {
+                          Navigator.push(
+                              context,
+                              PageTransition(
+                                  child: RequestProfilePage(
+                                    routeExists: _employeeList[index]['route']?.length == 0 ? false : true,
+                                    carNumber: _employeeList[index]['carNumber'],
+                                    isDriver: widget.isDriver ? true : false,
+                                    instituteType: _employeeList[index]['instituteType'],
+                                    instituteName: _employeeList[index]['instituteName'],
+                                    isActive: true,
+                                    profilePicExists: _employeeList[index]['profilePicture'] == null ? false : true,
+                                    id: _employeeList[index]['_id'],
+                                    role: _employeeList[index]['role'],
+                                    userName: _employeeList[index]['userName'],
+                                    aadharNumber: _employeeList[index]['adharNumber'].toString(),
+                                    contactNumber: _employeeList[index]['contactNumber'].toString(),
+                                    division: _employeeList[index]['division'],
+                                    grade: _employeeList[index]['grade'],
+                                    emailID: _employeeList[index]['userID'],
 //                                  profilePicture: _employeeList[index]
 //                                      ['profilePicture'],
-                                ),
-                                type: PageTransitionType.rightToLeft));
-                      },
-                      child: Container(
-                          padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey,
-                                blurRadius: 5,
-                                spreadRadius: 0.5,
-                              )
-                            ],
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    _employeeList[index]['userName'],
-                                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                                   ),
-                                  User.userRole != 'superAdmin' && !widget.isDriver
-                                      ? Row(
-                                          children: [
-                                            Text(
-                                              'Division: ',
-                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(
-                                              _employeeList[index]['division'],
-                                              style: TextStyle(fontSize: 14),
-                                            ),
-                                          ],
-                                        )
-                                      : Row(
-                                          children: [
-                                            Text(
-                                              'Institute Name: ',
-                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(
-                                              _employeeList[index]['instituteName'],
-                                              style: TextStyle(fontSize: 14),
-                                            )
-                                          ],
-                                        ),
-                                  User.userRole != 'superAdmin' && !widget.isDriver
-                                      ? Row(
-                                          children: [
-                                            Text(
-                                              'Grade: ',
-                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(
-                                              _employeeList[index]['grade'],
-                                              style: TextStyle(fontSize: 14),
-                                            ),
-                                          ],
-                                        )
-                                      : !widget.isDriver
-                                          ? Row(
-                                              children: [
-                                                Text(
-                                                  'Institute Type: ',
-                                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                                ),
-                                                Text(
-                                                  _employeeList[index]['instituteType'],
-                                                  style: TextStyle(fontSize: 14),
-                                                )
-                                              ],
-                                            )
-                                          : Row(
-                                              children: [
-                                                Text(
-                                                  'Car Number: ',
-                                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                                ),
-                                                Text(
-                                                  _employeeList[index]['carNumber'],
-                                                  style: TextStyle(fontSize: 14),
-                                                )
-                                              ],
-                                            )
-                                ],
-                              ),
-                              Icon(Icons.navigate_next),
-                            ],
-                          )),
-                    ),
-                  );
-                } else {
-                  return Container();
-                }
-              }),
+                                  type: PageTransitionType.rightToLeft));
+                        },
+                        child: Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey,
+                                  blurRadius: 5,
+                                  spreadRadius: 0.5,
+                                )
+                              ],
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _employeeList[index]['userName'],
+                                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                    ),
+                                    User.userRole != 'superAdmin' && !widget.isDriver
+                                        ? Row(
+                                            children: [
+                                              Text(
+                                                'Division: ',
+                                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                              ),
+                                              Text(
+                                                _employeeList[index]['division'],
+                                                style: TextStyle(fontSize: 14),
+                                              ),
+                                            ],
+                                          )
+                                        : Row(
+                                            children: [
+                                              Text(
+                                                'Institute Name: ',
+                                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                              ),
+                                              Text(
+                                                _employeeList[index]['instituteName'],
+                                                style: TextStyle(fontSize: 14),
+                                              )
+                                            ],
+                                          ),
+                                    User.userRole != 'superAdmin' && !widget.isDriver
+                                        ? Row(
+                                            children: [
+                                              Text(
+                                                'Grade: ',
+                                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                              ),
+                                              Text(
+                                                _employeeList[index]['grade'],
+                                                style: TextStyle(fontSize: 14),
+                                              ),
+                                            ],
+                                          )
+                                        : !widget.isDriver
+                                            ? Row(
+                                                children: [
+                                                  Text(
+                                                    'Institute Type: ',
+                                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                                  ),
+                                                  Text(
+                                                    _employeeList[index]['instituteType'],
+                                                    style: TextStyle(fontSize: 14),
+                                                  )
+                                                ],
+                                              )
+                                            : Row(
+                                                children: [
+                                                  Text(
+                                                    'Car Number: ',
+                                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                                  ),
+                                                  Text(
+                                                    _employeeList[index]['carNumber'],
+                                                    style: TextStyle(fontSize: 14),
+                                                  )
+                                                ],
+                                              )
+                                  ],
+                                ),
+                                Icon(Icons.navigate_next),
+                              ],
+                            )),
+                      ),
+                    );
+                  } else {
+                    return Container();
+                  }
+                }),
+          ),
         ),
       ),
     );
