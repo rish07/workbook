@@ -9,8 +9,10 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:universal_io/io.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/auth/active_users.dart';
+import 'package:workbook/screens/responsive_widget.dart';
 import 'package:workbook/user.dart';
 
 class RequestProfilePage extends StatefulWidget {
@@ -122,6 +124,7 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return ModalProgressHUD(
       inAsyncCall: _loading,
       child: Scaffold(
@@ -174,12 +177,16 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
                 ),
               )
             : Container(
-                padding: EdgeInsets.all(16),
+                padding: Platform.isAndroid
+                    ? EdgeInsets.all(16)
+                    : EdgeInsets.symmetric(
+                        horizontal: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.32 : ResponsiveWidget.isLargeScreen(context) ? size.width * 0.4 : 10,
+                      ),
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 20.0),
+                        padding: EdgeInsets.only(bottom: Platform.isAndroid ? 20.0 : 30),
                         child: Center(
                           child: CircleAvatar(
                             radius: 50,
@@ -326,7 +333,7 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
 
   Padding buildFieldEntry({String label, String value}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+      padding: EdgeInsets.symmetric(vertical: Platform.isAndroid ? 8.0 : 16, horizontal: 16),
       child: Row(
         textBaseline: TextBaseline.alphabetic,
         children: [
