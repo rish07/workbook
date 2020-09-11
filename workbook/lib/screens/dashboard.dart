@@ -506,7 +506,7 @@ class _DashBoardState extends State<DashBoard> {
                     )
                   : Padding(
                       padding: uni.Platform.isAndroid
-                          ? null
+                          ? EdgeInsets.zero
                           : EdgeInsets.symmetric(
                               vertical: 20,
                               horizontal: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.2 : ResponsiveWidget.isLargeScreen(context) ? size.width * 0.3 : 10,

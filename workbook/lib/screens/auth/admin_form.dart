@@ -1,4 +1,6 @@
 import 'dart:convert';
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -7,6 +9,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/auth/login_page.dart';
 import 'package:workbook/screens/auth/otp_verification.dart';
@@ -17,8 +20,10 @@ import 'package:workbook/widget/registerButton.dart';
 import 'package:regexed_validator/regexed_validator.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'package:universal_html/prefer_universal/html.dart' as html;
 
+import 'package:firebase/firebase.dart' as fb;
+import 'dart:io' as io;
 import 'package:workbook/user.dart';
 import 'dart:math' as math;
 import 'package:path/path.dart' as p;
@@ -31,6 +36,7 @@ class AdminForm extends StatefulWidget {
 class _AdminFormState extends State<AdminForm> {
   final math.Random random = math.Random();
   bool _showEmail = false;
+  fb.UploadTask _uploadTask;
   bool _isLoading = false;
   String imageAsB64;
   final picker = ImagePicker();
@@ -62,9 +68,12 @@ class _AdminFormState extends State<AdminForm> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _mailController = TextEditingController();
   String fileType = '';
-  File _file;
+  io.File _file;
   String fileName = '';
   String mediaUrl = '';
+  String imgb64;
+  bool imageExists = false;
+  String imageUrl;
 
   // Picks the file from local storage
   Future filePicker(BuildContext context) async {
@@ -157,6 +166,38 @@ class _AdminFormState extends State<AdminForm> {
       Fluttertoast.showToast(context, msg: 'File attached successfully');
     });
     print("URL is $url");
+  }
+
+  // For the website
+  File imageFile;
+
+  uploadImage() async {
+    // HTML input element
+    html.InputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.click();
+
+    uploadInput.onChange.listen(
+      (changeEvent) {
+        final file = uploadInput.files.first;
+        final reader = html.FileReader();
+
+        reader.readAsDataUrl(file);
+
+        reader.onLoadEnd.listen(
+          (loadEndEvent) async {
+            uploadImageFile(file, imageName: 'temp');
+          },
+        );
+      },
+    );
+  }
+
+  Future<Uri> uploadImageFile(html.File image, {String imageName}) async {
+    fb.StorageReference storageRef = fb.storage().ref('images/$imageName');
+    fb.UploadTaskSnapshot uploadTaskSnapshot = await storageRef.put(image).future;
+
+    Uri imageUri = await uploadTaskSnapshot.ref.getDownloadURL();
+    return imageUri;
   }
 
   @override
@@ -306,8 +347,12 @@ class _AdminFormState extends State<AdminForm> {
                               borderRadius: BorderRadius.circular(32),
                             ),
                             color: Colors.white,
-                            onPressed: () {
-                              filePicker(context);
+                            onPressed: () async {
+                              if (Platform.isAndroid) {
+                                filePicker(context);
+                              } else {
+                                await uploadImage();
+                              }
                             },
                             child: _file == null ? Text('Choose a file') : Text('Uploaded!'),
                           ),

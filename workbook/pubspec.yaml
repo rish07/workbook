@@ -64,6 +64,8 @@ dependencies:
   url_launcher:
   universal_io: ^1.0.1
   firebase_admob: any
+  universal_html: any
+  firebase: ^7.3.0
 
 
 
