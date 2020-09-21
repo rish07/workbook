@@ -90,63 +90,63 @@ class _AdminFormState extends State<AdminForm> {
   }
 
   // Send email verification OTP
-  Future _sendEmailVerification(String email) async {
-    var response = await http.post('$baseUrl/sendVerification', body: {
-      "userID": email,
-      "role": "admin",
-    });
-    print(response.body);
-
-    if (json.decode(response.body)['statusCode'] == 200) {
-      Fluttertoast.showToast(context, msg: 'Email sent', gravity: ToastGravity.CENTER);
-      Navigator.push(
-        context,
-        PageTransition(
-            child: OTPVerification(
-              role: 'admin',
-              name: _nameController.text,
-              password: _passwordController.text,
-              instituteName: _organizationController.text,
-              instituteImageUrl: mediaUrl,
-              instituteType: _selectedInstitutionType,
-              numberOfMembers: _organizationNumberController.text.toString(),
-              state: _selectedStateLocation,
-              city: _selectedCityLocation,
-              mail: _mailController.text,
-              fcm: User.userFcmToken,
-              aadhar: _aadharController.text.toString(),
-              phone: _phoneController.text.toString(),
-              otp: json.decode(response.body)['payload']['token'].toString(),
-              isEmailVerify: true,
-              email: _emailController.text,
-            ),
-            type: PageTransitionType.fade),
-      );
-    } else if (json.decode(response.body)['statusCode'] == 401) {
-      popDialog(
-          title: 'Duplicate User',
-          content: 'The user with email id $email already exists. Please login or click on forgot password!',
-          buttonTitle: 'Okay',
-          onPress: () {
-            Navigator.push(
-              context,
-              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
-            );
-          },
-          context: context);
-    } else if (json.decode(response.body)['statusCode'] == 400) {
-      popDialog(
-          title: 'Error',
-          content: 'There was some error,please try again!',
-          buttonTitle: 'Okay',
-          onPress: () {
-            Navigator.pop(context);
-          },
-          context: context);
-    } else {
-      Fluttertoast.showToast(context, msg: 'Error');
-    }
-  }
+  // Future _sendEmailVerification(String email) async {
+  //   var response = await http.post('$baseUrl/sendVerification', body: {
+  //     "userID": email,
+  //     "role": "admin",
+  //   });
+  //   print(response.body);
+  //
+  //   if (json.decode(response.body)['statusCode'] == 200) {
+  //     Fluttertoast.showToast(context, msg: 'Email sent', gravity: ToastGravity.CENTER);
+  //     Navigator.push(
+  //       context,
+  //       PageTransition(
+  //           child: OTPVerification(
+  //             role: 'admin',
+  //             name: _nameController.text,
+  //             password: _passwordController.text,
+  //             instituteName: _organizationController.text,
+  //             instituteImageUrl: mediaUrl,
+  //             instituteType: _selectedInstitutionType,
+  //             numberOfMembers: _organizationNumberController.text.toString(),
+  //             state: _selectedStateLocation,
+  //             city: _selectedCityLocation,
+  //             mail: _mailController.text,
+  //             fcm: User.userFcmToken,
+  //             aadhar: _aadharController.text.toString(),
+  //             phone: _phoneController.text.toString(),
+  //             otp: json.decode(response.body)['payload']['token'].toString(),
+  //             isEmailVerify: true,
+  //             email: _emailController.text,
+  //           ),
+  //           type: PageTransitionType.fade),
+  //     );
+  //   } else if (json.decode(response.body)['statusCode'] == 401) {
+  //     popDialog(
+  //         title: 'Duplicate User',
+  //         content: 'The user with email id $email already exists. Please login or click on forgot password!',
+  //         buttonTitle: 'Okay',
+  //         onPress: () {
+  //           Navigator.push(
+  //             context,
+  //             PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
+  //           );
+  //         },
+  //         context: context);
+  //   } else if (json.decode(response.body)['statusCode'] == 400) {
+  //     popDialog(
+  //         title: 'Error',
+  //         content: 'There was some error,please try again!',
+  //         buttonTitle: 'Okay',
+  //         onPress: () {
+  //           Navigator.pop(context);
+  //         },
+  //         context: context);
+  //   } else {
+  //     Fluttertoast.showToast(context, msg: 'Error');
+  //   }
+  // }
 
   // Upload the files to firebase storage
   Future<void> _uploadFile() async {
@@ -185,7 +185,7 @@ class _AdminFormState extends State<AdminForm> {
 
         reader.onLoadEnd.listen(
           (loadEndEvent) async {
-            uploadImageFile(file, imageName: 'temp');
+            uploadImageFile(file, imageName: _organizationController.text.toString());
           },
         );
       },
@@ -193,11 +193,93 @@ class _AdminFormState extends State<AdminForm> {
   }
 
   Future<Uri> uploadImageFile(html.File image, {String imageName}) async {
-    fb.StorageReference storageRef = fb.storage().ref('images/$imageName');
+    setState(() {
+      _isLoading = true;
+    });
+    fb.StorageReference storageRef = fb.app().storage().ref('images/$imageName');
     fb.UploadTaskSnapshot uploadTaskSnapshot = await storageRef.put(image).future;
 
     Uri imageUri = await uploadTaskSnapshot.ref.getDownloadURL();
+    print(imageUri);
+    setState(() {
+      imageUrl = imageUri.toString();
+      mediaUrl = imageUrl;
+      _isLoading = false;
+      Fluttertoast.showToast(context, msg: 'Uploaded successfully');
+    });
     return imageUri;
+  }
+
+  Future _registerUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+    var response = await http.post("$baseUrl/admin/register", body: {
+      "userName": _nameController.text.toString(),
+      "userID": _emailController.text.toString(),
+      "password": _passwordController.text,
+      "instituteName": _organizationController.text,
+      "instituteType": _selectedInstitutionType,
+      "instituteImageUrl": mediaUrl,
+      "numberOfMembers": _organizationNumberController.text,
+      "state": _selectedStateLocation,
+      "city": _selectedCityLocation,
+      "mailAddress": _mailController.text.toString(),
+      "adharNumber": _aadharController.text,
+      "contactNumber": _phoneController.text,
+      "fcmToken": User.userFcmToken == null ? 'fcmToken' : User.userFcmToken,
+    });
+    print(response.body);
+    setState(() {
+      _isLoading = false;
+    });
+    if (json.decode(response.body)['statusCode'] == 200) {
+      popDialog(
+          onPress: () {
+            Navigator.push(
+              context,
+              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
+            );
+          },
+          title: 'Registration Successful',
+          context: context,
+          buttonTitle: 'Close',
+          content: 'Your form has been submitted. Please wait for 24 hours for it to get approved');
+
+      _nameController.clear();
+      _emailController.clear();
+      _passwordController.clear();
+      _passwordReController.clear();
+      _organizationController.clear();
+      _cityNameController.clear();
+      _selectedCityLocation = null;
+      _selectedStateLocation = null;
+      _organizationNumberController.clear();
+      _mailController.clear();
+      _aadharController.clear();
+      _phoneController.clear();
+    } else if (json.decode(response.body)['payload']['err']['keyValue'] != null) {
+      popDialog(
+          title: 'Duplicate user',
+          context: context,
+          content: 'Admin with email ID ${json.decode(response.body)['payload']['err']['keyValue']['userID']} already exists. Please login in!',
+          onPress: () {
+            Navigator.push(
+              context,
+              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
+            );
+          },
+          buttonTitle: 'Login');
+    } else {
+      popDialog(
+          title: 'Error',
+          content: "Registration failed, please try again!",
+          context: context,
+          onPress: () {
+            Navigator.pop(context);
+          },
+          buttonTitle: 'Okay');
+    }
   }
 
   @override
@@ -354,7 +436,7 @@ class _AdminFormState extends State<AdminForm> {
                                 await uploadImage();
                               }
                             },
-                            child: _file == null ? Text('Choose a file') : Text('Uploaded!'),
+                            child: _file != null || imageUrl != null ? Text('Uploaded!') : Text('Choose a file'),
                           ),
                         ),
                       ],
@@ -518,7 +600,7 @@ class _AdminFormState extends State<AdminForm> {
                           if (_passwordController.text != _passwordReController.text) {
                             _validateRePassword = true;
                           }
-                          if (_file == null) {
+                          if (_file == null && imageUrl == null) {
                             Scaffold.of(context).showSnackBar(SnackBar(
                               content: Text('Please upload the institution image!'),
                               action: SnackBarAction(label: 'Okay', onPressed: () {}),
@@ -535,8 +617,8 @@ class _AdminFormState extends State<AdminForm> {
                                 !_validatePassword &&
                                 !_validateMail &&
                                 !_validateRePassword &&
-                                _file != null) {
-                          await _sendEmailVerification(_emailController.text.toString());
+                                (_file != null || imageUrl != null)) {
+                          await _registerUser();
                         }
                       },
                     ),
