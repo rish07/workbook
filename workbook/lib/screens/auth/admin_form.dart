@@ -13,6 +13,7 @@ import 'package:universal_io/prefer_universal/io.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/auth/login_page.dart';
 import 'package:workbook/screens/auth/otp_verification.dart';
+import 'package:workbook/screens/responsive_widget.dart';
 import 'package:workbook/widget/input_field.dart';
 import 'package:workbook/widget/password.dart';
 import 'package:workbook/widget/popUpDialog.dart';
@@ -305,6 +306,7 @@ class _AdminFormState extends State<AdminForm> {
   //UI Block
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: ModalProgressHUD(
         progressIndicator: CircularProgressIndicator(
@@ -320,13 +322,36 @@ class _AdminFormState extends State<AdminForm> {
             padding: EdgeInsets.all(16),
             child: ListView(
               children: [
-                Text(
-                  'Admin Registration',
-                  style: TextStyle(
-                    fontSize: 28,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
+                Row(
+                  mainAxisAlignment: Platform.isAndroid ? MainAxisAlignment.center : MainAxisAlignment.start,
+                  children: [
+                    !Platform.isAndroid
+                        ? IconButton(
+                            icon: Icon(
+                              Icons.arrow_back_outlined,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            })
+                        : Container(),
+                    !Platform.isAndroid
+                        ? SizedBox(
+                            width: ResponsiveWidget.isMediumScreen(context)
+                                ? size.width * 0.32
+                                : ResponsiveWidget.isLargeScreen(context)
+                                    ? size.width * 0.4
+                                    : 20)
+                        : Container(),
+                    Text(
+                      'Admin Registration',
+                      style: TextStyle(
+                        fontSize: 28,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 16.0),
@@ -579,7 +604,11 @@ class _AdminFormState extends State<AdminForm> {
                       onPressed: () async {
                         setState(() {
                           _nameController.text.isEmpty ? _validateName = true : _validateName = false;
-                          _selectedCityLocation == 'Others' ? _cityNameController.text.isEmpty ? _validateCityName = true : _validateCityName = false : Container();
+                          _selectedCityLocation == 'Others'
+                              ? _cityNameController.text.isEmpty
+                                  ? _validateCityName = true
+                                  : _validateCityName = false
+                              : Container();
                           (_emailController.text.isEmpty || !validator.email(_emailController.text)) ? _validateEmail = true : _validateEmail = false;
                           (_passwordController.text.isEmpty || !validator.password(_passwordController.text)) ? _validatePassword = true : _validatePassword = false;
                           (_passwordReController.text.isEmpty || !validator.password(_passwordController.text)) ? _validateRePassword = true : _validateRePassword = false;

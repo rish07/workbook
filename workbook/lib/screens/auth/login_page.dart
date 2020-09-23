@@ -13,6 +13,7 @@ import 'package:workbook/constants.dart';
 import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/screens/queries/guest_ticket.dart';
 import 'package:workbook/screens/auth/otp_verification.dart';
+import 'package:workbook/screens/responsive_widget.dart';
 import 'dart:convert';
 import 'package:workbook/widget/first.dart';
 import 'package:workbook/widget/input_field.dart';
@@ -303,6 +304,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
         body: WillPopScope(
       onWillPop: () async => false,
@@ -328,11 +330,25 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Row(children: <Widget>[
-                    VerticalText(),
-                    TextLogin(),
+                    Padding(
+                      padding: Platform.isAndroid ? EdgeInsets.zero : EdgeInsets.only(left: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.2 : size.width * 0.3),
+                      child: VerticalText(),
+                    ),
+                    Padding(
+                      padding: Platform.isAndroid ? EdgeInsets.zero : EdgeInsets.only(left: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.15 : 0),
+                      child: TextLogin(),
+                    ),
                   ]),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: Platform.isAndroid
+                        ? EdgeInsets.all(8.0)
+                        : EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: ResponsiveWidget.isMediumScreen(context)
+                                ? size.width * 0.2
+                                : ResponsiveWidget.isLargeScreen(context)
+                                    ? size.width * 0.3
+                                    : 8),
                     child: InputField(
                       validate: false,
                       validation: (String arg) {
@@ -350,7 +366,15 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(8),
+                    padding: Platform.isAndroid
+                        ? EdgeInsets.all(8.0)
+                        : EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: ResponsiveWidget.isMediumScreen(context)
+                                ? size.width * 0.2
+                                : ResponsiveWidget.isLargeScreen(context)
+                                    ? size.width * 0.3
+                                    : 8),
                     child: PasswordInput(
                       validate: false,
                       controller: _passwordController,
@@ -364,7 +388,14 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 28.0),
+                    padding: Platform.isAndroid
+                        ? EdgeInsets.only(left: 28.0)
+                        : EdgeInsets.only(
+                            left: ResponsiveWidget.isMediumScreen(context)
+                                ? size.width * 0.217
+                                : ResponsiveWidget.isLargeScreen(context)
+                                    ? size.width * 0.31
+                                    : 28),
                     child: GestureDetector(
                       onTap: () {
                         final TextEditingController _controller = TextEditingController();
@@ -433,7 +464,7 @@ class _LoginPageState extends State<LoginPage> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 25),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: Platform.isAndroid ? MainAxisAlignment.spaceBetween : MainAxisAlignment.center,
                       children: [
                         FlatButton(
                             onPressed: () {
@@ -446,10 +477,19 @@ class _LoginPageState extends State<LoginPage> {
                               'Guest user?',
                               style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                             )),
+                        !Platform.isAndroid
+                            ? SizedBox(
+                                width: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.35 : size.width * 0.25,
+                              )
+                            : Container(),
                         Container(
                           alignment: Alignment.bottomRight,
                           height: 50,
-                          width: MediaQuery.of(context).size.width * 0.3,
+                          width: Platform.isAndroid
+                              ? MediaQuery.of(context).size.width * 0.3
+                              : ResponsiveWidget.isMediumScreen(context)
+                                  ? size.width * 0.12
+                                  : size.width * 0.08,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(30),
@@ -500,7 +540,17 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                   ),
-                  FirstTime(),
+                  Padding(
+                    padding: Platform.isAndroid
+                        ? EdgeInsets.zero
+                        : EdgeInsets.only(
+                            left: ResponsiveWidget.isMediumScreen(context)
+                                ? size.width * 0.19
+                                : ResponsiveWidget.isLargeScreen(context)
+                                    ? size.width * 0.297
+                                    : 28),
+                    child: FirstTime(),
+                  ),
                 ],
               ),
             ),
