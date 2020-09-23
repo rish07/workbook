@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:http/http.dart' as http;
 import 'package:page_transition/page_transition.dart';
+import 'package:universal_io/io.dart';
 import 'package:workbook/screens/schedule/view_schedule.dart';
 import '../../ad_manager.dart';
 import '../../constants.dart';
@@ -67,9 +68,11 @@ class _ViewScheduleAdminState extends State<ViewScheduleAdmin> {
     setState(() {
       _isLoading = true;
     });
-    _bannerAd = createBannerAd()
-      ..load()
-      ..show();
+    if (Platform.isAndroid) {
+      _bannerAd = createBannerAd()
+        ..load()
+        ..show();
+    }
   }
 
   @override

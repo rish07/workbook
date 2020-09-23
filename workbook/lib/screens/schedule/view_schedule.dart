@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:universal_io/io.dart';
 import 'package:workbook/constants.dart';
 import 'package:http/http.dart' as http;
 
@@ -78,10 +79,11 @@ class _ViewScheduleState extends State<ViewSchedule> {
         _isLoading = true;
       });
     }
-
-    _bannerAd = createBannerAd()
-      ..load()
-      ..show();
+    if (Platform.isAndroid) {
+      _bannerAd = createBannerAd()
+        ..load()
+        ..show();
+    }
 
     // TODO: Load a Banner Ad
   }
