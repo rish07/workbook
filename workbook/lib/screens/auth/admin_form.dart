@@ -338,7 +338,7 @@ class _AdminFormState extends State<AdminForm> {
                     !Platform.isAndroid
                         ? SizedBox(
                             width: ResponsiveWidget.isMediumScreen(context)
-                                ? size.width * 0.32
+                                ? size.width * 0.3
                                 : ResponsiveWidget.isLargeScreen(context)
                                     ? size.width * 0.4
                                     : 20)
@@ -354,7 +354,15 @@ class _AdminFormState extends State<AdminForm> {
                   ],
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 16.0),
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.only(top: 16.0)
+                      : EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.15
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.27
+                                  : 0),
                   child: InputField(
                     validate: _validateName,
                     errorText: 'This field can\'t be empty',
@@ -362,34 +370,82 @@ class _AdminFormState extends State<AdminForm> {
                     labelText: 'Name',
                   ),
                 ),
-                InputField(
-                  onChange: () {
-                    setState(() {
-                      _showEmail = true;
-                    });
-                  },
-                  validate: _validateEmail,
-                  capital: TextCapitalization.none,
-                  controller: _emailController,
-                  errorText: 'Please enter a valid email ID',
-                  labelText: 'Email',
-                  textInputType: TextInputType.emailAddress,
-                ),
-                PasswordInput(
-                  validate: _validatePassword,
-                  controller: _passwordController,
-                  labelText: 'Password',
-                  errorText: 'Min Length = 8 and Max length = 15,\nShould have atleast 1 number, 1 capital letter\nand 1 Special Character',
-                ),
-                PasswordInput(
-                  validate: _validateRePassword,
-                  controller: _passwordReController,
-                  labelText: 'Re-enter Password',
-                  errorText: 'Passwords don\'t match',
-                ),
-                InputField(validate: _validateOrganization, controller: _organizationController, errorText: 'Max length is 50', labelText: 'Institution Name'),
                 Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.zero
+                      : EdgeInsets.symmetric(
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.15
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.27
+                                  : 0),
+                  child: InputField(
+                    onChange: () {
+                      setState(() {
+                        _showEmail = true;
+                      });
+                    },
+                    validate: _validateEmail,
+                    capital: TextCapitalization.none,
+                    controller: _emailController,
+                    errorText: 'Please enter a valid email ID',
+                    labelText: 'Email',
+                    textInputType: TextInputType.emailAddress,
+                  ),
+                ),
+                Padding(
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.zero
+                      : EdgeInsets.symmetric(
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.15
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.27
+                                  : 0),
+                  child: PasswordInput(
+                    validate: _validatePassword,
+                    controller: _passwordController,
+                    labelText: 'Password',
+                    errorText: 'Min Length = 8 and Max length = 15,\nShould have atleast 1 number, 1 capital letter\nand 1 Special Character',
+                  ),
+                ),
+                Padding(
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.zero
+                      : EdgeInsets.symmetric(
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.15
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.27
+                                  : 0),
+                  child: PasswordInput(
+                    validate: _validateRePassword,
+                    controller: _passwordReController,
+                    labelText: 'Re-enter Password',
+                    errorText: 'Passwords don\'t match',
+                  ),
+                ),
+                Padding(
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.zero
+                      : EdgeInsets.symmetric(
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.15
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.27
+                                  : 0),
+                  child: InputField(validate: _validateOrganization, controller: _organizationController, errorText: 'Max length is 50', labelText: 'Institution Name'),
+                ),
+                Padding(
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.all(16)
+                      : EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.168
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.278
+                                  : 0),
                   child: Theme(
                     data: Theme.of(context).copyWith(canvasColor: violet1),
                     child: DropdownButtonFormField(
@@ -433,22 +489,33 @@ class _AdminFormState extends State<AdminForm> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.all(16)
+                      : EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.168
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.278
+                                  : 0),
                   child: Container(
                     height: 60,
                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.white70)),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: Platform.isAndroid ? MainAxisAlignment.center : MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Institution Image',
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white70,
+                        Padding(
+                          padding: Platform.isAndroid ? EdgeInsets.zero : EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            'Institution Image',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white70,
+                            ),
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(left: 16.0),
+                          padding: EdgeInsets.only(left: 16.0, right: Platform.isAndroid ? 0 : 5),
                           child: MaterialButton(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(32),
@@ -468,15 +535,33 @@ class _AdminFormState extends State<AdminForm> {
                     ),
                   ),
                 ),
-                InputField(
-                  validate: _validateNumberOrganization,
-                  errorText: 'Please enter the number of members',
-                  controller: _organizationNumberController,
-                  labelText: 'Number of members',
-                  textInputType: TextInputType.number,
+                Padding(
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.zero
+                      : EdgeInsets.symmetric(
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.15
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.27
+                                  : 0),
+                  child: InputField(
+                    validate: _validateNumberOrganization,
+                    errorText: 'Please enter the number of members',
+                    controller: _organizationNumberController,
+                    labelText: 'Number of members',
+                    textInputType: TextInputType.number,
+                  ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.all(16)
+                      : EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.168
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.278
+                                  : 0),
                   child: Theme(
                     data: Theme.of(context).copyWith(canvasColor: violet1),
                     child: DropdownButtonFormField(
@@ -520,7 +605,15 @@ class _AdminFormState extends State<AdminForm> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.all(16)
+                      : EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.168
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.278
+                                  : 0),
                   child: Theme(
                     data: Theme.of(context).copyWith(canvasColor: violet1),
                     child: DropdownButtonFormField(
@@ -567,36 +660,76 @@ class _AdminFormState extends State<AdminForm> {
                   ),
                 ),
                 _selectedCityLocation == 'Others'
-                    ? InputField(
-                        validate: _validateCityName,
-                        controller: _cityNameController,
-                        errorText: 'Please enter your city name',
-                        labelText: 'City Name',
+                    ? Padding(
+                        padding: Platform.isAndroid
+                            ? EdgeInsets.zero
+                            : EdgeInsets.symmetric(
+                                horizontal: ResponsiveWidget.isMediumScreen(context)
+                                    ? size.width * 0.15
+                                    : ResponsiveWidget.isLargeScreen(context)
+                                        ? size.width * 0.27
+                                        : 0),
+                        child: InputField(
+                          validate: _validateCityName,
+                          controller: _cityNameController,
+                          errorText: 'Please enter your city name',
+                          labelText: 'City Name',
+                        ),
                       )
                     : Container(),
-                InputField(
-                  validate: _validateMail,
-                  maxLines: 5,
-                  controller: _mailController,
-                  errorText: 'Please enter your institute\'s mailing address',
-                  labelText: 'Institute Mailing Address',
-                ),
-                InputField(
-                  validate: _validateAadhar,
-                  controller: _aadharController,
-                  errorText: 'Please enter you 12 digit Aadhar Card number',
-                  textInputType: TextInputType.number,
-                  labelText: 'Aadhar Card Number',
-                ),
-                InputField(
-                  validate: _validatePhoneNumber,
-                  errorText: 'Please enter a valid 10 digit mobile number',
-                  controller: _phoneController,
-                  textInputType: TextInputType.phone,
-                  labelText: 'Contact Number',
+                Padding(
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.zero
+                      : EdgeInsets.symmetric(
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.15
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.27
+                                  : 0),
+                  child: InputField(
+                    validate: _validateMail,
+                    maxLines: 5,
+                    controller: _mailController,
+                    errorText: 'Please enter your institute\'s mailing address',
+                    labelText: 'Institute Mailing Address',
+                  ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 64),
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.zero
+                      : EdgeInsets.symmetric(
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.15
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.27
+                                  : 0),
+                  child: InputField(
+                    validate: _validateAadhar,
+                    controller: _aadharController,
+                    errorText: 'Please enter you 12 digit Aadhar Card number',
+                    textInputType: TextInputType.number,
+                    labelText: 'Aadhar Card Number',
+                  ),
+                ),
+                Padding(
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.zero
+                      : EdgeInsets.symmetric(
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.15
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.27
+                                  : 0),
+                  child: InputField(
+                    validate: _validatePhoneNumber,
+                    errorText: 'Please enter a valid 10 digit mobile number',
+                    controller: _phoneController,
+                    textInputType: TextInputType.phone,
+                    labelText: 'Contact Number',
+                  ),
+                ),
+                Padding(
+                  padding: Platform.isAndroid ? EdgeInsets.symmetric(vertical: 16.0, horizontal: 64) : EdgeInsets.symmetric(vertical: 16, horizontal: size.width * 0.4),
                   child: Builder(
                     builder: (context) => registerButton(
                       role: 'Submit',

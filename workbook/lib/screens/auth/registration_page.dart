@@ -1,12 +1,15 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/auth/driver_form.dart';
 import 'package:workbook/screens/auth/employee_cust_form.dart';
 import 'package:workbook/screens/auth/admin_form.dart';
+import 'package:workbook/screens/responsive_widget.dart';
 import 'package:workbook/widget/signup.dart';
 import 'package:workbook/widget/textNew.dart';
 import 'package:http/http.dart' as http;
@@ -21,6 +24,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: ModalProgressHUD(
         progressIndicator: CircularProgressIndicator(
@@ -36,12 +40,20 @@ class _RegistrationPageState extends State<RegistrationPage> {
             children: <Widget>[
               Column(
                 children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      SignUp(),
-                      TextNew(),
-                    ],
-                  ),
+                  Row(children: <Widget>[
+                    SignUp(),
+                    Padding(
+                      padding: Platform.isAndroid
+                          ? EdgeInsets.zero
+                          : EdgeInsets.only(
+                              left: ResponsiveWidget.isMediumScreen(context)
+                                  ? size.width * 0.5
+                                  : ResponsiveWidget.isLargeScreen(context)
+                                      ? size.width * 0.6
+                                      : 0),
+                      child: TextNew(),
+                    ),
+                  ]),
                   Text(
                     'Register as',
                     style: TextStyle(
