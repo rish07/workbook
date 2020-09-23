@@ -12,9 +12,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:http/http.dart' as http;
 import 'package:workbook/screens/dashboard.dart';
+import 'package:workbook/screens/responsive_widget.dart';
 import 'package:workbook/widget/popUpDialog.dart';
 import '../../constants.dart';
+import 'package:universal_io/io.dart' as uni;
 import '../../user.dart';
+import 'package:universal_html/prefer_universal/html.dart' as html;
+import 'package:firebase/firebase.dart' as fb;
 
 class CreateSchedule extends StatefulWidget {
   @override
@@ -30,6 +34,8 @@ class _CreateScheduleState extends State<CreateSchedule> {
   List gradeDivision = [];
   final picker = ImagePicker();
   String mediaUrl = '';
+  bool uploaded = false;
+
   File _file;
   String fileName = '';
   final math.Random random = math.Random();
@@ -110,6 +116,44 @@ class _CreateScheduleState extends State<CreateSchedule> {
     print("URL is $url");
   }
 
+  uploadImage() async {
+    // HTML input element
+    html.InputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.click();
+
+    uploadInput.onChange.listen(
+      (changeEvent) {
+        final file = uploadInput.files.first;
+        final reader = html.FileReader();
+
+        reader.readAsDataUrl(file);
+
+        reader.onLoadEnd.listen(
+          (loadEndEvent) async {
+            uploadImageFile(file, imageName: (_selectedGrade + _selectedDivision).toString());
+          },
+        );
+      },
+    );
+  }
+
+  Future<Uri> uploadImageFile(html.File image, {String imageName}) async {
+    setState(() {
+      _isLoading = true;
+    });
+    fb.StorageReference storageRef = fb.app().storage().ref('images/$imageName');
+    fb.UploadTaskSnapshot uploadTaskSnapshot = await storageRef.put(image).future;
+
+    Uri imageUri = await uploadTaskSnapshot.ref.getDownloadURL();
+    print(imageUri);
+    setState(() {
+      mediaUrl = imageUri.toString();
+      _isLoading = false;
+      Fluttertoast.showToast(context, msg: 'Uploaded successfully');
+    });
+    return imageUri;
+  }
+
   Future getDivision() async {
     var response = await http.get("$baseUrl/fetchDivision/${User.instituteName}");
     print('Response status: ${response.statusCode}');
@@ -143,6 +187,7 @@ class _CreateScheduleState extends State<CreateSchedule> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return ModalProgressHUD(
       inAsyncCall: _isLoading,
       child: Scaffold(
@@ -180,7 +225,14 @@ class _CreateScheduleState extends State<CreateSchedule> {
                   Expanded(
                     flex: 1,
                     child: Container(
-                      padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.04),
+                      padding: EdgeInsets.only(
+                          left: uni.Platform.isAndroid
+                              ? MediaQuery.of(context).size.width * 0.04
+                              : ResponsiveWidget.isMediumScreen(context)
+                                  ? MediaQuery.of(context).size.width * 0.15
+                                  : ResponsiveWidget.isLargeScreen(context)
+                                      ? MediaQuery.of(context).size.width * 0.32
+                                      : 0),
                       child: Text(
                         'Grade: ',
                         style: TextStyle(fontSize: 20, color: violet2),
@@ -188,35 +240,50 @@ class _CreateScheduleState extends State<CreateSchedule> {
                     ),
                   ),
                   Expanded(
-                    flex: 2,
-                    child: DropdownButtonFormField(
-                      hint: Text(
-                        'Select Grade',
-                        style: TextStyle(color: violet1, fontSize: 18),
-                      ),
-                      decoration: InputDecoration(
-                        errorText: _validateGrade ? 'Please choose an option' : null,
-                        isDense: true,
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: violet1),
+                    flex: !uni.Platform.isAndroid
+                        ? ResponsiveWidget.isMediumScreen(context)
+                            ? 2
+                            : 1
+                        : 2,
+                    child: Container(
+                      padding: uni.Platform.isAndroid
+                          ? EdgeInsets.zero
+                          : EdgeInsets.only(
+                              left: 0,
+                              right: ResponsiveWidget.isMediumScreen(context)
+                                  ? size.width * 0.15
+                                  : ResponsiveWidget.isLargeScreen(context)
+                                      ? size.width * 0.32
+                                      : 0),
+                      child: DropdownButtonFormField(
+                        hint: Text(
+                          'Select Grade',
+                          style: TextStyle(color: violet1, fontSize: 18),
                         ),
-                      ),
-                      items: grades.map((location) {
-                        return DropdownMenuItem(
-                          child: AutoSizeText(
-                            location,
-                            maxLines: 1,
-                            style: TextStyle(color: violet1),
+                        decoration: InputDecoration(
+                          errorText: _validateGrade ? 'Please choose an option' : null,
+                          isDense: true,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: violet1),
                           ),
-                          value: location,
-                        );
-                      }).toList(),
-                      onChanged: (value) async {
-                        setState(() {
-                          _selectedGrade = value;
-                        });
-                        await _div();
-                      },
+                        ),
+                        items: grades.map((location) {
+                          return DropdownMenuItem(
+                            child: AutoSizeText(
+                              location,
+                              maxLines: 1,
+                              style: TextStyle(color: violet1),
+                            ),
+                            value: location,
+                          );
+                        }).toList(),
+                        onChanged: (value) async {
+                          setState(() {
+                            _selectedGrade = value;
+                          });
+                          await _div();
+                        },
+                      ),
                     ),
                   ),
                 ],
@@ -231,7 +298,14 @@ class _CreateScheduleState extends State<CreateSchedule> {
                   Expanded(
                     flex: 1,
                     child: Container(
-                      padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.04),
+                      padding: EdgeInsets.only(
+                          left: uni.Platform.isAndroid
+                              ? MediaQuery.of(context).size.width * 0.04
+                              : ResponsiveWidget.isMediumScreen(context)
+                                  ? MediaQuery.of(context).size.width * 0.15
+                                  : ResponsiveWidget.isLargeScreen(context)
+                                      ? MediaQuery.of(context).size.width * 0.32
+                                      : 0),
                       child: Text(
                         'Division: ',
                         style: TextStyle(fontSize: 20, color: violet2),
@@ -239,34 +313,49 @@ class _CreateScheduleState extends State<CreateSchedule> {
                     ),
                   ),
                   Expanded(
-                    flex: 2,
-                    child: DropdownButtonFormField(
-                      hint: Text(
-                        'Select Division',
-                        style: TextStyle(color: violet1, fontSize: 18),
-                      ),
-                      decoration: InputDecoration(
-                        errorText: _validateDivision ? 'Please choose an option' : null,
-                        isDense: true,
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: violet1),
+                    flex: !uni.Platform.isAndroid
+                        ? ResponsiveWidget.isMediumScreen(context)
+                            ? 2
+                            : 1
+                        : 2,
+                    child: Container(
+                      padding: uni.Platform.isAndroid
+                          ? EdgeInsets.zero
+                          : EdgeInsets.only(
+                              left: 0,
+                              right: ResponsiveWidget.isMediumScreen(context)
+                                  ? size.width * 0.15
+                                  : ResponsiveWidget.isLargeScreen(context)
+                                      ? size.width * 0.32
+                                      : 0),
+                      child: DropdownButtonFormField(
+                        hint: Text(
+                          'Select Division',
+                          style: TextStyle(color: violet1, fontSize: 18),
                         ),
-                      ),
-                      items: gradeDivision.map((location) {
-                        return DropdownMenuItem(
-                          child: AutoSizeText(
-                            location,
-                            maxLines: 1,
-                            style: TextStyle(color: violet1),
+                        decoration: InputDecoration(
+                          errorText: _validateDivision ? 'Please choose an option' : null,
+                          isDense: true,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: violet1),
                           ),
-                          value: location,
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedDivision = value;
-                        });
-                      },
+                        ),
+                        items: gradeDivision.map((location) {
+                          return DropdownMenuItem(
+                            child: AutoSizeText(
+                              location,
+                              maxLines: 1,
+                              style: TextStyle(color: violet1),
+                            ),
+                            value: location,
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedDivision = value;
+                          });
+                        },
+                      ),
                     ),
                   ),
                 ],
@@ -275,7 +364,19 @@ class _CreateScheduleState extends State<CreateSchedule> {
                 height: 40,
               ),
               Container(
-                padding: EdgeInsets.all(16),
+                padding: uni.Platform.isAndroid
+                    ? EdgeInsets.all(16)
+                    : EdgeInsets.only(
+                        right: ResponsiveWidget.isMediumScreen(context)
+                            ? MediaQuery.of(context).size.width * 0.14
+                            : ResponsiveWidget.isLargeScreen(context)
+                                ? MediaQuery.of(context).size.width * 0.32
+                                : 0,
+                        left: ResponsiveWidget.isMediumScreen(context)
+                            ? MediaQuery.of(context).size.width * 0.15
+                            : ResponsiveWidget.isLargeScreen(context)
+                                ? MediaQuery.of(context).size.width * 0.32
+                                : 0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -287,19 +388,21 @@ class _CreateScheduleState extends State<CreateSchedule> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(32),
                       ),
-                      color: violet1,
                       onPressed: () async {
-                        await getImage();
+                        if (uni.Platform.isAndroid) {
+                          await getImage();
+                        } else {
+                          await uploadImage();
+                        }
                       },
-                      child: Center(
-                        child: Text(
-                          'Upload',
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
+                      color: violet1,
+                      child: Text(
+                        uploaded ? 'Uploaded!' : 'Select File',
+                        style: TextStyle(
+                          color: Colors.white,
                         ),
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),
@@ -307,7 +410,14 @@ class _CreateScheduleState extends State<CreateSchedule> {
                 height: MediaQuery.of(context).size.height * 0.4,
               ),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 100.0),
+                padding: uni.Platform.isAndroid
+                    ? EdgeInsets.symmetric(horizontal: 100.0)
+                    : EdgeInsets.symmetric(
+                        horizontal: ResponsiveWidget.isMediumScreen(context)
+                            ? size.width * 0.35
+                            : ResponsiveWidget.isLargeScreen(context)
+                                ? size.width * 0.4
+                                : 100),
                 child: MaterialButton(
                   padding: EdgeInsets.all(16),
                   color: violet2,
