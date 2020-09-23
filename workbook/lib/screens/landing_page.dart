@@ -40,7 +40,7 @@ class _LandingPageState extends State<LandingPage> {
 
   @override
   void initState() {
-    Timer(Duration(seconds: 4), () {
+    Timer(Duration(seconds: 1), () {
       if (Platform.isAndroid) {
         _initAdMob();
       }

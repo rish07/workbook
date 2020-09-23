@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
+import 'package:universal_html/prefer_universal/html.dart' as html;
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -11,14 +13,17 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:universal_io/prefer_universal/io.dart' as uni;
 import 'package:workbook/constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:workbook/screens/dashboard.dart';
+import 'package:workbook/screens/responsive_widget.dart';
 import 'package:workbook/screens/tasks/created_tasks.dart';
 import 'package:workbook/screens/tasks/view_tasks.dart';
 import 'package:workbook/widget/popUpDialog.dart';
 import 'package:path/path.dart' as p;
 import '../../user.dart';
+import 'package:firebase/firebase.dart' as fb;
 
 class CreateTask extends StatefulWidget {
   final bool isAdmin;
@@ -34,6 +39,7 @@ class _CreateTaskState extends State<CreateTask> {
   String _selectedType;
   String _selectedGrade;
   String _selectedDivision;
+
   bool _isLoading = false;
   final FirebaseMessaging _fcm = FirebaseMessaging();
   List gradeDivision = [];
@@ -170,13 +176,53 @@ class _CreateTaskState extends State<CreateTask> {
     }
   }
 
+  uploadImage() async {
+    // HTML input element
+    html.InputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.click();
+
+    uploadInput.onChange.listen(
+      (changeEvent) {
+        final file = uploadInput.files.first;
+        final reader = html.FileReader();
+
+        reader.readAsDataUrl(file);
+
+        reader.onLoadEnd.listen(
+          (loadEndEvent) async {
+            uploadImageFile(file, imageName: _taskNameController.text.toString());
+          },
+        );
+      },
+    );
+  }
+
+  Future<Uri> uploadImageFile(html.File image, {String imageName}) async {
+    setState(() {
+      _isLoading = true;
+    });
+    fb.StorageReference storageRef = fb.app().storage().ref('images/$imageName');
+    fb.UploadTaskSnapshot uploadTaskSnapshot = await storageRef.put(image).future;
+
+    Uri imageUri = await uploadTaskSnapshot.ref.getDownloadURL();
+    print(imageUri);
+    setState(() {
+      mediaUrl = imageUri.toString();
+      _isLoading = false;
+      Fluttertoast.showToast(context, msg: 'Uploaded successfully');
+    });
+    return imageUri;
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getGrades();
-    User.userRole != 'admin' ? _fcm.subscribeToTopic(User.instituteName.replaceAll(RegExp(r' '), '_')) : {};
-    User.userRole == 'customer' ? _fcm.subscribeToTopic('${User.grade.replaceAll(RegExp(r' '), '_')}${User.division.replaceAll(RegExp(r' '), '_')}') : {};
+    if (uni.Platform.isAndroid) {
+      User.userRole != 'admin' ? _fcm.subscribeToTopic(User.instituteName.replaceAll(RegExp(r' '), '_')) : {};
+      User.userRole == 'customer' ? _fcm.subscribeToTopic('${User.grade.replaceAll(RegExp(r' '), '_')}${User.division.replaceAll(RegExp(r' '), '_')}') : {};
+    }
   }
 
   @override
@@ -189,6 +235,7 @@ class _CreateTaskState extends State<CreateTask> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return ModalProgressHUD(
       inAsyncCall: _isLoading,
       child: Scaffold(
@@ -248,7 +295,14 @@ class _CreateTaskState extends State<CreateTask> {
                   Expanded(
                     flex: 1,
                     child: Container(
-                      padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.04),
+                      padding: EdgeInsets.only(
+                          left: uni.Platform.isAndroid
+                              ? MediaQuery.of(context).size.width * 0.04
+                              : ResponsiveWidget.isMediumScreen(context)
+                                  ? MediaQuery.of(context).size.width * 0.15
+                                  : ResponsiveWidget.isLargeScreen(context)
+                                      ? MediaQuery.of(context).size.width * 0.32
+                                      : 0),
                       child: Text(
                         'Type: ',
                         style: TextStyle(fontSize: 20, color: violet2),
@@ -256,35 +310,50 @@ class _CreateTaskState extends State<CreateTask> {
                     ),
                   ),
                   Expanded(
-                    flex: 2,
-                    child: DropdownButtonFormField(
-                      hint: Text(
-                        'Select Type',
-                        style: TextStyle(color: violet1, fontSize: 18),
-                      ),
-                      decoration: InputDecoration(
-                        errorText: _validateType ? 'Please choose an option' : null,
-                        isDense: true,
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: violet1),
+                    flex: !uni.Platform.isAndroid
+                        ? ResponsiveWidget.isMediumScreen(context)
+                            ? 2
+                            : 1
+                        : 2,
+                    child: Container(
+                      padding: uni.Platform.isAndroid
+                          ? EdgeInsets.zero
+                          : EdgeInsets.only(
+                              left: 0,
+                              right: ResponsiveWidget.isMediumScreen(context)
+                                  ? size.width * 0.15
+                                  : ResponsiveWidget.isLargeScreen(context)
+                                      ? size.width * 0.32
+                                      : 0),
+                      child: DropdownButtonFormField(
+                        hint: Text(
+                          'Select Type',
+                          style: TextStyle(color: violet1, fontSize: 18),
                         ),
-                      ),
-                      items: types.map((location) {
-                        return DropdownMenuItem(
-                          child: AutoSizeText(
-                            location,
-                            maxLines: 1,
-                            style: TextStyle(color: violet1),
+                        decoration: InputDecoration(
+                          errorText: _validateType ? 'Please choose an option' : null,
+                          isDense: true,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: violet1),
                           ),
-                          value: location,
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          value == 'Other' ? isOther = true : isOther = false;
-                          _selectedType = value;
-                        });
-                      },
+                        ),
+                        items: types.map((location) {
+                          return DropdownMenuItem(
+                            child: AutoSizeText(
+                              location,
+                              maxLines: 1,
+                              style: TextStyle(color: violet1),
+                            ),
+                            value: location,
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            value == 'Other' ? isOther = true : isOther = false;
+                            _selectedType = value;
+                          });
+                        },
+                      ),
                     ),
                   ),
                 ],
@@ -458,7 +527,14 @@ class _CreateTaskState extends State<CreateTask> {
                 height: User.userRole == 'employee' ? 40 : 0,
               ),
               Container(
-                padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.04),
+                padding: EdgeInsets.only(
+                    left: uni.Platform.isAndroid
+                        ? MediaQuery.of(context).size.width * 0.04
+                        : ResponsiveWidget.isMediumScreen(context)
+                            ? MediaQuery.of(context).size.width * 0.15
+                            : ResponsiveWidget.isLargeScreen(context)
+                                ? MediaQuery.of(context).size.width * 0.32
+                                : 0),
                 child: Text(
                   'Description: ',
                   style: TextStyle(fontSize: 20, color: violet2),
@@ -468,7 +544,19 @@ class _CreateTaskState extends State<CreateTask> {
                 height: 20,
               ),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 16),
+                padding: uni.Platform.isAndroid
+                    ? EdgeInsets.symmetric(horizontal: 16)
+                    : EdgeInsets.only(
+                        right: ResponsiveWidget.isMediumScreen(context)
+                            ? MediaQuery.of(context).size.width * 0.14
+                            : ResponsiveWidget.isLargeScreen(context)
+                                ? MediaQuery.of(context).size.width * 0.32
+                                : 0,
+                        left: ResponsiveWidget.isMediumScreen(context)
+                            ? MediaQuery.of(context).size.width * 0.15
+                            : ResponsiveWidget.isLargeScreen(context)
+                                ? MediaQuery.of(context).size.width * 0.32
+                                : 0),
                 height: MediaQuery.of(context).size.height * 0.35,
                 width: MediaQuery.of(context).size.width,
                 child: TextFormField(
@@ -511,9 +599,21 @@ class _CreateTaskState extends State<CreateTask> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: uni.Platform.isAndroid
+                    ? EdgeInsets.symmetric(horizontal: 16)
+                    : EdgeInsets.only(
+                        right: ResponsiveWidget.isMediumScreen(context)
+                            ? MediaQuery.of(context).size.width * 0.14
+                            : ResponsiveWidget.isLargeScreen(context)
+                                ? MediaQuery.of(context).size.width * 0.32
+                                : 0,
+                        left: ResponsiveWidget.isMediumScreen(context)
+                            ? MediaQuery.of(context).size.width * 0.15
+                            : ResponsiveWidget.isLargeScreen(context)
+                                ? MediaQuery.of(context).size.width * 0.32
+                                : 0),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: uni.Platform.isAndroid ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'Attachments: ',
@@ -527,7 +627,11 @@ class _CreateTaskState extends State<CreateTask> {
                         borderRadius: BorderRadius.circular(32),
                       ),
                       onPressed: () async {
-                        await getImage();
+                        if (uni.Platform.isAndroid) {
+                          await getImage();
+                        } else {
+                          await uploadImage();
+                        }
                       },
                       color: violet1,
                       child: Text(
@@ -546,6 +650,7 @@ class _CreateTaskState extends State<CreateTask> {
         floatingActionButton: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               FloatingActionButton.extended(
@@ -578,7 +683,7 @@ class _CreateTaskState extends State<CreateTask> {
             ],
           ),
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButtonLocation: uni.Platform.isAndroid ? FloatingActionButtonLocation.centerDocked : FloatingActionButtonLocation.centerFloat,
       ),
     );
   }

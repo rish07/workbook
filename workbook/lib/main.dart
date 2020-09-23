@@ -7,6 +7,8 @@ import 'package:workbook/screens/auth/registration_page.dart';
 import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/screens/landing_page.dart';
 import 'package:flutter/services.dart';
+import 'package:workbook/screens/tasks/create_tasks.dart';
+import 'package:workbook/screens/tasks/view_tasks.dart';
 
 import 'ad_manager.dart';
 
