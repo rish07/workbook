@@ -16,8 +16,8 @@ import 'package:page_transition/page_transition.dart';
 import 'package:universal_io/prefer_universal/io.dart' as uni;
 import 'package:workbook/constants.dart';
 import 'package:http/http.dart' as http;
+import 'package:workbook/responsive_widget.dart';
 import 'package:workbook/screens/dashboard.dart';
-import 'package:workbook/screens/responsive_widget.dart';
 import 'package:workbook/screens/tasks/created_tasks.dart';
 import 'package:workbook/screens/tasks/view_tasks.dart';
 import 'package:workbook/widget/popUpDialog.dart';
@@ -429,7 +429,14 @@ class _CreateTaskState extends State<CreateTask> {
                         Expanded(
                           flex: 1,
                           child: Container(
-                            padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.04),
+                            padding: EdgeInsets.only(
+                                left: uni.Platform.isAndroid
+                                    ? MediaQuery.of(context).size.width * 0.04
+                                    : ResponsiveWidget.isMediumScreen(context)
+                                        ? MediaQuery.of(context).size.width * 0.15
+                                        : ResponsiveWidget.isLargeScreen(context)
+                                            ? MediaQuery.of(context).size.width * 0.32
+                                            : 0),
                             child: Text(
                               'Grade: ',
                               style: TextStyle(fontSize: 20, color: violet2),
@@ -437,35 +444,50 @@ class _CreateTaskState extends State<CreateTask> {
                           ),
                         ),
                         Expanded(
-                          flex: 2,
-                          child: DropdownButtonFormField(
-                            hint: Text(
-                              'Select Grade',
-                              style: TextStyle(color: violet1, fontSize: 18),
-                            ),
-                            decoration: InputDecoration(
-                              errorText: _validateGrade ? 'Please choose an option' : null,
-                              isDense: true,
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: violet1),
+                          flex: !uni.Platform.isAndroid
+                              ? ResponsiveWidget.isMediumScreen(context)
+                                  ? 2
+                                  : 1
+                              : 2,
+                          child: Container(
+                            padding: uni.Platform.isAndroid
+                                ? EdgeInsets.zero
+                                : EdgeInsets.only(
+                                    left: 0,
+                                    right: ResponsiveWidget.isMediumScreen(context)
+                                        ? size.width * 0.15
+                                        : ResponsiveWidget.isLargeScreen(context)
+                                            ? size.width * 0.32
+                                            : 0),
+                            child: DropdownButtonFormField(
+                              hint: Text(
+                                'Select Grade',
+                                style: TextStyle(color: violet1, fontSize: 18),
                               ),
-                            ),
-                            items: grades.map((location) {
-                              return DropdownMenuItem(
-                                child: AutoSizeText(
-                                  location,
-                                  maxLines: 1,
-                                  style: TextStyle(color: violet1),
+                              decoration: InputDecoration(
+                                errorText: _validateGrade ? 'Please choose an option' : null,
+                                isDense: true,
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: violet1),
                                 ),
-                                value: location,
-                              );
-                            }).toList(),
-                            onChanged: (value) async {
-                              setState(() {
-                                _selectedGrade = value;
-                              });
-                              await _div();
-                            },
+                              ),
+                              items: grades.map((location) {
+                                return DropdownMenuItem(
+                                  child: AutoSizeText(
+                                    location,
+                                    maxLines: 1,
+                                    style: TextStyle(color: violet1),
+                                  ),
+                                  value: location,
+                                );
+                              }).toList(),
+                              onChanged: (value) async {
+                                setState(() {
+                                  _selectedGrade = value;
+                                });
+                                await _div();
+                              },
+                            ),
                           ),
                         ),
                       ],
@@ -482,7 +504,14 @@ class _CreateTaskState extends State<CreateTask> {
                         Expanded(
                           flex: 1,
                           child: Container(
-                            padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.04),
+                            padding: EdgeInsets.only(
+                                left: uni.Platform.isAndroid
+                                    ? MediaQuery.of(context).size.width * 0.04
+                                    : ResponsiveWidget.isMediumScreen(context)
+                                        ? MediaQuery.of(context).size.width * 0.15
+                                        : ResponsiveWidget.isLargeScreen(context)
+                                            ? MediaQuery.of(context).size.width * 0.32
+                                            : 0),
                             child: Text(
                               'Division: ',
                               style: TextStyle(fontSize: 20, color: violet2),
@@ -490,34 +519,49 @@ class _CreateTaskState extends State<CreateTask> {
                           ),
                         ),
                         Expanded(
-                          flex: 2,
-                          child: DropdownButtonFormField(
-                            hint: Text(
-                              'Select Division',
-                              style: TextStyle(color: violet1, fontSize: 18),
-                            ),
-                            decoration: InputDecoration(
-                              errorText: _validateDivision ? 'Please choose an option' : null,
-                              isDense: true,
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: violet1),
+                          flex: !uni.Platform.isAndroid
+                              ? ResponsiveWidget.isMediumScreen(context)
+                                  ? 2
+                                  : 1
+                              : 2,
+                          child: Container(
+                            padding: uni.Platform.isAndroid
+                                ? EdgeInsets.zero
+                                : EdgeInsets.only(
+                                    left: 0,
+                                    right: ResponsiveWidget.isMediumScreen(context)
+                                        ? size.width * 0.15
+                                        : ResponsiveWidget.isLargeScreen(context)
+                                            ? size.width * 0.32
+                                            : 0),
+                            child: DropdownButtonFormField(
+                              hint: Text(
+                                'Select Division',
+                                style: TextStyle(color: violet1, fontSize: 18),
                               ),
-                            ),
-                            items: gradeDivision.map((location) {
-                              return DropdownMenuItem(
-                                child: AutoSizeText(
-                                  location,
-                                  maxLines: 1,
-                                  style: TextStyle(color: violet1),
+                              decoration: InputDecoration(
+                                errorText: _validateDivision ? 'Please choose an option' : null,
+                                isDense: true,
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: violet1),
                                 ),
-                                value: location,
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedDivision = value;
-                              });
-                            },
+                              ),
+                              items: gradeDivision.map((location) {
+                                return DropdownMenuItem(
+                                  child: AutoSizeText(
+                                    location,
+                                    maxLines: 1,
+                                    style: TextStyle(color: violet1),
+                                  ),
+                                  value: location,
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedDivision = value;
+                                });
+                              },
+                            ),
                           ),
                         ),
                       ],

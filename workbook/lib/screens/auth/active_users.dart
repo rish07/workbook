@@ -8,7 +8,7 @@ import 'package:universal_io/io.dart';
 
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/request_profile_page.dart';
-import 'package:workbook/screens/responsive_widget.dart';
+import '../../responsive_widget.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';
 import 'dart:convert';
@@ -66,7 +66,9 @@ class _ActiveUsersState extends State<ActiveUsers> {
         ? await http.post(
             User.userRole == 'admin' && !widget.isDriver
                 ? "$baseUrl/admin/viewAllEmployees"
-                : (User.userRole == 'admin' && widget.isDriver) ? "$baseUrl/admin/viewAllDrivers" : "$baseUrl/employee/viewAllCustomers",
+                : (User.userRole == 'admin' && widget.isDriver)
+                    ? "$baseUrl/admin/viewAllDrivers"
+                    : "$baseUrl/employee/viewAllCustomers",
             body: {"userID": User.userEmail, "instituteName": User.instituteName, "jwtToken": User.userJwtToken},
           )
         : await http.get('$baseUrl/superAdmin/viewAllAdmin');
@@ -80,7 +82,9 @@ class _ActiveUsersState extends State<ActiveUsers> {
           ? json.decode(response.body)['payload']['employees']
           : (User.userRole == 'admin' && widget.isDriver)
               ? json.decode(response.body)['payload']['drivers']
-              : (User.userRole == 'employee') ? json.decode(response.body)['payload']['customer'] : json.decode(response.body)['payload']['admin'];
+              : (User.userRole == 'employee')
+                  ? json.decode(response.body)['payload']['customer']
+                  : json.decode(response.body)['payload']['admin'];
       for (var employee in employees) {
         _employeeList.add(employee);
       }
@@ -118,7 +122,11 @@ class _ActiveUsersState extends State<ActiveUsers> {
         title: Text(
           User.userRole == 'admin' && !widget.isDriver
               ? 'Active Employees'
-              : (User.userRole == 'admin' && widget.isDriver) ? "Active Drivers" : (User.userRole == 'employee') ? 'Active Customers' : 'Active Admins',
+              : (User.userRole == 'admin' && widget.isDriver)
+                  ? "Active Drivers"
+                  : (User.userRole == 'employee')
+                      ? 'Active Customers'
+                      : 'Active Admins',
           style: TextStyle(color: violet2, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
@@ -135,7 +143,12 @@ class _ActiveUsersState extends State<ActiveUsers> {
           padding: Platform.isAndroid
               ? null
               : EdgeInsets.symmetric(
-                  vertical: 20, horizontal: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.2 : ResponsiveWidget.isLargeScreen(context) ? size.width * 0.3 : 10),
+                  vertical: 20,
+                  horizontal: ResponsiveWidget.isMediumScreen(context)
+                      ? size.width * 0.2
+                      : ResponsiveWidget.isLargeScreen(context)
+                          ? size.width * 0.3
+                          : 10),
           child: Center(
             child: ListView.builder(
                 itemCount: _employeeList.length,

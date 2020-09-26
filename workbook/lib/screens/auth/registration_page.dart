@@ -9,7 +9,7 @@ import 'package:workbook/constants.dart';
 import 'package:workbook/screens/auth/driver_form.dart';
 import 'package:workbook/screens/auth/employee_cust_form.dart';
 import 'package:workbook/screens/auth/admin_form.dart';
-import 'package:workbook/screens/responsive_widget.dart';
+import '../../responsive_widget.dart';
 import 'package:workbook/widget/signup.dart';
 import 'package:workbook/widget/textNew.dart';
 import 'package:http/http.dart' as http;

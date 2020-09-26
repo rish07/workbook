@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 import 'package:workbook/constants.dart';
+
+import '../../responsive_widget.dart';
 
 class ViewDivisions extends StatefulWidget {
   final String gradeName;
@@ -36,6 +39,7 @@ class _ViewDivisionsState extends State<ViewDivisions> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return ModalProgressHUD(
       inAsyncCall: _isLoading,
       child: Scaffold(
@@ -52,7 +56,9 @@ class _ViewDivisionsState extends State<ViewDivisions> {
         body: Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.all(16),
+          padding: Platform.isAndroid
+              ? EdgeInsets.all(16)
+              : EdgeInsets.symmetric(vertical: 16, horizontal: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.25 : size.width * 0.3),
           child: ListView(
             children: [
               Column(

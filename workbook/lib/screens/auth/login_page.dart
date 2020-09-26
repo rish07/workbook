@@ -13,7 +13,7 @@ import 'package:workbook/constants.dart';
 import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/screens/queries/guest_ticket.dart';
 import 'package:workbook/screens/auth/otp_verification.dart';
-import 'package:workbook/screens/responsive_widget.dart';
+import '../../responsive_widget.dart';
 import 'dart:convert';
 import 'package:workbook/widget/first.dart';
 import 'package:workbook/widget/input_field.dart';

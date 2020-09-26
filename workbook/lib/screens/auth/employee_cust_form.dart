@@ -9,7 +9,6 @@ import 'package:universal_io/prefer_sdk/io.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/auth/login_page.dart';
 import 'package:workbook/screens/auth/otp_verification.dart';
-import 'package:workbook/screens/responsive_widget.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/input_field.dart';
 import 'package:workbook/widget/password.dart';
@@ -17,6 +16,8 @@ import 'package:workbook/widget/popUpDialog.dart';
 import 'package:workbook/widget/registerButton.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import '../../responsive_widget.dart';
 
 class EmployeeCustomerForm extends StatefulWidget {
   final bool isEmployee;

@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:universal_io/io.dart';
-import 'package:workbook/screens/responsive_widget.dart';
+import 'package:workbook/responsive_widget.dart';
 import '../../constants.dart';
 import '../../user.dart';
 

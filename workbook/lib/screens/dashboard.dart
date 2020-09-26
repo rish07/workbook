@@ -28,7 +28,7 @@ import 'package:workbook/screens/leave_attendance/holiday_calendar/view_holidays
 import 'package:workbook/screens/posts/add_post.dart';
 import 'package:workbook/screens/auth/approve_user.dart';
 import 'package:workbook/screens/coming_soon.dart';
-import 'package:workbook/screens/responsive_widget.dart';
+import '../responsive_widget.dart';
 import 'package:workbook/screens/schedule/create_schedule.dart';
 import 'package:workbook/screens/schedule/view_schedule.dart';
 import 'package:workbook/screens/tasks/create_tasks.dart';
@@ -420,7 +420,13 @@ class _DashBoardState extends State<DashBoard> {
                             size: 25,
                           ),
                           Text(
-                            User.userRole == 'superAdmin' ? 'Admins' : (User.userRole == 'admin') ? 'Emp' : (User.userRole == 'employee') ? 'Cust' : 'Travel',
+                            User.userRole == 'superAdmin'
+                                ? 'Admins'
+                                : (User.userRole == 'admin')
+                                    ? 'Emp'
+                                    : (User.userRole == 'employee')
+                                        ? 'Cust'
+                                        : 'Travel',
                             style: TextStyle(fontSize: 10),
                           )
                         ],
@@ -509,7 +515,11 @@ class _DashBoardState extends State<DashBoard> {
                           ? EdgeInsets.zero
                           : EdgeInsets.symmetric(
                               vertical: 20,
-                              horizontal: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.2 : ResponsiveWidget.isLargeScreen(context) ? size.width * 0.3 : 10,
+                              horizontal: ResponsiveWidget.isMediumScreen(context)
+                                  ? size.width * 0.2
+                                  : ResponsiveWidget.isLargeScreen(context)
+                                      ? size.width * 0.3
+                                      : 10,
                             ),
                       child: ListView.builder(
                         itemCount: posts.length,

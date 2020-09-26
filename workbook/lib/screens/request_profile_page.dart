@@ -12,7 +12,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:universal_io/io.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/auth/active_users.dart';
-import 'package:workbook/screens/responsive_widget.dart';
+import '../responsive_widget.dart';
 import 'package:workbook/user.dart';
 
 class RequestProfilePage extends StatefulWidget {
@@ -180,7 +180,11 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
                 padding: Platform.isAndroid
                     ? EdgeInsets.all(16)
                     : EdgeInsets.symmetric(
-                        horizontal: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.32 : ResponsiveWidget.isLargeScreen(context) ? size.width * 0.4 : 10,
+                        horizontal: ResponsiveWidget.isMediumScreen(context)
+                            ? size.width * 0.32
+                            : ResponsiveWidget.isLargeScreen(context)
+                                ? size.width * 0.4
+                                : 10,
                       ),
                 child: SingleChildScrollView(
                   child: Column(
@@ -205,10 +209,16 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
                         value: widget.emailID ?? "-",
                       ),
                       buildFieldEntry(
-                        label: User.userRole != 'superAdmin' && !widget.isDriver ? 'Grade' : (User.userRole != 'superAdmin' && widget.isDriver) ? "Car Number" : 'Institute Name',
+                        label: User.userRole != 'superAdmin' && !widget.isDriver
+                            ? 'Grade'
+                            : (User.userRole != 'superAdmin' && widget.isDriver)
+                                ? "Car Number"
+                                : 'Institute Name',
                         value: User.userRole != 'superAdmin' && !widget.isDriver
                             ? widget.grade ?? "-"
-                            : (User.userRole != 'superAdmin' && widget.isDriver) ? widget.carNumber ?? '-' : widget.instituteName ?? '-',
+                            : (User.userRole != 'superAdmin' && widget.isDriver)
+                                ? widget.carNumber ?? '-'
+                                : widget.instituteName ?? '-',
                       ),
                       User.userRole != 'superAdmin' && !widget.isDriver
                           ? buildFieldEntry(

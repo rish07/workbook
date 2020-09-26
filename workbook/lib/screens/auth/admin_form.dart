@@ -11,9 +11,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:universal_io/prefer_universal/io.dart';
 import 'package:workbook/constants.dart';
+import 'package:workbook/responsive_widget.dart';
 import 'package:workbook/screens/auth/login_page.dart';
 import 'package:workbook/screens/auth/otp_verification.dart';
-import 'package:workbook/screens/responsive_widget.dart';
 import 'package:workbook/widget/input_field.dart';
 import 'package:workbook/widget/password.dart';
 import 'package:workbook/widget/popUpDialog.dart';
@@ -65,6 +65,7 @@ class _AdminFormState extends State<AdminForm> {
   final TextEditingController _passwordReController = TextEditingController();
   final TextEditingController _organizationController = TextEditingController();
   final TextEditingController _organizationNumberController = TextEditingController();
+  final TextEditingController _referenceController = TextEditingController();
   final TextEditingController _aadharController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _mailController = TextEditingController();
@@ -225,6 +226,7 @@ class _AdminFormState extends State<AdminForm> {
       "numberOfMembers": _organizationNumberController.text,
       "state": _selectedStateLocation,
       "city": _selectedCityLocation,
+      "reference": _referenceController.text.isEmpty ? "Self" : _referenceController.text.toString(),
       "mailAddress": _mailController.text.toString(),
       "adharNumber": _aadharController.text,
       "contactNumber": _phoneController.text,
@@ -549,6 +551,22 @@ class _AdminFormState extends State<AdminForm> {
                     errorText: 'Please enter the number of members',
                     controller: _organizationNumberController,
                     labelText: 'Number of members',
+                    textInputType: TextInputType.number,
+                  ),
+                ),
+                Padding(
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.zero
+                      : EdgeInsets.symmetric(
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.15
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.27
+                                  : 0),
+                  child: InputField(
+                    validate: false,
+                    controller: _referenceController,
+                    labelText: 'Reference(optional)',
                     textInputType: TextInputType.number,
                   ),
                 ),
