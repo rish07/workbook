@@ -1,9 +1,8 @@
-# Workbook
+# The Amazing Workbook
 
 <p align="center">
 <img src="https://i.ibb.co/whpzWvk/Workbook.png"alt="Welcome"  width="600" height="300" />
 </p>
-
 
 This app will help the user to manage their organization efficiently.
 
@@ -24,7 +23,7 @@ This app will help the user to manage their organization efficiently.
 * Enable travel services for customers and employees.
 * Manage membership status of every role.
 
-## Tools and Technologies used
+## Tools and Technologies used:
 * Flutter
 * Node.js for backend (https://github.com/noob-master147/WorkBook)
 * Mongo DB Atlas for database
@@ -33,7 +32,6 @@ This app will help the user to manage their organization efficiently.
 * Google Maps API
 * AWS EC2 for backend server deployment
 * Twilio(SendGrid) for Email verification
-
 
 ## App Screenshots:
 <p align="center">
@@ -58,7 +56,3 @@ This app will help the user to manage their organization efficiently.
 ## Contributors:
 * Rishi Raj Singh (<a href="https://github.com/rish07">@rish07</a>): Flutter App and Integration
 * Divyansh Khandelwal(<a href="https://github.com/noob-master147">@noob-master147</a>): Backend and Deployment
-
-
-
-
