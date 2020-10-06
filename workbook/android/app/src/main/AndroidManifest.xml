@@ -17,6 +17,11 @@
         android:icon="@mipmap/ic_launcher">
 <!--        <meta-data android:name="com.google.android.geo.API_KEY"-->
 <!--            android:value=/>-->
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/transparent.png" />
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3040440138829028~8445837828"/>

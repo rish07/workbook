@@ -13,7 +13,6 @@ import 'package:universal_io/prefer_universal/io.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/responsive_widget.dart';
 import 'package:workbook/screens/auth/login_page.dart';
-import 'package:workbook/screens/auth/otp_verification.dart';
 import 'package:workbook/widget/input_field.dart';
 import 'package:workbook/widget/password.dart';
 import 'package:workbook/widget/popUpDialog.dart';
@@ -36,8 +35,8 @@ class AdminForm extends StatefulWidget {
 
 class _AdminFormState extends State<AdminForm> {
   final math.Random random = math.Random();
-  bool _showEmail = false;
-  fb.UploadTask _uploadTask;
+  // bool _showEmail = false;
+  // fb.UploadTask _uploadTask;
   bool _isLoading = false;
   String imageAsB64;
   final picker = ImagePicker();
@@ -384,7 +383,7 @@ class _AdminFormState extends State<AdminForm> {
                   child: InputField(
                     onChange: () {
                       setState(() {
-                        _showEmail = true;
+                        //_showEmail = true;
                       });
                     },
                     validate: _validateEmail,

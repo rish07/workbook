@@ -125,6 +125,7 @@ class _LoginPageState extends State<LoginPage> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+    subscription.cancel();
   }
 
   // Get the FCM token

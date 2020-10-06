@@ -1,14 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:regexed_validator/regexed_validator.dart';
 import 'package:universal_io/prefer_sdk/io.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/auth/login_page.dart';
-import 'package:workbook/screens/auth/otp_verification.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/input_field.dart';
 import 'package:workbook/widget/password.dart';

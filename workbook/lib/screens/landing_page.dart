@@ -2,15 +2,11 @@ import 'dart:async';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/screens/auth/login_page.dart';
 import 'package:universal_io/io.dart';
-import 'package:workbook/screens/tasks/view_tasks.dart';
-
-import '../ad_manager.dart';
 
 class LandingPage extends StatefulWidget {
   @override
