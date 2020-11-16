@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:regexed_validator/regexed_validator.dart';
+import 'package:universal_io/io.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/auth/otp_verification.dart';
 import 'package:workbook/user.dart';
@@ -14,6 +15,8 @@ import 'package:workbook/widget/password.dart';
 import 'package:workbook/widget/popUpDialog.dart';
 import 'package:workbook/widget/registerButton.dart';
 import 'package:http/http.dart' as http;
+
+import '../../responsive_widget.dart';
 
 class DriverForm extends StatefulWidget {
   @override
@@ -103,6 +106,7 @@ class _DriverFormState extends State<DriverForm> {
   //UI Block
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: ModalProgressHUD(
         progressIndicator: CircularProgressIndicator(
@@ -118,16 +122,47 @@ class _DriverFormState extends State<DriverForm> {
             padding: EdgeInsets.all(16),
             child: ListView(
               children: [
-                Text(
-                  'Driver Registration',
-                  style: TextStyle(
-                    fontSize: 28,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
+                Row(
+                  mainAxisAlignment: Platform.isAndroid ? MainAxisAlignment.center : MainAxisAlignment.start,
+                  children: [
+                    !Platform.isAndroid
+                        ? IconButton(
+                            icon: Icon(
+                              Icons.arrow_back_outlined,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            })
+                        : Container(),
+                    !Platform.isAndroid
+                        ? SizedBox(
+                            width: ResponsiveWidget.isMediumScreen(context)
+                                ? size.width * 0.3
+                                : ResponsiveWidget.isLargeScreen(context)
+                                    ? size.width * 0.4
+                                    : 20)
+                        : Container(),
+                    Text(
+                      'Driver Registration',
+                      style: TextStyle(
+                        fontSize: 28,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 16.0),
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.only(top: 16.0)
+                      : EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.15
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.32
+                                  : 0),
                   child: InputField(
                     validate: _validateName,
                     errorText: 'This field can\'t be empty',
@@ -135,28 +170,69 @@ class _DriverFormState extends State<DriverForm> {
                     labelText: 'Name',
                   ),
                 ),
-                InputField(
-                  validate: _validateEmail,
-                  capital: TextCapitalization.none,
-                  controller: _emailController,
-                  errorText: 'Please enter a valid email ID',
-                  labelText: 'Email',
-                  textInputType: TextInputType.emailAddress,
-                ),
-                PasswordInput(
-                  validate: _validatePassword,
-                  controller: _passwordController,
-                  labelText: 'Password',
-                  errorText: 'Min Length = 8 and Max length = 15,\nShould have atleast 1 number, 1 capital letter\nand 1 Special Character',
-                ),
-                PasswordInput(
-                  validate: _validateRePassword,
-                  controller: _passwordReController,
-                  labelText: 'Re-enter Password',
-                  errorText: 'Passwords don\'t match',
+                Padding(
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.only(top: 16.0)
+                      : EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.15
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.32
+                                  : 0),
+                  child: InputField(
+                    validate: _validateEmail,
+                    capital: TextCapitalization.none,
+                    controller: _emailController,
+                    errorText: 'Please enter a valid email ID',
+                    labelText: 'Email',
+                    textInputType: TextInputType.emailAddress,
+                  ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.only(top: 16.0)
+                      : EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.15
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.32
+                                  : 0),
+                  child: PasswordInput(
+                    validate: _validatePassword,
+                    controller: _passwordController,
+                    labelText: 'Password',
+                    errorText: 'Min Length = 8 and Max length = 15,\nShould have atleast 1 number, 1 capital letter\nand 1 Special Character',
+                  ),
+                ),
+                Padding(
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.only(top: 16.0)
+                      : EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.15
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.32
+                                  : 0),
+                  child: PasswordInput(
+                    validate: _validateRePassword,
+                    controller: _passwordReController,
+                    labelText: 'Re-enter Password',
+                    errorText: 'Passwords don\'t match',
+                  ),
+                ),
+                Padding(
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.all(16)
+                      : EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.165
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.328
+                                  : 0),
                   child: Theme(
                     data: Theme.of(context).copyWith(canvasColor: violet1),
                     child: DropdownButtonFormField(
@@ -200,7 +276,15 @@ class _DriverFormState extends State<DriverForm> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.all(16)
+                      : EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.165
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.328
+                                  : 0),
                   child: Theme(
                     data: Theme.of(context).copyWith(canvasColor: violet1),
                     child: DropdownButtonFormField(
@@ -243,22 +327,42 @@ class _DriverFormState extends State<DriverForm> {
                     ),
                   ),
                 ),
-                InputField(
-                  validate: _validateAadhar,
-                  controller: _aadharController,
-                  errorText: 'Please enter you 12 digit Aadhar Card number',
-                  textInputType: TextInputType.number,
-                  labelText: 'Aadhar Card Number',
-                ),
-                InputField(
-                  validate: _validatePhoneNumber,
-                  errorText: 'Please enter a valid 10 digit mobile number',
-                  controller: _phoneController,
-                  textInputType: TextInputType.phone,
-                  labelText: 'Contact Number',
+                Padding(
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.zero
+                      : EdgeInsets.symmetric(
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.15
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.32
+                                  : 0),
+                  child: InputField(
+                    validate: _validateAadhar,
+                    controller: _aadharController,
+                    errorText: 'Please enter you 12 digit Aadhar Card number',
+                    textInputType: TextInputType.number,
+                    labelText: 'Aadhar Card Number',
+                  ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 64),
+                  padding: Platform.isAndroid
+                      ? EdgeInsets.zero
+                      : EdgeInsets.symmetric(
+                          horizontal: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.15
+                              : ResponsiveWidget.isLargeScreen(context)
+                                  ? size.width * 0.32
+                                  : 0),
+                  child: InputField(
+                    validate: _validatePhoneNumber,
+                    errorText: 'Please enter a valid 10 digit mobile number',
+                    controller: _phoneController,
+                    textInputType: TextInputType.phone,
+                    labelText: 'Contact Number',
+                  ),
+                ),
+                Padding(
+                  padding: Platform.isAndroid ? EdgeInsets.symmetric(vertical: 16.0, horizontal: 64) : EdgeInsets.symmetric(vertical: 16, horizontal: size.width * 0.4),
                   child: Builder(
                     builder: (context) => registerButton(
                       role: 'Submit',

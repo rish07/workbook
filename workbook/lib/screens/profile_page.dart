@@ -218,186 +218,184 @@ class _ProfilePageState extends State<ProfilePage> {
         drawer: buildDrawer(context),
         body: Container(
           padding: EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 20.0, left: _isEdit ? 50 : 0),
-                      child: Center(
-                        child: Hero(
-                          tag: "profile",
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundImage: !User.profilePicExists ? AssetImage('images/userPhoto.jpg') : NetworkImage((User.userPhotoData)),
-                          ),
+          child: ListView(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20.0, left: _isEdit ? 50 : 0),
+                    child: Center(
+                      child: Hero(
+                        tag: "profile",
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundImage: !User.profilePicExists ? AssetImage('images/userPhoto.jpg') : NetworkImage((User.userPhotoData)),
                         ),
                       ),
                     ),
-                    _isEdit
-                        ? IconButton(
-                            icon: Icon(Icons.edit),
-                            color: violet2,
-                            onPressed: () {
-                              getImage();
-                            },
-                            iconSize: 25,
-                          )
-                        : Container(),
-                  ],
-                ),
-                buildFieldEntry(
-                  label: 'Name',
-                  value: User.userName ?? "-",
-                ),
-                buildFieldEntry(
-                  label: 'Email ID',
-                  value: User.userEmail ?? "-",
-                ),
-                User.userRole != 'superAdmin'
-                    ? buildFieldEntry(
-                        label: 'Institute Name',
-                        value: User.instituteName ?? "-",
-                      )
-                    : Container(),
-                User.userRole == 'admin'
-                    ? buildFieldEntry(
-                        label: 'Institute Type',
-                        value: User.userInstituteType ?? "-",
-                      )
-                    : Container(),
-                (_isEdit
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.04),
-                              child: Text(
-                                'State: ',
-                                style: TextStyle(fontSize: 20, color: violet2),
-                              ),
+                  ),
+                  _isEdit
+                      ? IconButton(
+                          icon: Icon(Icons.edit),
+                          color: violet2,
+                          onPressed: () {
+                            getImage();
+                          },
+                          iconSize: 25,
+                        )
+                      : Container(),
+                ],
+              ),
+              buildFieldEntry(
+                label: 'Name',
+                value: User.userName ?? "-",
+              ),
+              buildFieldEntry(
+                label: 'Email ID',
+                value: User.userEmail ?? "-",
+              ),
+              User.userRole != 'superAdmin'
+                  ? buildFieldEntry(
+                      label: 'Institute Name',
+                      value: User.instituteName ?? "-",
+                    )
+                  : Container(),
+              User.userRole == 'admin'
+                  ? buildFieldEntry(
+                      label: 'Institute Type',
+                      value: User.userInstituteType ?? "-",
+                    )
+                  : Container(),
+              (_isEdit
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.04),
+                            child: Text(
+                              'State: ',
+                              style: TextStyle(fontSize: 20, color: violet2),
                             ),
                           ),
-                          Expanded(
-                            flex: 2,
-                            child: Theme(
-                              data: Theme.of(context).copyWith(canvasColor: violet1),
-                              child: DropdownButtonFormField(
-                                hint: Text(
-                                  'Select State',
-                                  style: TextStyle(color: violet1, fontSize: 18),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Theme(
+                            data: Theme.of(context).copyWith(canvasColor: violet1),
+                            child: DropdownButtonFormField(
+                              hint: Text(
+                                'Select State',
+                                style: TextStyle(color: violet1, fontSize: 18),
+                              ),
+                              decoration: InputDecoration(
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.white70),
                                 ),
-                                decoration: InputDecoration(
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.white70),
+                              ),
+                              items: cities[User.state].map((location) {
+                                return DropdownMenuItem(
+                                  child: AutoSizeText(
+                                    location,
+                                    maxLines: 1,
+                                    style: TextStyle(color: Colors.white),
                                   ),
-                                ),
-                                items: cities[User.state].map((location) {
-                                  return DropdownMenuItem(
-                                    child: AutoSizeText(
-                                      location,
-                                      maxLines: 1,
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    value: location,
-                                  );
-                                }).toList(),
-                                onChanged: (value) {
-                                  setState(() {
-                                    User.state = value;
-                                  });
-                                },
-                              ),
+                                  value: location,
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  User.state = value;
+                                });
+                              },
                             ),
                           ),
-                        ],
-                      )
-                    : (User.userRole != 'superAdmin')
-                        ? buildFieldEntry(
-                            label: 'State',
-                            value: User.state ?? "-",
-                          )
-                        : Container()),
-                (_isEdit
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.04),
-                              child: Text(
-                                User.city,
-                                style: TextStyle(fontSize: 20, color: violet2),
-                              ),
+                        ),
+                      ],
+                    )
+                  : (User.userRole != 'superAdmin')
+                      ? buildFieldEntry(
+                          label: 'State',
+                          value: User.state ?? "-",
+                        )
+                      : Container()),
+              (_isEdit
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.04),
+                            child: Text(
+                              'City: ',
+                              style: TextStyle(fontSize: 20, color: violet2),
                             ),
                           ),
-                          Expanded(
-                            flex: 2,
-                            child: Theme(
-                              data: Theme.of(context).copyWith(canvasColor: violet1),
-                              child: DropdownButtonFormField(
-                                hint: Text(
-                                  User.state,
-                                  style: TextStyle(color: violet1, fontSize: 18),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Theme(
+                            data: Theme.of(context).copyWith(canvasColor: violet1),
+                            child: DropdownButtonFormField(
+                              hint: Text(
+                                'Select City',
+                                style: TextStyle(color: violet1, fontSize: 18),
+                              ),
+                              decoration: InputDecoration(
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.white70),
                                 ),
-                                decoration: InputDecoration(
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.white70),
+                              ),
+                              items: cities[User.state].map((location) {
+                                return DropdownMenuItem(
+                                  child: AutoSizeText(
+                                    location,
+                                    maxLines: 1,
+                                    style: TextStyle(color: Colors.white),
                                   ),
-                                ),
-                                items: cities[User.state].map((location) {
-                                  return DropdownMenuItem(
-                                    child: AutoSizeText(
-                                      location,
-                                      maxLines: 1,
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    value: location,
-                                  );
-                                }).toList(),
-                                onChanged: (value) {
-                                  setState(() {
-                                    User.city = value;
-                                  });
-                                },
-                              ),
+                                  value: location,
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  User.city = value;
+                                });
+                              },
                             ),
                           ),
-                        ],
-                      )
-                    : (User.userRole != 'superAdmin')
-                        ? buildFieldEntry(
-                            label: 'City',
-                            value: User.city ?? "-",
-                          )
-                        : Container()),
-                User.userRole != 'superAdmin'
-                    ? buildFieldEntry(
-                        label: 'Contact Number',
-                        value: User.contactNumber.toString() ?? "-",
-                      )
-                    : Container(),
-                User.userRole != 'superAdmin'
-                    ? buildFieldEntry(
-                        label: 'Aadhar Number',
-                        value: User.aadharNumber.toString() ?? "-",
-                      )
-                    : Container(),
-                User.userRole != 'superAdmin'
-                    ? buildFieldEntry(
-                        label: 'Institute Mail Address',
-                        value: User.mailAddress ?? "-",
-                      )
-                    : Container(),
-              ],
-            ),
+                        ),
+                      ],
+                    )
+                  : (User.userRole != 'superAdmin')
+                      ? buildFieldEntry(
+                          label: 'City',
+                          value: User.city ?? "-",
+                        )
+                      : Container()),
+              User.userRole != 'superAdmin'
+                  ? buildFieldEntry(
+                      label: 'Contact Number',
+                      value: User.contactNumber.toString() ?? "-",
+                    )
+                  : Container(),
+              User.userRole != 'superAdmin'
+                  ? buildFieldEntry(
+                      label: 'Aadhar Number',
+                      value: User.aadharNumber.toString() ?? "-",
+                    )
+                  : Container(),
+              User.userRole != 'superAdmin'
+                  ? buildFieldEntry(
+                      label: 'Institute Mail Address',
+                      value: User.mailAddress ?? "-",
+                    )
+                  : Container(),
+            ],
           ),
         ),
       ),
@@ -408,6 +406,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         textBaseline: TextBaseline.alphabetic,
         children: [
           Expanded(

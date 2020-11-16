@@ -32,217 +32,212 @@ class _RegistrationPageState extends State<RegistrationPage> {
           backgroundColor: Colors.transparent,
         ),
         inAsyncCall: _isLoading,
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [violet1, violet2]),
-          ),
-          child: ListView(
-            children: <Widget>[
-              Column(
+        child: Stack(
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: ResponsiveWidget.isLargeScreen(context) ? size.width * 0.3 : 0),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [violet1, violet2]),
+              ),
+              child: ListView(
                 children: <Widget>[
-                  Row(children: <Widget>[
-                    SignUp(),
-                    Padding(
-                      padding: Platform.isAndroid
-                          ? EdgeInsets.zero
-                          : EdgeInsets.only(
-                              left: ResponsiveWidget.isMediumScreen(context)
-                                  ? size.width * 0.5
-                                  : ResponsiveWidget.isLargeScreen(context)
-                                      ? size.width * 0.6
-                                      : 0),
-                      child: TextNew(),
-                    ),
-                  ]),
-                  Text(
-                    'Register as',
-                    style: TextStyle(
-                      fontSize: 35,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.05,
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 32),
-                    child: Column(
-                      children: [
-                        Row(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Row(mainAxisAlignment: ResponsiveWidget.isLargeScreen(context) ? MainAxisAlignment.center : MainAxisAlignment.spaceBetween, children: <Widget>[
+                        SignUp(),
+                        TextNew(),
+                      ]),
+                      Text(
+                        'Register as',
+                        style: TextStyle(
+                          fontSize: 35,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.05,
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 32),
+                        child: Column(
                           children: [
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    PageTransition(child: AdminForm(), type: PageTransitionType.rightToLeft),
-                                  );
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.only(right: 16),
-                                  height: MediaQuery.of(context).size.height * 0.18,
-                                  width: MediaQuery.of(context).size.width * 0.35,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(13),
-                                  ),
-                                  child: Center(
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          height: MediaQuery.of(context).size.height * 0.14,
-                                          child: Image.asset('images/admin.png'),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      print('admin');
+                                      Navigator.push(
+                                        context,
+                                        PageTransition(child: AdminForm(), type: PageTransitionType.rightToLeft),
+                                      );
+                                    },
+                                    child: Container(
+                                      margin: EdgeInsets.only(right: 16),
+                                      height: MediaQuery.of(context).size.height * 0.18,
+                                      width: MediaQuery.of(context).size.width * 0.35,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(13),
+                                      ),
+                                      child: Center(
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              height: MediaQuery.of(context).size.height * 0.14,
+                                              child: Image.asset('images/admin.png'),
+                                            ),
+                                            Text(
+                                              'Admin',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        Text(
-                                          'Admin',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () async {
-                                  setState(() {
-                                    _isLoading = true;
-                                  });
-                                  var response = await http.get('$baseUrl/superAdmin/viewAllAdmin');
-                                  print(response.body);
-                                  setState(() {
-                                    _isLoading = false;
-                                  });
-                                  Navigator.push(
-                                    context,
-                                    PageTransition(
-                                        child: EmployeeCustomerForm(
-                                          admins: json.decode(response.body)['payload']['admin'],
-                                          isEmployee: true,
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      setState(() {
+                                        _isLoading = true;
+                                      });
+                                      var response = await http.get('$baseUrl/superAdmin/viewAllAdmin');
+                                      print(response.body);
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+                                      Navigator.push(
+                                        context,
+                                        PageTransition(
+                                            child: EmployeeCustomerForm(
+                                              admins: json.decode(response.body)['payload']['admin'],
+                                              isEmployee: true,
+                                            ),
+                                            type: PageTransitionType.rightToLeft),
+                                      );
+                                    },
+                                    child: Container(
+                                      margin: EdgeInsets.only(left: 16),
+                                      height: MediaQuery.of(context).size.height * 0.18,
+                                      width: MediaQuery.of(context).size.width * 0.35,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(13),
+                                      ),
+                                      child: Center(
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              height: MediaQuery.of(context).size.height * 0.14,
+                                              child: Image.asset('images/emp.png'),
+                                            ),
+                                            Text(
+                                              'Employee/Staff',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        type: PageTransitionType.rightToLeft),
-                                  );
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.only(left: 16),
-                                  height: MediaQuery.of(context).size.height * 0.18,
-                                  width: MediaQuery.of(context).size.width * 0.35,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(13),
-                                  ),
-                                  child: Center(
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          height: MediaQuery.of(context).size.height * 0.14,
-                                          child: Image.asset('images/emp.png'),
-                                        ),
-                                        Text(
-                                          'Employee/Staff',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.04,
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        PageTransition(child: DriverForm(), type: PageTransitionType.rightToLeft),
+                                      );
+                                    },
+                                    child: Container(
+                                      margin: EdgeInsets.only(right: 16),
+                                      height: MediaQuery.of(context).size.height * 0.18,
+                                      width: MediaQuery.of(context).size.width * 0.35,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(13),
+                                      ),
+                                      child: Center(
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              height: MediaQuery.of(context).size.height * 0.14,
+                                              child: Image.asset('images/driver.jpeg'),
+                                            ),
+                                            Text(
+                                              'Driver',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        PageTransition(
+                                            child: EmployeeCustomerForm(
+                                              isEmployee: false,
+                                            ),
+                                            type: PageTransitionType.rightToLeft),
+                                      );
+                                    },
+                                    child: Container(
+                                      margin: EdgeInsets.only(left: 16),
+                                      height: MediaQuery.of(context).size.height * 0.18,
+                                      width: MediaQuery.of(context).size.width * 0.35,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(13),
+                                      ),
+                                      child: Center(
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              height: MediaQuery.of(context).size.height * 0.14,
+                                              child: Image.asset('images/cust.jpg'),
+                                            ),
+                                            Text(
+                                              'Customer',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
                           ],
                         ),
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.04,
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    PageTransition(child: DriverForm(), type: PageTransitionType.rightToLeft),
-                                  );
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.only(right: 16),
-                                  height: MediaQuery.of(context).size.height * 0.18,
-                                  width: MediaQuery.of(context).size.width * 0.35,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(13),
-                                  ),
-                                  child: Center(
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          height: MediaQuery.of(context).size.height * 0.14,
-                                          child: Image.asset('images/driver.jpeg'),
-                                        ),
-                                        Text(
-                                          'Driver',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    PageTransition(
-                                        child: EmployeeCustomerForm(
-                                          isEmployee: false,
-                                        ),
-                                        type: PageTransitionType.rightToLeft),
-                                  );
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.only(left: 16),
-                                  height: MediaQuery.of(context).size.height * 0.18,
-                                  width: MediaQuery.of(context).size.width * 0.35,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(13),
-                                  ),
-                                  child: Center(
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          height: MediaQuery.of(context).size.height * 0.14,
-                                          child: Image.asset('images/cust.jpg'),
-                                        ),
-                                        Text(
-                                          'Customer',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
+                      ),
 //                  registerButton(
 //                      role: 'Admin',
 //                      context: context,
@@ -308,10 +303,28 @@ class _RegistrationPageState extends State<RegistrationPage> {
 //                  SizedBox(
 //                    height: MediaQuery.of(context).size.height * 0.02,
 //                  ),
+                    ],
+                  ),
                 ],
               ),
-            ],
-          ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(bottom: size.height * 0.8),
+              child: AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                leading: IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -362,7 +362,7 @@ class _AdminFormState extends State<AdminForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.15
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.27
+                                  ? size.width * 0.32
                                   : 0),
                   child: InputField(
                     validate: _validateName,
@@ -378,7 +378,7 @@ class _AdminFormState extends State<AdminForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.15
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.27
+                                  ? size.width * 0.32
                                   : 0),
                   child: InputField(
                     onChange: () {
@@ -401,7 +401,7 @@ class _AdminFormState extends State<AdminForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.15
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.27
+                                  ? size.width * 0.32
                                   : 0),
                   child: PasswordInput(
                     validate: _validatePassword,
@@ -417,7 +417,7 @@ class _AdminFormState extends State<AdminForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.15
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.27
+                                  ? size.width * 0.32
                                   : 0),
                   child: PasswordInput(
                     validate: _validateRePassword,
@@ -433,7 +433,7 @@ class _AdminFormState extends State<AdminForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.15
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.27
+                                  ? size.width * 0.32
                                   : 0),
                   child: InputField(validate: _validateOrganization, controller: _organizationController, errorText: 'Max length is 50', labelText: 'Institution Name'),
                 ),
@@ -445,7 +445,7 @@ class _AdminFormState extends State<AdminForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.168
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.278
+                                  ? size.width * 0.328
                                   : 0),
                   child: Theme(
                     data: Theme.of(context).copyWith(canvasColor: violet1),
@@ -497,7 +497,7 @@ class _AdminFormState extends State<AdminForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.168
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.278
+                                  ? size.width * 0.328
                                   : 0),
                   child: Container(
                     height: 60,
@@ -543,7 +543,7 @@ class _AdminFormState extends State<AdminForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.15
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.27
+                                  ? size.width * 0.32
                                   : 0),
                   child: InputField(
                     validate: _validateNumberOrganization,
@@ -560,7 +560,7 @@ class _AdminFormState extends State<AdminForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.15
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.27
+                                  ? size.width * 0.32
                                   : 0),
                   child: InputField(
                     validate: false,
@@ -577,7 +577,7 @@ class _AdminFormState extends State<AdminForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.168
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.278
+                                  ? size.width * 0.328
                                   : 0),
                   child: Theme(
                     data: Theme.of(context).copyWith(canvasColor: violet1),
@@ -629,7 +629,7 @@ class _AdminFormState extends State<AdminForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.168
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.278
+                                  ? size.width * 0.328
                                   : 0),
                   child: Theme(
                     data: Theme.of(context).copyWith(canvasColor: violet1),
@@ -684,7 +684,7 @@ class _AdminFormState extends State<AdminForm> {
                                 horizontal: ResponsiveWidget.isMediumScreen(context)
                                     ? size.width * 0.15
                                     : ResponsiveWidget.isLargeScreen(context)
-                                        ? size.width * 0.27
+                                        ? size.width * 0.32
                                         : 0),
                         child: InputField(
                           validate: _validateCityName,
@@ -701,7 +701,7 @@ class _AdminFormState extends State<AdminForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.15
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.27
+                                  ? size.width * 0.32
                                   : 0),
                   child: InputField(
                     validate: _validateMail,
@@ -718,7 +718,7 @@ class _AdminFormState extends State<AdminForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.15
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.27
+                                  ? size.width * 0.32
                                   : 0),
                   child: InputField(
                     validate: _validateAadhar,
@@ -735,7 +735,7 @@ class _AdminFormState extends State<AdminForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.15
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.27
+                                  ? size.width * 0.32
                                   : 0),
                   child: InputField(
                     validate: _validatePhoneNumber,

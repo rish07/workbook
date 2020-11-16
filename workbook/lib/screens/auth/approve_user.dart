@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:universal_io/prefer_universal/io.dart';
@@ -46,7 +47,7 @@ class _ApproveUserState extends State<ApproveUser> {
           )
         : await http.get('$baseUrl/superAdmin/viewAllAdmin');
     print('Response status: ${response.statusCode}');
-
+    print(response.body);
     if (json.decode(response.body)["statusCode"] == 200) {
       setState(() {
         _loading = false;
@@ -343,6 +344,15 @@ class _ApproveUserState extends State<ApproveUser> {
                                                   _employeeList[index]['grade'],
                                                   style: TextStyle(fontSize: 14),
                                                 ),
+                                                SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Text('Received on: '),
+                                                Text(
+                                                  DateFormat("yyyy-MM-dd HH:mm:ss").format(
+                                                    DateTime.parse(_employeeList[index]['createdAt']),
+                                                  ),
+                                                )
                                               ],
                                             )
                                           : !widget.isDriver

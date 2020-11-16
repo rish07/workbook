@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:workbook/screens/dashboard.dart';
 import 'package:workbook/screens/landing_page.dart';
 import 'package:flutter/services.dart';
+import 'package:workbook/screens/profile_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

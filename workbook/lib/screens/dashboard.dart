@@ -309,9 +309,10 @@ class _DashBoardState extends State<DashBoard> {
           backgroundColor: Color(0xFFF5F5F5),
           bottomNavigationBar: BottomAppBar(
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.07,
+              height: MediaQuery.of(context).size.height * 0.08,
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: uni.Platform.isAndroid ? MainAxisAlignment.spaceBetween : MainAxisAlignment.spaceAround,
                 children: [
                   Padding(

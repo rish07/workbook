@@ -341,7 +341,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.15
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.27
+                                  ? size.width * 0.32
                                   : 0),
                   child: InputField(
                     validate: _validateName,
@@ -357,7 +357,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.15
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.27
+                                  ? size.width * 0.32
                                   : 0),
                   child: InputField(
                     validate: _validateEmail,
@@ -375,7 +375,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.15
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.27
+                                  ? size.width * 0.32
                                   : 0),
                   child: PasswordInput(
                     validate: _validatePassword,
@@ -391,7 +391,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.15
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.27
+                                  ? size.width * 0.32
                                   : 0),
                   child: PasswordInput(
                     validate: _validateRePassword,
@@ -408,7 +408,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.168
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.278
+                                  ? size.width * 0.328
                                   : 0),
                   child: Theme(
                     data: Theme.of(context).copyWith(canvasColor: violet1),
@@ -462,7 +462,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.168
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.278
+                                  ? size.width * 0.33
                                   : 0),
                   child: Theme(
                     data: Theme.of(context).copyWith(canvasColor: violet1),
@@ -515,7 +515,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.168
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.278
+                                  ? size.width * 0.328
                                   : 0),
                   child: Theme(
                     data: Theme.of(context).copyWith(canvasColor: violet1),
@@ -566,7 +566,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.15
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.27
+                                  ? size.width * 0.32
                                   : 0),
                   child: InputField(
                     validate: _validateAadhar,
@@ -583,7 +583,7 @@ class _EmployeeCustomerFormState extends State<EmployeeCustomerForm> {
                           horizontal: ResponsiveWidget.isMediumScreen(context)
                               ? size.width * 0.15
                               : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.27
+                                  ? size.width * 0.32
                                   : 0),
                   child: InputField(
                     validate: _validatePhoneNumber,

@@ -231,8 +231,8 @@ class _LoginPageState extends State<LoginPage> {
         User.instituteImage = tempo['instituteImageUrl'] ?? null;
         User.userInstituteType = tempo['instituteType'] ?? null;
         User.numberOfMembers = tempo['numberOfMembers'] ?? null;
-        User.state = tempo['state'] ?? null;
-        User.city = tempo['city'] ?? null;
+        User.state = tempo['state'] ?? 'Maharashtra';
+        User.city = tempo['city'] ?? 'Ahmednagar';
         User.mailAddress = tempo['mailAddress'] ?? null;
         User.aadharNumber = tempo['adharNumber'] ?? null;
         User.grade = tempo['grade'] ?? null;
