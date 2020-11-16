@@ -225,6 +225,7 @@ class _OTPVerificationState extends State<OTPVerification> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _registerUser();
     Timer(Duration(minutes: 5), () {
       setState(() {
         _time = true;

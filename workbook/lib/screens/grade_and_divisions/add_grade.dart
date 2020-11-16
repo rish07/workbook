@@ -7,7 +7,9 @@ import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 import 'package:workbook/constants.dart';
+import 'package:workbook/responsive_widget.dart';
 import 'package:workbook/screens/grade_and_divisions/view_divisions.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';
@@ -174,6 +176,7 @@ class _AddGradeState extends State<AddGrade> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return ModalProgressHUD(
       progressIndicator: CircularProgressIndicator(
         valueColor: AlwaysStoppedAnimation<Color>(violet2),
@@ -219,7 +222,9 @@ class _AddGradeState extends State<AddGrade> {
         body: Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.all(16),
+          padding: Platform.isAndroid
+              ? EdgeInsets.all(16)
+              : EdgeInsets.symmetric(vertical: 16, horizontal: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.25 : size.width * 0.3),
           child: ListView(
             children: [
               Column(
