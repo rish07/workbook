@@ -1,32 +1,32 @@
 import 'dart:convert';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html';
-import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:page_transition/page_transition.dart';
+import 'dart:io' as io;
+import 'dart:math' as math;
+
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase/firebase.dart' as fb;
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:path/path.dart' as p;
+import 'package:regexed_validator/regexed_validator.dart';
+import 'package:universal_html/prefer_universal/html.dart' as html;
 import 'package:universal_io/prefer_universal/io.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/responsive_widget.dart';
 import 'package:workbook/screens/auth/login_page.dart';
+import 'package:workbook/user.dart';
 import 'package:workbook/widget/input_field.dart';
 import 'package:workbook/widget/password.dart';
 import 'package:workbook/widget/popUpDialog.dart';
 import 'package:workbook/widget/registerButton.dart';
-import 'package:regexed_validator/regexed_validator.dart';
-import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
-import 'package:universal_html/prefer_universal/html.dart' as html;
-
-import 'package:firebase/firebase.dart' as fb;
-import 'dart:io' as io;
-import 'package:workbook/user.dart';
-import 'dart:math' as math;
-import 'package:path/path.dart' as p;
 
 class AdminForm extends StatefulWidget {
   @override
@@ -63,7 +63,8 @@ class _AdminFormState extends State<AdminForm> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordReController = TextEditingController();
   final TextEditingController _organizationController = TextEditingController();
-  final TextEditingController _organizationNumberController = TextEditingController();
+  final TextEditingController _organizationNumberController =
+      TextEditingController();
   final TextEditingController _referenceController = TextEditingController();
   final TextEditingController _aadharController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
@@ -186,7 +187,8 @@ class _AdminFormState extends State<AdminForm> {
 
         reader.onLoadEnd.listen(
           (loadEndEvent) async {
-            uploadImageFile(file, imageName: _organizationController.text.toString());
+            uploadImageFile(file,
+                imageName: _organizationController.text.toString());
           },
         );
       },
@@ -197,8 +199,10 @@ class _AdminFormState extends State<AdminForm> {
     setState(() {
       _isLoading = true;
     });
-    fb.StorageReference storageRef = fb.app().storage().ref('images/$imageName');
-    fb.UploadTaskSnapshot uploadTaskSnapshot = await storageRef.put(image).future;
+    fb.StorageReference storageRef =
+        fb.app().storage().ref('images/$imageName');
+    fb.UploadTaskSnapshot uploadTaskSnapshot =
+        await storageRef.put(image).future;
 
     Uri imageUri = await uploadTaskSnapshot.ref.getDownloadURL();
     print(imageUri);
@@ -225,7 +229,9 @@ class _AdminFormState extends State<AdminForm> {
       "numberOfMembers": _organizationNumberController.text,
       "state": _selectedStateLocation,
       "city": _selectedCityLocation,
-      "reference": _referenceController.text.isEmpty ? "Self" : _referenceController.text.toString(),
+      "reference": _referenceController.text.isEmpty
+          ? "Self"
+          : _referenceController.text.toString(),
       "mailAddress": _mailController.text.toString(),
       "adharNumber": _aadharController.text,
       "contactNumber": _phoneController.text,
@@ -240,13 +246,15 @@ class _AdminFormState extends State<AdminForm> {
           onPress: () {
             Navigator.push(
               context,
-              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
+              PageTransition(
+                  child: LoginPage(), type: PageTransitionType.rightToLeft),
             );
           },
           title: 'Registration Successful',
           context: context,
           buttonTitle: 'Close',
-          content: 'Your form has been submitted. Please wait for 24 hours for it to get approved');
+          content:
+              'Your form has been submitted. Please wait for 24 hours for it to get approved');
 
       _nameController.clear();
       _emailController.clear();
@@ -260,15 +268,18 @@ class _AdminFormState extends State<AdminForm> {
       _mailController.clear();
       _aadharController.clear();
       _phoneController.clear();
-    } else if (json.decode(response.body)['payload']['err']['keyValue'] != null) {
+    } else if (json.decode(response.body)['payload']['err']['keyValue'] !=
+        null) {
       popDialog(
           title: 'Duplicate user',
           context: context,
-          content: 'Admin with email ID ${json.decode(response.body)['payload']['err']['keyValue']['userID']} already exists. Please login in!',
+          content:
+              'Admin with email ID ${json.decode(response.body)['payload']['err']['keyValue']['userID']} already exists. Please login in!',
           onPress: () {
             Navigator.push(
               context,
-              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
+              PageTransition(
+                  child: LoginPage(), type: PageTransitionType.rightToLeft),
             );
           },
           buttonTitle: 'Login');
@@ -315,35 +326,19 @@ class _AdminFormState extends State<AdminForm> {
           backgroundColor: Colors.transparent,
         ),
         inAsyncCall: _isLoading,
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [violet1, violet2]),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: ListView(
-              children: [
-                Row(
-                  mainAxisAlignment: Platform.isAndroid ? MainAxisAlignment.center : MainAxisAlignment.start,
+        child: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                    colors: [violet1, violet2]),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: ListView(
                   children: [
-                    !Platform.isAndroid
-                        ? IconButton(
-                            icon: Icon(
-                              Icons.arrow_back_outlined,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            })
-                        : Container(),
-                    !Platform.isAndroid
-                        ? SizedBox(
-                            width: ResponsiveWidget.isMediumScreen(context)
-                                ? size.width * 0.3
-                                : ResponsiveWidget.isLargeScreen(context)
-                                    ? size.width * 0.4
-                                    : 20)
-                        : Container(),
                     Text(
                       'Admin Registration',
                       style: TextStyle(
@@ -352,460 +347,569 @@ class _AdminFormState extends State<AdminForm> {
                       ),
                       textAlign: TextAlign.center,
                     ),
+                    Padding(
+                      padding: Platform.isAndroid
+                          ? EdgeInsets.only(top: 16.0)
+                          : EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal:
+                                  ResponsiveWidget.isMediumScreen(context)
+                                      ? size.width * 0.15
+                                      : ResponsiveWidget.isLargeScreen(context)
+                                          ? size.width * 0.32
+                                          : 0),
+                      child: InputField(
+                        validate: _validateName,
+                        errorText: 'This field can\'t be empty',
+                        controller: _nameController,
+                        labelText: 'Name',
+                      ),
+                    ),
+                    Padding(
+                      padding: Platform.isAndroid
+                          ? EdgeInsets.zero
+                          : EdgeInsets.symmetric(
+                              horizontal:
+                                  ResponsiveWidget.isMediumScreen(context)
+                                      ? size.width * 0.15
+                                      : ResponsiveWidget.isLargeScreen(context)
+                                          ? size.width * 0.32
+                                          : 0),
+                      child: InputField(
+                        onChange: () {
+                          setState(() {
+                            //_showEmail = true;
+                          });
+                        },
+                        validate: _validateEmail,
+                        capital: TextCapitalization.none,
+                        controller: _emailController,
+                        errorText: 'Please enter a valid email ID',
+                        labelText: 'Email',
+                        textInputType: TextInputType.emailAddress,
+                      ),
+                    ),
+                    Padding(
+                      padding: Platform.isAndroid
+                          ? EdgeInsets.zero
+                          : EdgeInsets.symmetric(
+                              horizontal:
+                                  ResponsiveWidget.isMediumScreen(context)
+                                      ? size.width * 0.15
+                                      : ResponsiveWidget.isLargeScreen(context)
+                                          ? size.width * 0.32
+                                          : 0),
+                      child: PasswordInput(
+                        validate: _validatePassword,
+                        controller: _passwordController,
+                        labelText: 'Password',
+                        errorText:
+                            'Min Length = 8 and Max length = 15,\nShould have atleast 1 number, 1 capital letter\nand 1 Special Character',
+                      ),
+                    ),
+                    Padding(
+                      padding: Platform.isAndroid
+                          ? EdgeInsets.zero
+                          : EdgeInsets.symmetric(
+                              horizontal:
+                                  ResponsiveWidget.isMediumScreen(context)
+                                      ? size.width * 0.15
+                                      : ResponsiveWidget.isLargeScreen(context)
+                                          ? size.width * 0.32
+                                          : 0),
+                      child: PasswordInput(
+                        validate: _validateRePassword,
+                        controller: _passwordReController,
+                        labelText: 'Re-enter Password',
+                        errorText: 'Passwords don\'t match',
+                      ),
+                    ),
+                    Padding(
+                      padding: Platform.isAndroid
+                          ? EdgeInsets.zero
+                          : EdgeInsets.symmetric(
+                              horizontal:
+                                  ResponsiveWidget.isMediumScreen(context)
+                                      ? size.width * 0.15
+                                      : ResponsiveWidget.isLargeScreen(context)
+                                          ? size.width * 0.32
+                                          : 0),
+                      child: InputField(
+                          validate: _validateOrganization,
+                          controller: _organizationController,
+                          errorText: 'Max length is 50',
+                          labelText: 'Institution Name'),
+                    ),
+                    Padding(
+                      padding: Platform.isAndroid
+                          ? EdgeInsets.all(16)
+                          : EdgeInsets.symmetric(
+                              vertical: 16,
+                              horizontal:
+                                  ResponsiveWidget.isMediumScreen(context)
+                                      ? size.width * 0.168
+                                      : ResponsiveWidget.isLargeScreen(context)
+                                          ? size.width * 0.328
+                                          : 0),
+                      child: Theme(
+                        data: Theme.of(context).copyWith(canvasColor: violet1),
+                        child: DropdownButtonFormField(
+                          onTap: () {
+                            setState(() {
+                              _validateInstituteType = false;
+                            });
+                          },
+                          decoration: InputDecoration(
+                            errorText: _validateInstituteType
+                                ? 'Please choose an option'
+                                : null,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white70),
+                            ),
+                          ),
+                          icon: Icon(Icons.keyboard_arrow_down),
+                          iconDisabledColor: Colors.white,
+                          iconEnabledColor: Colors.white,
+                          iconSize: 24,
+                          style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontSize: 20,
+                            color: Colors.white70,
+                          ),
+                          hint: Text(
+                            'Select Institution Type',
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                          value: _selectedInstitutionType,
+                          onChanged: (newValue) {
+                            setState(() {
+                              _selectedInstitutionType = newValue;
+                            });
+                          },
+                          items: instituteType.map((type) {
+                            return DropdownMenuItem(
+                              child: Text(type),
+                              value: type,
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: Platform.isAndroid
+                          ? EdgeInsets.all(16)
+                          : EdgeInsets.symmetric(
+                              vertical: 16,
+                              horizontal:
+                                  ResponsiveWidget.isMediumScreen(context)
+                                      ? size.width * 0.168
+                                      : ResponsiveWidget.isLargeScreen(context)
+                                          ? size.width * 0.328
+                                          : 0),
+                      child: Container(
+                        height: 60,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(color: Colors.white70)),
+                        child: Row(
+                          mainAxisAlignment: Platform.isAndroid
+                              ? MainAxisAlignment.center
+                              : MainAxisAlignment.spaceBetween,
+                          children: [
+                            Padding(
+                              padding: Platform.isAndroid
+                                  ? EdgeInsets.zero
+                                  : EdgeInsets.only(left: 8.0),
+                              child: Text(
+                                'Institution Image',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  left: 16.0,
+                                  right: Platform.isAndroid ? 0 : 5),
+                              child: MaterialButton(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(32),
+                                ),
+                                color: Colors.white,
+                                onPressed: () async {
+                                  if (Platform.isAndroid) {
+                                    filePicker(context);
+                                  } else {
+                                    await uploadImage();
+                                  }
+                                },
+                                child: _file != null || imageUrl != null
+                                    ? Text('Uploaded!')
+                                    : Text('Choose a file'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: Platform.isAndroid
+                          ? EdgeInsets.zero
+                          : EdgeInsets.symmetric(
+                              horizontal:
+                                  ResponsiveWidget.isMediumScreen(context)
+                                      ? size.width * 0.15
+                                      : ResponsiveWidget.isLargeScreen(context)
+                                          ? size.width * 0.32
+                                          : 0),
+                      child: InputField(
+                        validate: _validateNumberOrganization,
+                        errorText: 'Please enter the number of members',
+                        controller: _organizationNumberController,
+                        labelText: 'Number of members',
+                        textInputType: TextInputType.number,
+                      ),
+                    ),
+                    Padding(
+                      padding: Platform.isAndroid
+                          ? EdgeInsets.all(16)
+                          : EdgeInsets.symmetric(
+                              vertical: 16,
+                              horizontal:
+                                  ResponsiveWidget.isMediumScreen(context)
+                                      ? size.width * 0.168
+                                      : ResponsiveWidget.isLargeScreen(context)
+                                          ? size.width * 0.328
+                                          : 0),
+                      child: Theme(
+                        data: Theme.of(context).copyWith(canvasColor: violet1),
+                        child: DropdownButtonFormField(
+                          onTap: () {
+                            setState(() {
+                              _validateState = false;
+                            });
+                          },
+                          decoration: InputDecoration(
+                            errorText: _validateState
+                                ? 'Please choose an option'
+                                : null,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white70),
+                            ),
+                          ),
+                          icon: Icon(Icons.keyboard_arrow_down),
+                          iconDisabledColor: Colors.white,
+                          iconEnabledColor: Colors.white,
+                          iconSize: 24,
+                          style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontSize: 20,
+                            color: Colors.white70,
+                          ),
+                          hint: Text(
+                            'Select State',
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                          value: _selectedStateLocation,
+                          onChanged: (newValue) {
+                            setState(() {
+                              _selectedStateLocation = newValue;
+                            });
+                          },
+                          items: states.map((location) {
+                            return DropdownMenuItem(
+                              child: Text(location),
+                              value: location,
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: Platform.isAndroid
+                          ? EdgeInsets.all(16)
+                          : EdgeInsets.symmetric(
+                              vertical: 16,
+                              horizontal:
+                                  ResponsiveWidget.isMediumScreen(context)
+                                      ? size.width * 0.168
+                                      : ResponsiveWidget.isLargeScreen(context)
+                                          ? size.width * 0.328
+                                          : 0),
+                      child: Theme(
+                        data: Theme.of(context).copyWith(canvasColor: violet1),
+                        child: DropdownButtonFormField(
+                          onTap: () {
+                            setState(() {
+                              _validateCity = false;
+                            });
+                          },
+                          decoration: InputDecoration(
+                            errorText: _validateCity
+                                ? 'Please choose an option'
+                                : null,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white70),
+                            ),
+                          ),
+                          icon: Icon(Icons.keyboard_arrow_down),
+                          iconDisabledColor: Colors.white,
+                          iconEnabledColor: Colors.white,
+                          iconSize: 24,
+                          style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontSize: 20,
+                            color: Colors.white70,
+                          ),
+                          hint: Text(
+                            'Select City',
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                          value: _selectedCityLocation,
+                          onChanged: (newValue) {
+                            setState(() {
+                              _selectedCityLocation = newValue;
+                            });
+                          },
+                          items:
+                              cities[_selectedStateLocation ?? 'Madhya Pradesh']
+                                  .map((location) {
+                            return DropdownMenuItem(
+                              child: AutoSizeText(
+                                location,
+                                maxLines: 1,
+                              ),
+                              value: location,
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                    _selectedCityLocation == 'Others'
+                        ? Padding(
+                            padding: Platform.isAndroid
+                                ? EdgeInsets.zero
+                                : EdgeInsets.symmetric(
+                                    horizontal:
+                                        ResponsiveWidget.isMediumScreen(context)
+                                            ? size.width * 0.15
+                                            : ResponsiveWidget.isLargeScreen(
+                                                    context)
+                                                ? size.width * 0.32
+                                                : 0),
+                            child: InputField(
+                              validate: _validateCityName,
+                              controller: _cityNameController,
+                              errorText: 'Please enter your city name',
+                              labelText: 'City Name',
+                            ),
+                          )
+                        : Container(),
+                    Padding(
+                      padding: Platform.isAndroid
+                          ? EdgeInsets.zero
+                          : EdgeInsets.symmetric(
+                              horizontal:
+                                  ResponsiveWidget.isMediumScreen(context)
+                                      ? size.width * 0.15
+                                      : ResponsiveWidget.isLargeScreen(context)
+                                          ? size.width * 0.32
+                                          : 0),
+                      child: InputField(
+                        validate: _validateMail,
+                        maxLines: 5,
+                        controller: _mailController,
+                        errorText:
+                            'Please enter your institute\'s mailing address',
+                        labelText: 'Institute Mailing Address',
+                      ),
+                    ),
+                    Padding(
+                      padding: Platform.isAndroid
+                          ? EdgeInsets.zero
+                          : EdgeInsets.symmetric(
+                              horizontal:
+                                  ResponsiveWidget.isMediumScreen(context)
+                                      ? size.width * 0.15
+                                      : ResponsiveWidget.isLargeScreen(context)
+                                          ? size.width * 0.32
+                                          : 0),
+                      child: InputField(
+                        validate: _validateAadhar,
+                        controller: _aadharController,
+                        errorText:
+                            'Please enter you 12 digit Aadhar Card number',
+                        textInputType: TextInputType.number,
+                        labelText: 'Aadhar Card Number',
+                      ),
+                    ),
+                    Padding(
+                      padding: Platform.isAndroid
+                          ? EdgeInsets.zero
+                          : EdgeInsets.symmetric(
+                              horizontal:
+                                  ResponsiveWidget.isMediumScreen(context)
+                                      ? size.width * 0.15
+                                      : ResponsiveWidget.isLargeScreen(context)
+                                          ? size.width * 0.32
+                                          : 0),
+                      child: InputField(
+                        validate: _validatePhoneNumber,
+                        errorText:
+                            'Please enter a valid 10 digit mobile number',
+                        controller: _phoneController,
+                        textInputType: TextInputType.phone,
+                        labelText: 'Contact Number',
+                      ),
+                    ),
+                    Padding(
+                      padding: Platform.isAndroid
+                          ? EdgeInsets.zero
+                          : EdgeInsets.symmetric(
+                              horizontal:
+                                  ResponsiveWidget.isMediumScreen(context)
+                                      ? size.width * 0.15
+                                      : ResponsiveWidget.isLargeScreen(context)
+                                          ? size.width * 0.32
+                                          : 0),
+                      child: InputField(
+                        validate: false,
+                        controller: _referenceController,
+                        labelText: 'Reference',
+                        textInputType: TextInputType.number,
+                      ),
+                    ),
+                    Padding(
+                      padding: Platform.isAndroid
+                          ? EdgeInsets.symmetric(vertical: 16.0, horizontal: 64)
+                          : EdgeInsets.symmetric(
+                              vertical: 16, horizontal: size.width * 0.4),
+                      child: Builder(
+                        builder: (context) => registerButton(
+                          role: 'Submit',
+                          context: context,
+                          onPressed: () async {
+                            setState(() {
+                              _nameController.text.isEmpty
+                                  ? _validateName = true
+                                  : _validateName = false;
+                              _selectedCityLocation == 'Others'
+                                  ? _cityNameController.text.isEmpty
+                                      ? _validateCityName = true
+                                      : _validateCityName = false
+                                  : Container();
+                              (_emailController.text.isEmpty ||
+                                      !validator.email(_emailController.text))
+                                  ? _validateEmail = true
+                                  : _validateEmail = false;
+                              (_passwordController.text.isEmpty ||
+                                      !validator
+                                          .password(_passwordController.text))
+                                  ? _validatePassword = true
+                                  : _validatePassword = false;
+                              (_passwordReController.text.isEmpty ||
+                                      !validator
+                                          .password(_passwordController.text))
+                                  ? _validateRePassword = true
+                                  : _validateRePassword = false;
+                              (_organizationController.text.isEmpty ||
+                                      _organizationController.text.length > 50)
+                                  ? _validateOrganization = true
+                                  : _validateOrganization = false;
+                              _organizationNumberController.text.isEmpty
+                                  ? _validateNumberOrganization = true
+                                  : _validateNumberOrganization = false;
+                              _mailController.text.isEmpty
+                                  ? _validateMail = true
+                                  : _validateMail = false;
+                              (_aadharController.text.isEmpty ||
+                                      _aadharController.text.length != 12)
+                                  ? _validateAadhar = true
+                                  : _validateAadhar = false;
+                              (_phoneController.text.isEmpty ||
+                                      _phoneController.text.length != 10)
+                                  ? _validatePhoneNumber = true
+                                  : _validatePhoneNumber = false;
+                              if (_selectedStateLocation == null) {
+                                _validateState = true;
+                              }
+                              if (_selectedInstitutionType == null) {
+                                _validateInstituteType = true;
+                              }
+                              if (_selectedCityLocation == null) {
+                                _validateCity = true;
+                              }
+                              if (_passwordController.text !=
+                                  _passwordReController.text) {
+                                _validateRePassword = true;
+                              }
+                              if (_file == null && imageUrl == null) {
+                                Scaffold.of(context).showSnackBar(SnackBar(
+                                  content: Text(
+                                      'Please upload the institution image!'),
+                                  action: SnackBarAction(
+                                      label: 'Okay', onPressed: () {}),
+                                ));
+                              }
+                            });
+                            if (!_validateName &&
+                                    !_validateEmail &&
+                                    !_validatePhoneNumber &&
+                                    !_validateNumberOrganization &&
+                                    !_validateMail &&
+                                    _selectedCityLocation == 'Other'
+                                ? _validateCityName
+                                : true &&
+                                    !_validateCity &&
+                                    !_validateState &&
+                                    !_validateAadhar &&
+                                    !_validateOrganization &&
+                                    !_validatePassword &&
+                                    !_validateMail &&
+                                    !_validateRePassword &&
+                                    (_file != null || imageUrl != null)) {
+                              await _registerUser();
+                            }
+                          },
+                        ),
+                      ),
+                    ),
                   ],
                 ),
-                Padding(
-                  padding: Platform.isAndroid
-                      ? EdgeInsets.only(top: 16.0)
-                      : EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: ResponsiveWidget.isMediumScreen(context)
-                              ? size.width * 0.15
-                              : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.32
-                                  : 0),
-                  child: InputField(
-                    validate: _validateName,
-                    errorText: 'This field can\'t be empty',
-                    controller: _nameController,
-                    labelText: 'Name',
-                  ),
-                ),
-                Padding(
-                  padding: Platform.isAndroid
-                      ? EdgeInsets.zero
-                      : EdgeInsets.symmetric(
-                          horizontal: ResponsiveWidget.isMediumScreen(context)
-                              ? size.width * 0.15
-                              : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.32
-                                  : 0),
-                  child: InputField(
-                    onChange: () {
-                      setState(() {
-                        //_showEmail = true;
-                      });
-                    },
-                    validate: _validateEmail,
-                    capital: TextCapitalization.none,
-                    controller: _emailController,
-                    errorText: 'Please enter a valid email ID',
-                    labelText: 'Email',
-                    textInputType: TextInputType.emailAddress,
-                  ),
-                ),
-                Padding(
-                  padding: Platform.isAndroid
-                      ? EdgeInsets.zero
-                      : EdgeInsets.symmetric(
-                          horizontal: ResponsiveWidget.isMediumScreen(context)
-                              ? size.width * 0.15
-                              : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.32
-                                  : 0),
-                  child: PasswordInput(
-                    validate: _validatePassword,
-                    controller: _passwordController,
-                    labelText: 'Password',
-                    errorText: 'Min Length = 8 and Max length = 15,\nShould have atleast 1 number, 1 capital letter\nand 1 Special Character',
-                  ),
-                ),
-                Padding(
-                  padding: Platform.isAndroid
-                      ? EdgeInsets.zero
-                      : EdgeInsets.symmetric(
-                          horizontal: ResponsiveWidget.isMediumScreen(context)
-                              ? size.width * 0.15
-                              : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.32
-                                  : 0),
-                  child: PasswordInput(
-                    validate: _validateRePassword,
-                    controller: _passwordReController,
-                    labelText: 'Re-enter Password',
-                    errorText: 'Passwords don\'t match',
-                  ),
-                ),
-                Padding(
-                  padding: Platform.isAndroid
-                      ? EdgeInsets.zero
-                      : EdgeInsets.symmetric(
-                          horizontal: ResponsiveWidget.isMediumScreen(context)
-                              ? size.width * 0.15
-                              : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.32
-                                  : 0),
-                  child: InputField(validate: _validateOrganization, controller: _organizationController, errorText: 'Max length is 50', labelText: 'Institution Name'),
-                ),
-                Padding(
-                  padding: Platform.isAndroid
-                      ? EdgeInsets.all(16)
-                      : EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: ResponsiveWidget.isMediumScreen(context)
-                              ? size.width * 0.168
-                              : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.328
-                                  : 0),
-                  child: Theme(
-                    data: Theme.of(context).copyWith(canvasColor: violet1),
-                    child: DropdownButtonFormField(
-                      onTap: () {
-                        setState(() {
-                          _validateInstituteType = false;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        errorText: _validateInstituteType ? 'Please choose an option' : null,
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white70),
-                        ),
-                      ),
-                      icon: Icon(Icons.keyboard_arrow_down),
-                      iconDisabledColor: Colors.white,
-                      iconEnabledColor: Colors.white,
-                      iconSize: 24,
-                      style: TextStyle(
-                        fontFamily: 'Montserrat',
-                        fontSize: 20,
-                        color: Colors.white70,
-                      ),
-                      hint: Text(
-                        'Select Institution Type',
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                      value: _selectedInstitutionType,
-                      onChanged: (newValue) {
-                        setState(() {
-                          _selectedInstitutionType = newValue;
-                        });
-                      },
-                      items: instituteType.map((type) {
-                        return DropdownMenuItem(
-                          child: Text(type),
-                          value: type,
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: Platform.isAndroid
-                      ? EdgeInsets.all(16)
-                      : EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: ResponsiveWidget.isMediumScreen(context)
-                              ? size.width * 0.168
-                              : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.328
-                                  : 0),
-                  child: Container(
-                    height: 60,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.white70)),
-                    child: Row(
-                      mainAxisAlignment: Platform.isAndroid ? MainAxisAlignment.center : MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: Platform.isAndroid ? EdgeInsets.zero : EdgeInsets.only(left: 8.0),
-                          child: Text(
-                            'Institution Image',
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.white70,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 16.0, right: Platform.isAndroid ? 0 : 5),
-                          child: MaterialButton(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32),
-                            ),
-                            color: Colors.white,
-                            onPressed: () async {
-                              if (Platform.isAndroid) {
-                                filePicker(context);
-                              } else {
-                                await uploadImage();
-                              }
-                            },
-                            child: _file != null || imageUrl != null ? Text('Uploaded!') : Text('Choose a file'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: Platform.isAndroid
-                      ? EdgeInsets.zero
-                      : EdgeInsets.symmetric(
-                          horizontal: ResponsiveWidget.isMediumScreen(context)
-                              ? size.width * 0.15
-                              : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.32
-                                  : 0),
-                  child: InputField(
-                    validate: _validateNumberOrganization,
-                    errorText: 'Please enter the number of members',
-                    controller: _organizationNumberController,
-                    labelText: 'Number of members',
-                    textInputType: TextInputType.number,
-                  ),
-                ),
-                Padding(
-                  padding: Platform.isAndroid
-                      ? EdgeInsets.zero
-                      : EdgeInsets.symmetric(
-                          horizontal: ResponsiveWidget.isMediumScreen(context)
-                              ? size.width * 0.15
-                              : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.32
-                                  : 0),
-                  child: InputField(
-                    validate: false,
-                    controller: _referenceController,
-                    labelText: 'Reference(optional)',
-                    textInputType: TextInputType.number,
-                  ),
-                ),
-                Padding(
-                  padding: Platform.isAndroid
-                      ? EdgeInsets.all(16)
-                      : EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: ResponsiveWidget.isMediumScreen(context)
-                              ? size.width * 0.168
-                              : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.328
-                                  : 0),
-                  child: Theme(
-                    data: Theme.of(context).copyWith(canvasColor: violet1),
-                    child: DropdownButtonFormField(
-                      onTap: () {
-                        setState(() {
-                          _validateState = false;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        errorText: _validateState ? 'Please choose an option' : null,
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white70),
-                        ),
-                      ),
-                      icon: Icon(Icons.keyboard_arrow_down),
-                      iconDisabledColor: Colors.white,
-                      iconEnabledColor: Colors.white,
-                      iconSize: 24,
-                      style: TextStyle(
-                        fontFamily: 'Montserrat',
-                        fontSize: 20,
-                        color: Colors.white70,
-                      ),
-                      hint: Text(
-                        'Select State',
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                      value: _selectedStateLocation,
-                      onChanged: (newValue) {
-                        setState(() {
-                          _selectedStateLocation = newValue;
-                        });
-                      },
-                      items: states.map((location) {
-                        return DropdownMenuItem(
-                          child: Text(location),
-                          value: location,
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: Platform.isAndroid
-                      ? EdgeInsets.all(16)
-                      : EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: ResponsiveWidget.isMediumScreen(context)
-                              ? size.width * 0.168
-                              : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.328
-                                  : 0),
-                  child: Theme(
-                    data: Theme.of(context).copyWith(canvasColor: violet1),
-                    child: DropdownButtonFormField(
-                      onTap: () {
-                        setState(() {
-                          _validateCity = false;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        errorText: _validateCity ? 'Please choose an option' : null,
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white70),
-                        ),
-                      ),
-                      icon: Icon(Icons.keyboard_arrow_down),
-                      iconDisabledColor: Colors.white,
-                      iconEnabledColor: Colors.white,
-                      iconSize: 24,
-                      style: TextStyle(
-                        fontFamily: 'Montserrat',
-                        fontSize: 20,
-                        color: Colors.white70,
-                      ),
-                      hint: Text(
-                        'Select City',
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                      value: _selectedCityLocation,
-                      onChanged: (newValue) {
-                        setState(() {
-                          _selectedCityLocation = newValue;
-                        });
-                      },
-                      items: cities[_selectedStateLocation ?? 'Madhya Pradesh'].map((location) {
-                        return DropdownMenuItem(
-                          child: AutoSizeText(
-                            location,
-                            maxLines: 1,
-                          ),
-                          value: location,
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ),
-                _selectedCityLocation == 'Others'
-                    ? Padding(
-                        padding: Platform.isAndroid
-                            ? EdgeInsets.zero
-                            : EdgeInsets.symmetric(
-                                horizontal: ResponsiveWidget.isMediumScreen(context)
-                                    ? size.width * 0.15
-                                    : ResponsiveWidget.isLargeScreen(context)
-                                        ? size.width * 0.32
-                                        : 0),
-                        child: InputField(
-                          validate: _validateCityName,
-                          controller: _cityNameController,
-                          errorText: 'Please enter your city name',
-                          labelText: 'City Name',
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(bottom: size.height * 0.9),
+              child: AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                leading: Platform.isAndroid
+                    ? IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
                         ),
                       )
-                    : Container(),
-                Padding(
-                  padding: Platform.isAndroid
-                      ? EdgeInsets.zero
-                      : EdgeInsets.symmetric(
-                          horizontal: ResponsiveWidget.isMediumScreen(context)
-                              ? size.width * 0.15
-                              : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.32
-                                  : 0),
-                  child: InputField(
-                    validate: _validateMail,
-                    maxLines: 5,
-                    controller: _mailController,
-                    errorText: 'Please enter your institute\'s mailing address',
-                    labelText: 'Institute Mailing Address',
-                  ),
-                ),
-                Padding(
-                  padding: Platform.isAndroid
-                      ? EdgeInsets.zero
-                      : EdgeInsets.symmetric(
-                          horizontal: ResponsiveWidget.isMediumScreen(context)
-                              ? size.width * 0.15
-                              : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.32
-                                  : 0),
-                  child: InputField(
-                    validate: _validateAadhar,
-                    controller: _aadharController,
-                    errorText: 'Please enter you 12 digit Aadhar Card number',
-                    textInputType: TextInputType.number,
-                    labelText: 'Aadhar Card Number',
-                  ),
-                ),
-                Padding(
-                  padding: Platform.isAndroid
-                      ? EdgeInsets.zero
-                      : EdgeInsets.symmetric(
-                          horizontal: ResponsiveWidget.isMediumScreen(context)
-                              ? size.width * 0.15
-                              : ResponsiveWidget.isLargeScreen(context)
-                                  ? size.width * 0.32
-                                  : 0),
-                  child: InputField(
-                    validate: _validatePhoneNumber,
-                    errorText: 'Please enter a valid 10 digit mobile number',
-                    controller: _phoneController,
-                    textInputType: TextInputType.phone,
-                    labelText: 'Contact Number',
-                  ),
-                ),
-                Padding(
-                  padding: Platform.isAndroid ? EdgeInsets.symmetric(vertical: 16.0, horizontal: 64) : EdgeInsets.symmetric(vertical: 16, horizontal: size.width * 0.4),
-                  child: Builder(
-                    builder: (context) => registerButton(
-                      role: 'Submit',
-                      context: context,
-                      onPressed: () async {
-                        setState(() {
-                          _nameController.text.isEmpty ? _validateName = true : _validateName = false;
-                          _selectedCityLocation == 'Others'
-                              ? _cityNameController.text.isEmpty
-                                  ? _validateCityName = true
-                                  : _validateCityName = false
-                              : Container();
-                          (_emailController.text.isEmpty || !validator.email(_emailController.text)) ? _validateEmail = true : _validateEmail = false;
-                          (_passwordController.text.isEmpty || !validator.password(_passwordController.text)) ? _validatePassword = true : _validatePassword = false;
-                          (_passwordReController.text.isEmpty || !validator.password(_passwordController.text)) ? _validateRePassword = true : _validateRePassword = false;
-                          (_organizationController.text.isEmpty || _organizationController.text.length > 50) ? _validateOrganization = true : _validateOrganization = false;
-                          _organizationNumberController.text.isEmpty ? _validateNumberOrganization = true : _validateNumberOrganization = false;
-                          _mailController.text.isEmpty ? _validateMail = true : _validateMail = false;
-                          (_aadharController.text.isEmpty || _aadharController.text.length != 12) ? _validateAadhar = true : _validateAadhar = false;
-                          (_phoneController.text.isEmpty || _phoneController.text.length != 10) ? _validatePhoneNumber = true : _validatePhoneNumber = false;
-                          if (_selectedStateLocation == null) {
-                            _validateState = true;
-                          }
-                          if (_selectedInstitutionType == null) {
-                            _validateInstituteType = true;
-                          }
-                          if (_selectedCityLocation == null) {
-                            _validateCity = true;
-                          }
-                          if (_passwordController.text != _passwordReController.text) {
-                            _validateRePassword = true;
-                          }
-                          if (_file == null && imageUrl == null) {
-                            Scaffold.of(context).showSnackBar(SnackBar(
-                              content: Text('Please upload the institution image!'),
-                              action: SnackBarAction(label: 'Okay', onPressed: () {}),
-                            ));
-                          }
-                        });
-                        if (!_validateName && !_validateEmail && !_validatePhoneNumber && !_validateNumberOrganization && !_validateMail && _selectedCityLocation == 'Other'
-                            ? _validateCityName
-                            : true &&
-                                !_validateCity &&
-                                !_validateState &&
-                                !_validateAadhar &&
-                                !_validateOrganization &&
-                                !_validatePassword &&
-                                !_validateMail &&
-                                !_validateRePassword &&
-                                (_file != null || imageUrl != null)) {
-                          await _registerUser();
-                        }
-                      },
-                    ),
-                  ),
-                ),
-              ],
+                    : MaterialButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          'Back',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

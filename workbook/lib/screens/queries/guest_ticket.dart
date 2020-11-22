@@ -2,15 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:regexed_validator/regexed_validator.dart';
 import 'package:universal_io/io.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/auth/login_page.dart';
-import 'package:workbook/widget/input_field.dart';
-import 'package:http/http.dart' as http;
 import 'package:workbook/user.dart';
+import 'package:workbook/widget/input_field.dart';
 import 'package:workbook/widget/popUpDialog.dart';
 
 import '../../responsive_widget.dart';
@@ -49,12 +49,14 @@ class _GenerateTicketState extends State<GenerateTicket> {
       popDialog(
           title: "Submitted successfully",
           context: context,
-          content: "Your query has been submitted successfully. Please wait for the admin to contact you",
+          content:
+              "Your query has been submitted successfully. Please wait for the admin to contact you",
           buttonTitle: 'Close',
           onPress: () {
             Navigator.push(
               context,
-              PageTransition(child: LoginPage(), type: PageTransitionType.rightToLeft),
+              PageTransition(
+                  child: LoginPage(), type: PageTransitionType.rightToLeft),
             );
             _nameController.clear();
             _emailController.clear();
@@ -89,7 +91,10 @@ class _GenerateTicketState extends State<GenerateTicket> {
           children: [
             Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [violet1, violet2]),
+                gradient: LinearGradient(
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                    colors: [violet1, violet2]),
               ),
               padding: EdgeInsets.all(16),
               child: ListView(
@@ -175,7 +180,9 @@ class _GenerateTicketState extends State<GenerateTicket> {
                           });
                         },
                         decoration: InputDecoration(
-                          errorText: _validateInstitution ? 'Please choose an option' : null,
+                          errorText: _validateInstitution
+                              ? 'Please choose an option'
+                              : null,
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.white70),
                           ),
@@ -239,20 +246,26 @@ class _GenerateTicketState extends State<GenerateTicket> {
                           color: Colors.white,
                         ),
                         decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 18),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 18),
                           isDense: true,
                           errorMaxLines: 1,
                           focusedErrorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white, width: 2),
+                            borderSide:
+                                BorderSide(color: Colors.white, width: 2),
                           ),
                           errorStyle: TextStyle(height: 0, fontSize: 10),
                           floatingLabelBehavior: FloatingLabelBehavior.auto,
-                          errorText: _validateDescription ? "This field can't be empty" : null,
+                          errorText: _validateDescription
+                              ? "This field can't be empty"
+                              : null,
                           enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white70, width: 1),
+                            borderSide:
+                                BorderSide(color: Colors.white70, width: 1),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white, width: 2.0),
+                            borderSide:
+                                BorderSide(color: Colors.white, width: 2.0),
                           ),
                           fillColor: Colors.lightBlueAccent,
                           labelText: "Enquiry description",
@@ -266,35 +279,83 @@ class _GenerateTicketState extends State<GenerateTicket> {
                     ),
                   ),
                   Padding(
-                    padding: Platform.isAndroid ? EdgeInsets.symmetric(vertical: 16.0, horizontal: 64) : EdgeInsets.symmetric(vertical: 16, horizontal: size.width * 0.4),
-                    child: MaterialButton(
-                      padding: EdgeInsets.all(20),
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(32),
-                      ),
-                      onPressed: () async {
-                        setState(() {
-                          _nameController.text.isEmpty ? _validateName = true : _validateName = false;
-                          _descriptionController.text.isEmpty ? _validateDescription = true : _validateDescription = false;
-                          (_emailController.text.isEmpty || !validator.email(_emailController.text)) ? _validateEmail = true : _validateEmail = false;
-                          (_phoneController.text.isEmpty || !validator.phone(_phoneController.text)) ? _validatePhoneNumber = true : _validatePhoneNumber = false;
-                          if (_selectedInstitution == null) {
-                            _validateInstitution = true;
-                          }
-                        });
+                    padding: Platform.isAndroid
+                        ? EdgeInsets.symmetric(vertical: 16.0, horizontal: 64)
+                        : EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: ResponsiveWidget.isMediumScreen(context)
+                                ? size.width * 0.3
+                                : size.width * 0.4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        MaterialButton(
+                          onPressed: () {
+                            _nameController.clear();
+                            _emailController.clear();
+                            _phoneController.clear();
+                            _descriptionController.clear();
+                            _selectedInstitution = null;
+                          },
+                          padding: EdgeInsets.all(16),
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(32),
+                          ),
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                                color: violet2, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        MaterialButton(
+                          padding: EdgeInsets.all(16),
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(32),
+                          ),
+                          onPressed: () async {
+                            setState(() {
+                              _nameController.text.isEmpty
+                                  ? _validateName = true
+                                  : _validateName = false;
+                              _descriptionController.text.isEmpty
+                                  ? _validateDescription = true
+                                  : _validateDescription = false;
+                              (_emailController.text.isEmpty ||
+                                      !validator.email(_emailController.text))
+                                  ? _validateEmail = true
+                                  : _validateEmail = false;
+                              (_phoneController.text.isEmpty ||
+                                      !validator.phone(_phoneController.text))
+                                  ? _validatePhoneNumber = true
+                                  : _validatePhoneNumber = false;
+                              if (_selectedInstitution == null) {
+                                _validateInstitution = true;
+                              }
+                            });
 
-                        if (!_validateInstitution && !_validateDescription && !_validateName && !_validatePhoneNumber && !_validateEmail) {
-                          setState(() {
-                            _isLoading = true;
-                          });
-                          await createTicket();
-                        }
-                      },
-                      child: Text(
-                        'Submit Enquiry',
-                        style: TextStyle(color: violet2, fontWeight: FontWeight.bold),
-                      ),
+                            if (!_validateInstitution &&
+                                !_validateDescription &&
+                                !_validateName &&
+                                !_validatePhoneNumber &&
+                                !_validateEmail) {
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              await createTicket();
+                            }
+                          },
+                          child: Text(
+                            'Submit Enquiry',
+                            style: TextStyle(
+                                color: violet2, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
                     ),
                   )
                 ],
@@ -305,15 +366,29 @@ class _GenerateTicketState extends State<GenerateTicket> {
               child: AppBar(
                 backgroundColor: Colors.transparent,
                 elevation: 0,
-                leading: IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                  ),
-                ),
+                leading: Platform.isAndroid
+                    ? IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                        ),
+                      )
+                    : MaterialButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          'Back',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
               ),
             ),
           ],
