@@ -14,7 +14,6 @@ import 'package:workbook/user.dart';
 import 'package:workbook/widget/input_field.dart';
 import 'package:workbook/widget/password.dart';
 import 'package:workbook/widget/popUpDialog.dart';
-import 'package:workbook/widget/registerButton.dart';
 
 import '../../responsive_widget.dart';
 
@@ -363,64 +362,93 @@ class _DriverFormState extends State<DriverForm> {
                       padding: Platform.isAndroid
                           ? EdgeInsets.symmetric(vertical: 16.0, horizontal: 64)
                           : EdgeInsets.symmetric(
-                              vertical: 16, horizontal: size.width * 0.4),
-                      child: Builder(
-                        builder: (context) => registerButton(
-                          role: 'Submit',
-                          context: context,
-                          onPressed: () async {
-                            setState(() {
-                              _nameController.text.isEmpty
-                                  ? _validateName = true
-                                  : _validateName = false;
-                              (_emailController.text.isEmpty ||
-                                      !validator.email(_emailController.text))
-                                  ? _validateEmail = true
-                                  : _validateEmail = false;
-                              (_passwordController.text.isEmpty ||
-                                      !validator
-                                          .password(_passwordController.text))
-                                  ? _validatePassword = true
-                                  : _validatePassword = false;
-                              (_passwordReController.text.isEmpty ||
-                                      !validator
-                                          .password(_passwordController.text))
-                                  ? _validateRePassword = true
-                                  : _validateRePassword = false;
+                              vertical: 16, horizontal: size.width * 0.2),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          MaterialButton(
+                            padding: EdgeInsets.all(16),
+                            color: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            child: Text(
+                              'Submit',
+                              style: TextStyle(
+                                  color: violet2, fontWeight: FontWeight.bold),
+                            ),
+                            onPressed: () async {
+                              setState(() {
+                                _nameController.text.isEmpty
+                                    ? _validateName = true
+                                    : _validateName = false;
+                                (_emailController.text.isEmpty ||
+                                        !validator.email(_emailController.text))
+                                    ? _validateEmail = true
+                                    : _validateEmail = false;
+                                (_passwordController.text.isEmpty ||
+                                        !validator
+                                            .password(_passwordController.text))
+                                    ? _validatePassword = true
+                                    : _validatePassword = false;
+                                (_passwordReController.text.isEmpty ||
+                                        !validator
+                                            .password(_passwordController.text))
+                                    ? _validateRePassword = true
+                                    : _validateRePassword = false;
 
-                              (_aadharController.text.isEmpty ||
-                                      _aadharController.text.length != 12)
-                                  ? _validateAadhar = true
-                                  : _validateAadhar = false;
-                              (_phoneController.text.isEmpty ||
-                                      _phoneController.text.length != 10)
-                                  ? _validatePhoneNumber = true
-                                  : _validatePhoneNumber = false;
+                                (_aadharController.text.isEmpty ||
+                                        _aadharController.text.length != 12)
+                                    ? _validateAadhar = true
+                                    : _validateAadhar = false;
+                                (_phoneController.text.isEmpty ||
+                                        _phoneController.text.length != 10)
+                                    ? _validatePhoneNumber = true
+                                    : _validatePhoneNumber = false;
 
-                              if (_selectedCar == null) {
-                                _validateCar = true;
+                                if (_selectedCar == null) {
+                                  _validateCar = true;
+                                }
+                                if (_selectedInstitution == null) {
+                                  _validateInstitution = true;
+                                }
+                                if (_passwordController.text !=
+                                    _passwordReController.text) {
+                                  _validateRePassword = true;
+                                }
+                              });
+                              if (!_validateName &&
+                                  !_validateEmail &&
+                                  !_validatePhoneNumber &&
+                                  !_validateCar &&
+                                  !_validateInstitution &&
+                                  !_validateAadhar &&
+                                  !_validatePassword &&
+                                  !_validateRePassword) {
+                                await _sendEmailVerification(
+                                    _emailController.text.toString());
                               }
-                              if (_selectedInstitution == null) {
-                                _validateInstitution = true;
-                              }
-                              if (_passwordController.text !=
-                                  _passwordReController.text) {
-                                _validateRePassword = true;
-                              }
-                            });
-                            if (!_validateName &&
-                                !_validateEmail &&
-                                !_validatePhoneNumber &&
-                                !_validateCar &&
-                                !_validateInstitution &&
-                                !_validateAadhar &&
-                                !_validatePassword &&
-                                !_validateRePassword) {
-                              await _sendEmailVerification(
-                                  _emailController.text.toString());
-                            }
-                          },
-                        ),
+                            },
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          MaterialButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            padding: EdgeInsets.all(16),
+                            color: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                  color: violet2, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

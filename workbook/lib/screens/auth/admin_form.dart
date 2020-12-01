@@ -26,7 +26,6 @@ import 'package:workbook/user.dart';
 import 'package:workbook/widget/input_field.dart';
 import 'package:workbook/widget/password.dart';
 import 'package:workbook/widget/popUpDialog.dart';
-import 'package:workbook/widget/registerButton.dart';
 
 class AdminForm extends StatefulWidget {
   @override
@@ -784,95 +783,125 @@ class _AdminFormState extends State<AdminForm> {
                       padding: Platform.isAndroid
                           ? EdgeInsets.symmetric(vertical: 16.0, horizontal: 64)
                           : EdgeInsets.symmetric(
-                              vertical: 16, horizontal: size.width * 0.4),
-                      child: Builder(
-                        builder: (context) => registerButton(
-                          role: 'Submit',
-                          context: context,
-                          onPressed: () async {
-                            setState(() {
-                              _nameController.text.isEmpty
-                                  ? _validateName = true
-                                  : _validateName = false;
-                              _selectedCityLocation == 'Others'
-                                  ? _cityNameController.text.isEmpty
-                                      ? _validateCityName = true
-                                      : _validateCityName = false
-                                  : Container();
-                              (_emailController.text.isEmpty ||
-                                      !validator.email(_emailController.text))
-                                  ? _validateEmail = true
-                                  : _validateEmail = false;
-                              (_passwordController.text.isEmpty ||
-                                      !validator
-                                          .password(_passwordController.text))
-                                  ? _validatePassword = true
-                                  : _validatePassword = false;
-                              (_passwordReController.text.isEmpty ||
-                                      !validator
-                                          .password(_passwordController.text))
-                                  ? _validateRePassword = true
-                                  : _validateRePassword = false;
-                              (_organizationController.text.isEmpty ||
-                                      _organizationController.text.length > 50)
-                                  ? _validateOrganization = true
-                                  : _validateOrganization = false;
-                              _organizationNumberController.text.isEmpty
-                                  ? _validateNumberOrganization = true
-                                  : _validateNumberOrganization = false;
-                              _mailController.text.isEmpty
-                                  ? _validateMail = true
-                                  : _validateMail = false;
-                              (_aadharController.text.isEmpty ||
-                                      _aadharController.text.length != 12)
-                                  ? _validateAadhar = true
-                                  : _validateAadhar = false;
-                              (_phoneController.text.isEmpty ||
-                                      _phoneController.text.length != 10)
-                                  ? _validatePhoneNumber = true
-                                  : _validatePhoneNumber = false;
-                              if (_selectedStateLocation == null) {
-                                _validateState = true;
+                              vertical: 16, horizontal: size.width * 0.2),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          MaterialButton(
+                            padding: EdgeInsets.all(16),
+                            color: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            child: Text(
+                              'Submit',
+                              style: TextStyle(
+                                  color: violet2, fontWeight: FontWeight.bold),
+                            ),
+                            onPressed: () async {
+                              setState(() {
+                                _nameController.text.isEmpty
+                                    ? _validateName = true
+                                    : _validateName = false;
+                                _selectedCityLocation == 'Others'
+                                    ? _cityNameController.text.isEmpty
+                                        ? _validateCityName = true
+                                        : _validateCityName = false
+                                    : Container();
+                                (_emailController.text.isEmpty ||
+                                        !validator.email(_emailController.text))
+                                    ? _validateEmail = true
+                                    : _validateEmail = false;
+                                (_passwordController.text.isEmpty ||
+                                        !validator
+                                            .password(_passwordController.text))
+                                    ? _validatePassword = true
+                                    : _validatePassword = false;
+                                (_passwordReController.text.isEmpty ||
+                                        !validator
+                                            .password(_passwordController.text))
+                                    ? _validateRePassword = true
+                                    : _validateRePassword = false;
+                                (_organizationController.text.isEmpty ||
+                                        _organizationController.text.length >
+                                            50)
+                                    ? _validateOrganization = true
+                                    : _validateOrganization = false;
+                                _organizationNumberController.text.isEmpty
+                                    ? _validateNumberOrganization = true
+                                    : _validateNumberOrganization = false;
+                                _mailController.text.isEmpty
+                                    ? _validateMail = true
+                                    : _validateMail = false;
+                                (_aadharController.text.isEmpty ||
+                                        _aadharController.text.length != 12)
+                                    ? _validateAadhar = true
+                                    : _validateAadhar = false;
+                                (_phoneController.text.isEmpty ||
+                                        _phoneController.text.length != 10)
+                                    ? _validatePhoneNumber = true
+                                    : _validatePhoneNumber = false;
+                                if (_selectedStateLocation == null) {
+                                  _validateState = true;
+                                }
+                                if (_selectedInstitutionType == null) {
+                                  _validateInstituteType = true;
+                                }
+                                if (_selectedCityLocation == null) {
+                                  _validateCity = true;
+                                }
+                                if (_passwordController.text !=
+                                    _passwordReController.text) {
+                                  _validateRePassword = true;
+                                }
+                                if (_file == null && imageUrl == null) {
+                                  Scaffold.of(context).showSnackBar(SnackBar(
+                                    content: Text(
+                                        'Please upload the institution image!'),
+                                    action: SnackBarAction(
+                                        label: 'Okay', onPressed: () {}),
+                                  ));
+                                }
+                              });
+                              if (!_validateName &&
+                                      !_validateEmail &&
+                                      !_validatePhoneNumber &&
+                                      !_validateNumberOrganization &&
+                                      !_validateMail &&
+                                      _selectedCityLocation == 'Other'
+                                  ? _validateCityName
+                                  : true &&
+                                      !_validateCity &&
+                                      !_validateState &&
+                                      !_validateAadhar &&
+                                      !_validateOrganization &&
+                                      !_validatePassword &&
+                                      !_validateMail &&
+                                      !_validateRePassword &&
+                                      (_file != null || imageUrl != null)) {
+                                await _registerUser();
                               }
-                              if (_selectedInstitutionType == null) {
-                                _validateInstituteType = true;
-                              }
-                              if (_selectedCityLocation == null) {
-                                _validateCity = true;
-                              }
-                              if (_passwordController.text !=
-                                  _passwordReController.text) {
-                                _validateRePassword = true;
-                              }
-                              if (_file == null && imageUrl == null) {
-                                Scaffold.of(context).showSnackBar(SnackBar(
-                                  content: Text(
-                                      'Please upload the institution image!'),
-                                  action: SnackBarAction(
-                                      label: 'Okay', onPressed: () {}),
-                                ));
-                              }
-                            });
-                            if (!_validateName &&
-                                    !_validateEmail &&
-                                    !_validatePhoneNumber &&
-                                    !_validateNumberOrganization &&
-                                    !_validateMail &&
-                                    _selectedCityLocation == 'Other'
-                                ? _validateCityName
-                                : true &&
-                                    !_validateCity &&
-                                    !_validateState &&
-                                    !_validateAadhar &&
-                                    !_validateOrganization &&
-                                    !_validatePassword &&
-                                    !_validateMail &&
-                                    !_validateRePassword &&
-                                    (_file != null || imageUrl != null)) {
-                              await _registerUser();
-                            }
-                          },
-                        ),
+                            },
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          MaterialButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            padding: EdgeInsets.all(16),
+                            color: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                  color: violet2, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
