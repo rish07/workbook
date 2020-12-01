@@ -285,32 +285,10 @@ class _GenerateTicketState extends State<GenerateTicket> {
                             vertical: 16,
                             horizontal: ResponsiveWidget.isMediumScreen(context)
                                 ? size.width * 0.3
-                                : size.width * 0.4),
+                                : size.width * 0.2),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        MaterialButton(
-                          onPressed: () {
-                            _nameController.clear();
-                            _emailController.clear();
-                            _phoneController.clear();
-                            _descriptionController.clear();
-                            _selectedInstitution = null;
-                          },
-                          padding: EdgeInsets.all(16),
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(32),
-                          ),
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(
-                                color: violet2, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
                         MaterialButton(
                           padding: EdgeInsets.all(16),
                           color: Colors.white,
@@ -351,6 +329,28 @@ class _GenerateTicketState extends State<GenerateTicket> {
                           },
                           child: Text(
                             'Submit Enquiry',
+                            style: TextStyle(
+                                color: violet2, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        MaterialButton(
+                          onPressed: () {
+                            _nameController.clear();
+                            _emailController.clear();
+                            _phoneController.clear();
+                            _descriptionController.clear();
+                            _selectedInstitution = null;
+                          },
+                          padding: EdgeInsets.all(16),
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(32),
+                          ),
+                          child: Text(
+                            'Cancel',
                             style: TextStyle(
                                 color: violet2, fontWeight: FontWeight.bold),
                           ),

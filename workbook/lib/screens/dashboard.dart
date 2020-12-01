@@ -1,43 +1,41 @@
 import 'dart:convert';
-import 'dart:math' as math;
 import 'dart:io';
+import 'dart:math' as math;
+import 'dart:math';
 import 'dart:typed_data';
-import 'package:flutter/foundation.dart';
-import 'package:image_picker_saver/image_picker_saver.dart';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker_saver/image_picker_saver.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
-
-import 'package:universal_io/io.dart' as uni;
-import 'dart:math';
-import 'package:wc_flutter_share/wc_flutter_share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:universal_io/io.dart' as uni;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'package:wc_flutter_share/wc_flutter_share.dart';
 import 'package:workbook/constants.dart';
+import 'package:workbook/screens/auth/approve_user.dart';
+import 'package:workbook/screens/coming_soon.dart';
 import 'package:workbook/screens/grade_and_divisions/add_grade.dart';
 import 'package:workbook/screens/leave_attendance/holiday_calendar/view_holidays.dart';
 import 'package:workbook/screens/posts/add_post.dart';
-import 'package:workbook/screens/auth/approve_user.dart';
-import 'package:workbook/screens/coming_soon.dart';
-import '../responsive_widget.dart';
-import 'package:workbook/screens/schedule/create_schedule.dart';
-import 'package:workbook/screens/schedule/view_schedule.dart';
-import 'package:workbook/screens/tasks/create_tasks.dart';
 import 'package:workbook/screens/profile_page.dart';
 import 'package:workbook/screens/queries/query_data.dart';
-import 'package:workbook/screens/settings.dart';
+import 'package:workbook/screens/schedule/create_schedule.dart';
+import 'package:workbook/screens/schedule/view_schedule.dart';
 import 'package:workbook/screens/schedule/view_schedules_admin.dart';
+import 'package:workbook/screens/settings.dart';
+import 'package:workbook/screens/tasks/created_tasks.dart';
 import 'package:workbook/screens/tasks/view_tasks.dart';
 import 'package:workbook/user.dart';
-import 'package:http/http.dart' as http;
+
+import '../responsive_widget.dart';
 
 class DashBoard extends StatefulWidget {
   @override
@@ -45,7 +43,8 @@ class DashBoard extends StatefulWidget {
 }
 
 class _DashBoardState extends State<DashBoard> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>(); // ADD THIS LINE
+  final GlobalKey<ScaffoldState> _scaffoldKey =
+      new GlobalKey<ScaffoldState>(); // ADD THIS LINE
 
   static final Random random = Random();
   bool _isLoading = false;
@@ -100,7 +99,11 @@ class _DashBoardState extends State<DashBoard> {
 
   // Like Post
   Future _likePost({String postId, String userName}) async {
-    var response = await http.post("$baseUrl/post/like", body: {"id": postId, "userName": User.userName, "userID": User.userEmail});
+    var response = await http.post("$baseUrl/post/like", body: {
+      "id": postId,
+      "userName": User.userName,
+      "userID": User.userEmail
+    });
     print(json.decode(response.body)['statusCode']);
     print(response.body);
   }
@@ -135,11 +138,14 @@ class _DashBoardState extends State<DashBoard> {
                       ListTile(
                         leading: CircleAvatar(
                           radius: 30,
-                          backgroundImage: !User.profilePicExists ? AssetImage('images/userPhoto.jpg') : NetworkImage((User.userPhotoData)),
+                          backgroundImage: !User.profilePicExists
+                              ? AssetImage('images/userPhoto.jpg')
+                              : NetworkImage((User.userPhotoData)),
                         ),
                         title: Text(
                           User.userName,
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                         subtitle: Text(
                           User.userEmail,
@@ -150,7 +156,9 @@ class _DashBoardState extends State<DashBoard> {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                PageTransition(child: ProfilePage(), type: PageTransitionType.rightToLeft),
+                                PageTransition(
+                                    child: ProfilePage(),
+                                    type: PageTransitionType.rightToLeft),
                               );
                             }),
                       ),
@@ -163,10 +171,17 @@ class _DashBoardState extends State<DashBoard> {
                               ),
                               title: Text(
                                 'Grades and Divisions',
-                                style: TextStyle(fontSize: 16, color: violet2, fontWeight: FontWeight.w600),
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: violet2,
+                                    fontWeight: FontWeight.w600),
                               ),
                               onTap: () {
-                                Navigator.push(context, PageTransition(child: AddGrade(), type: PageTransitionType.rightToLeft));
+                                Navigator.push(
+                                    context,
+                                    PageTransition(
+                                        child: AddGrade(),
+                                        type: PageTransitionType.rightToLeft));
                               },
                               trailing: Icon(Icons.navigate_next),
                             )
@@ -179,7 +194,10 @@ class _DashBoardState extends State<DashBoard> {
                               ),
                               title: Text(
                                 'Drivers',
-                                style: TextStyle(fontSize: 16, color: violet2, fontWeight: FontWeight.w600),
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: violet2,
+                                    fontWeight: FontWeight.w600),
                               ),
                               onTap: () {
                                 Navigator.push(
@@ -201,16 +219,18 @@ class _DashBoardState extends State<DashBoard> {
                         ),
                         title: Text(
                           'Tasks/Meetings',
-                          style: TextStyle(fontSize: 16, color: violet2, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: violet2,
+                              fontWeight: FontWeight.w600),
                         ),
                         onTap: () {
                           Navigator.push(
                             context,
                             PageTransition(
-                                child: User.userRole == 'admin' || User.userRole == 'employee'
-                                    ? CreateTask(
-                                        isAdmin: User.userRole == 'admin' ? true : false,
-                                      )
+                                child: User.userRole == 'admin' ||
+                                        User.userRole == 'employee'
+                                    ? CreatedTasks()
                                     : ViewTasks(),
                                 type: PageTransitionType.rightToLeft),
                           );
@@ -225,7 +245,10 @@ class _DashBoardState extends State<DashBoard> {
                               ),
                               title: Text(
                                 'Create Schedules',
-                                style: TextStyle(fontSize: 16, color: violet2, fontWeight: FontWeight.w600),
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: violet2,
+                                    fontWeight: FontWeight.w600),
                               ),
                               onTap: () {
                                 Navigator.push(
@@ -246,20 +269,27 @@ class _DashBoardState extends State<DashBoard> {
                         ),
                         title: Text(
                           'View Schedules',
-                          style: TextStyle(fontSize: 16, color: violet2, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: violet2,
+                              fontWeight: FontWeight.w600),
                         ),
                         onTap: () {
                           Navigator.push(
                             context,
                             PageTransition(
-                              child: User.userRole != 'admin' ? ViewSchedule() : ViewScheduleAdmin(),
+                              child: User.userRole != 'admin'
+                                  ? ViewSchedule()
+                                  : ViewScheduleAdmin(),
                               type: PageTransitionType.rightToLeft,
                             ),
                           );
                         },
                         trailing: Icon(Icons.navigate_next),
                       ),
-                      User.userRole == 'employee' || User.userRole == 'customer' || User.userRole == 'driver'
+                      User.userRole == 'employee' ||
+                              User.userRole == 'customer' ||
+                              User.userRole == 'driver'
                           ? ListTile(
                               leading: Icon(
                                 Icons.map,
@@ -267,10 +297,17 @@ class _DashBoardState extends State<DashBoard> {
                               ),
                               title: Text(
                                 'Travel',
-                                style: TextStyle(fontSize: 16, color: violet2, fontWeight: FontWeight.w600),
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: violet2,
+                                    fontWeight: FontWeight.w600),
                               ),
                               onTap: () {
-                                Navigator.push(context, PageTransition(child: ComingSoon(), type: PageTransitionType.rightToLeft));
+                                Navigator.push(
+                                    context,
+                                    PageTransition(
+                                        child: ComingSoon(),
+                                        type: PageTransitionType.rightToLeft));
                               },
                               trailing: Icon(Icons.navigate_next),
                             )
@@ -282,10 +319,17 @@ class _DashBoardState extends State<DashBoard> {
                         ),
                         title: Text(
                           'Leave and Attendance',
-                          style: TextStyle(fontSize: 16, color: violet2, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: violet2,
+                              fontWeight: FontWeight.w600),
                         ),
                         onTap: () {
-                          Navigator.push(context, PageTransition(child: ViewHolidays(), type: PageTransitionType.rightToLeft));
+                          Navigator.push(
+                              context,
+                              PageTransition(
+                                  child: ViewHolidays(),
+                                  type: PageTransitionType.rightToLeft));
                         },
                         trailing: Icon(Icons.navigate_next),
                       )
@@ -297,7 +341,9 @@ class _DashBoardState extends State<DashBoard> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      PageTransition(child: Settings(), type: PageTransitionType.rightToLeft),
+                      PageTransition(
+                          child: Settings(),
+                          type: PageTransitionType.rightToLeft),
                     );
                   },
                   leading: Icon(Icons.settings),
@@ -313,16 +359,21 @@ class _DashBoardState extends State<DashBoard> {
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: uni.Platform.isAndroid ? MainAxisAlignment.spaceBetween : MainAxisAlignment.spaceAround,
+                mainAxisAlignment: uni.Platform.isAndroid
+                    ? MainAxisAlignment.spaceBetween
+                    : MainAxisAlignment.spaceAround,
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.012),
+                    padding: EdgeInsets.symmetric(
+                        vertical: MediaQuery.of(context).size.height * 0.012),
                     child: MaterialButton(
                       minWidth: 1,
                       onPressed: () {
                         Navigator.push(
                           context,
-                          PageTransition(child: DashBoard(), type: PageTransitionType.fade),
+                          PageTransition(
+                              child: DashBoard(),
+                              type: PageTransitionType.fade),
                         );
                       },
                       child: Column(
@@ -341,13 +392,16 @@ class _DashBoardState extends State<DashBoard> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.012),
+                    padding: EdgeInsets.symmetric(
+                        vertical: MediaQuery.of(context).size.height * 0.012),
                     child: MaterialButton(
                       minWidth: 1,
                       onPressed: () {
                         Navigator.push(
                           context,
-                          PageTransition(child: ComingSoon(), type: PageTransitionType.rightToLeft),
+                          PageTransition(
+                              child: ComingSoon(),
+                              type: PageTransitionType.rightToLeft),
                         );
                       },
                       child: Column(
@@ -365,28 +419,36 @@ class _DashBoardState extends State<DashBoard> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.012),
+                    padding: EdgeInsets.symmetric(
+                        vertical: MediaQuery.of(context).size.height * 0.012),
                     child: MaterialButton(
                       minWidth: 1,
                       onPressed: () {
                         if (User.userRole == 'superAdmin') {
                           Navigator.push(
                             context,
-                            PageTransition(child: AddPost(), type: PageTransitionType.fade),
+                            PageTransition(
+                                child: AddPost(),
+                                type: PageTransitionType.fade),
                           );
                         } else if (User.userRole == 'admin') {
                           Navigator.push(
                             context,
-                            PageTransition(child: QueryData(), type: PageTransitionType.rightToLeft),
+                            PageTransition(
+                                child: QueryData(),
+                                type: PageTransitionType.rightToLeft),
                           );
                         } else {
-                          Fluttertoast.showToast(context, msg: 'Only Superadmin can post for now!');
+                          Fluttertoast.showToast(context,
+                              msg: 'Only Superadmin can post for now!');
                         }
                       },
                       child: Column(
                         children: [
                           Icon(
-                            User.userRole != 'admin' ? Icons.add_circle_outline : Icons.chat_bubble_outline,
+                            User.userRole != 'admin'
+                                ? Icons.add_circle_outline
+                                : Icons.chat_bubble_outline,
                             size: 25,
                           ),
                           Text(
@@ -398,14 +460,16 @@ class _DashBoardState extends State<DashBoard> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.012),
+                    padding: EdgeInsets.symmetric(
+                        vertical: MediaQuery.of(context).size.height * 0.012),
                     child: MaterialButton(
                       minWidth: 1,
                       onPressed: () {
                         Navigator.push(
                           context,
                           PageTransition(
-                              child: User.userRole != 'driver' && User.userRole != 'customer'
+                              child: User.userRole != 'driver' &&
+                                      User.userRole != 'customer'
                                   ? ApproveUser(
                                       isDriver: false,
                                     )
@@ -416,7 +480,9 @@ class _DashBoardState extends State<DashBoard> {
                       child: Column(
                         children: [
                           Icon(
-                            User.userRole == 'driver' ? Icons.map : Icons.people_outline,
+                            User.userRole == 'driver'
+                                ? Icons.map
+                                : Icons.people_outline,
                             size: 25,
                           ),
                           Text(
@@ -434,7 +500,8 @@ class _DashBoardState extends State<DashBoard> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.012),
+                    padding: EdgeInsets.symmetric(
+                        vertical: MediaQuery.of(context).size.height * 0.012),
                     child: MaterialButton(
                       minWidth: 1,
                       onPressed: () {
@@ -461,7 +528,8 @@ class _DashBoardState extends State<DashBoard> {
           appBar: AppBar(
             title: Text(
               'Feed',
-              style: TextStyle(color: violet2, fontSize: 30, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: violet2, fontSize: 30, fontWeight: FontWeight.bold),
             ),
             automaticallyImplyLeading: false,
             elevation: 0,
@@ -487,9 +555,12 @@ class _DashBoardState extends State<DashBoard> {
                               height: MediaQuery.of(context).size.height * 0.2,
                             ),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 64),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0, vertical: 64),
                               child: AutoSizeText(
-                                User.userRole != "superAdmin" ? 'Welcome to ${User.instituteName},\n${User.userName?.split(" ")[0]}!' : "Welcome,\n${User.userName}",
+                                User.userRole != "superAdmin"
+                                    ? 'Welcome to ${User.instituteName},\n${User.userName?.split(" ")[0]}!'
+                                    : "Welcome,\n${User.userName}",
                                 maxLines: 2,
                                 style: TextStyle(color: violet2, fontSize: 50),
                               ),
@@ -499,7 +570,8 @@ class _DashBoardState extends State<DashBoard> {
                                 : TyperAnimatedTextKit(
                                     speed: Duration(milliseconds: 200),
                                     text: ['Loading...'],
-                                    textStyle: TextStyle(fontSize: 25, color: violet1),
+                                    textStyle:
+                                        TextStyle(fontSize: 25, color: violet1),
                                     onFinished: () {
                                       setState(() {
                                         _isLoading = false;
@@ -515,27 +587,32 @@ class _DashBoardState extends State<DashBoard> {
                           ? EdgeInsets.zero
                           : EdgeInsets.symmetric(
                               vertical: 20,
-                              horizontal: ResponsiveWidget.isMediumScreen(context)
-                                  ? size.width * 0.2
-                                  : ResponsiveWidget.isLargeScreen(context)
-                                      ? size.width * 0.3
-                                      : 10,
+                              horizontal:
+                                  ResponsiveWidget.isMediumScreen(context)
+                                      ? size.width * 0.2
+                                      : ResponsiveWidget.isLargeScreen(context)
+                                          ? size.width * 0.3
+                                          : 10,
                             ),
                       child: ListView.builder(
                         itemCount: posts.length,
                         itemBuilder: ((context, index) {
                           var randid = random.nextInt(10000);
                           if (posts[index]['mediaType'] == 'pdf') {}
-                          final TextEditingController contro = TextEditingController();
+                          final TextEditingController contro =
+                              TextEditingController();
                           List temp = [];
                           posts[index]['likedBy'].forEach((element) {
                             temp.add(element['userID']);
                           });
-                          return (posts[index]['enabled'] == true || User.userRole == 'superAdmin')
+                          return (posts[index]['enabled'] == true ||
+                                  User.userRole == 'superAdmin')
                               ? VisibilityDetector(
                                   onVisibilityChanged: (visibilityInfo) async {
                                     if (visibilityInfo.visibleFraction == 1.0) {
-                                      var response = await http.post('$baseUrl/post/updateViews', body: {"id": posts[index]['_id']});
+                                      var response = await http.post(
+                                          '$baseUrl/post/updateViews',
+                                          body: {"id": posts[index]['_id']});
                                       print(response.body);
                                     }
                                   },
@@ -547,38 +624,63 @@ class _DashBoardState extends State<DashBoard> {
                                         child: Padding(
                                           padding: EdgeInsets.all(8.0),
                                           child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
                                             children: [
-                                              (posts[index]['mediaUrl'] != "null" && posts[index]['mediaType'] == 'image')
+                                              (posts[index]['mediaUrl'] !=
+                                                          "null" &&
+                                                      posts[index]
+                                                              ['mediaType'] ==
+                                                          'image')
                                                   ? GestureDetector(
                                                       onLongPress: () async {
-                                                        await launch(posts[index]['mediaUrl']);
+                                                        await launch(
+                                                            posts[index]
+                                                                ['mediaUrl']);
                                                       },
                                                       child: Container(
-                                                        padding: EdgeInsets.all(8),
-                                                        child: Image.network(posts[index]['mediaUrl']),
+                                                        padding:
+                                                            EdgeInsets.all(8),
+                                                        child: Image.network(
+                                                            posts[index]
+                                                                ['mediaUrl']),
                                                       ),
                                                     )
-                                                  : (posts[index]['mediaUrl'] != "null" && posts[index]['mediaType'] == 'pdf')
+                                                  : (posts[index]['mediaUrl'] !=
+                                                              "null" &&
+                                                          posts[index][
+                                                                  'mediaType'] ==
+                                                              'pdf')
                                                       ? Container(
-                                                          padding: EdgeInsets.all(8),
+                                                          padding:
+                                                              EdgeInsets.all(8),
                                                           child: ListTile(
                                                             title: Row(
-                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
                                                               children: [
                                                                 Container(
                                                                   height: 50,
                                                                   width: 50,
-                                                                  child: Image.asset(
+                                                                  child: Image
+                                                                      .asset(
                                                                     'images/pdf.png',
                                                                   ),
                                                                 ),
                                                                 IconButton(
-                                                                    icon: Icon(Icons.file_download),
-                                                                    color: violet2,
-                                                                    onPressed: () async {
-                                                                      await launch(posts[index]['mediaUrl']);
+                                                                    icon: Icon(Icons
+                                                                        .file_download),
+                                                                    color:
+                                                                        violet2,
+                                                                    onPressed:
+                                                                        () async {
+                                                                      await launch(
+                                                                          posts[index]
+                                                                              [
+                                                                              'mediaUrl']);
                                                                     })
                                                               ],
                                                             ),
@@ -589,19 +691,27 @@ class _DashBoardState extends State<DashBoard> {
                                                 padding: EdgeInsets.all(8),
                                                 child: Text(
                                                   posts[index]['content'],
-                                                  style: TextStyle(fontSize: 14),
+                                                  style:
+                                                      TextStyle(fontSize: 14),
                                                   textAlign: TextAlign.left,
                                                 ),
                                               ),
                                               Padding(
-                                                padding: EdgeInsets.only(left: 16.0, top: 32, right: 16),
+                                                padding: EdgeInsets.only(
+                                                    left: 16.0,
+                                                    top: 32,
+                                                    right: 16),
                                                 child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
                                                   children: [
                                                     Row(
                                                       children: [
                                                         Text('Likes: '),
-                                                        Text(posts[index]['likes'].toString()),
+                                                        Text(posts[index]
+                                                                ['likes']
+                                                            .toString()),
                                                       ],
                                                     ),
                                                     Row(
@@ -611,8 +721,10 @@ class _DashBoardState extends State<DashBoard> {
                                                           color: violet2,
                                                         ),
                                                         Text(
-                                                          posts[index]['views'].toString(),
-                                                          style: TextStyle(color: violet1),
+                                                          posts[index]['views']
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                              color: violet1),
                                                         ),
                                                       ],
                                                     )
@@ -625,7 +737,9 @@ class _DashBoardState extends State<DashBoard> {
                                               ),
                                               Container(
                                                 child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
                                                   children: [
                                                     Row(
                                                       children: [
@@ -634,20 +748,40 @@ class _DashBoardState extends State<DashBoard> {
                                                             children: [
                                                               IconButton(
                                                                 icon: Transform(
-                                                                  alignment: Alignment.center,
-                                                                  transform: Matrix4.rotationY(math.pi),
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .center,
+                                                                  transform: Matrix4
+                                                                      .rotationY(
+                                                                          math.pi),
                                                                   child: Icon(
-                                                                    Icons.thumb_up,
-                                                                    color: temp.contains(User.userEmail) ? violet2 : Colors.grey,
+                                                                    Icons
+                                                                        .thumb_up,
+                                                                    color: temp.contains(User
+                                                                            .userEmail)
+                                                                        ? violet2
+                                                                        : Colors
+                                                                            .grey,
                                                                   ),
                                                                 ),
-                                                                onPressed: () async {
-                                                                  if (temp.contains(User.userEmail)) {
-                                                                    Fluttertoast.showToast(context, msg: 'Liked already!');
+                                                                onPressed:
+                                                                    () async {
+                                                                  if (temp.contains(
+                                                                      User.userEmail)) {
+                                                                    Fluttertoast.showToast(
+                                                                        context,
+                                                                        msg:
+                                                                            'Liked already!');
                                                                   } else {
-                                                                    await _likePost(postId: posts[index]['_id'], userName: User.userName);
+                                                                    await _likePost(
+                                                                        postId: posts[index]
+                                                                            [
+                                                                            '_id'],
+                                                                        userName:
+                                                                            User.userName);
                                                                     await _getAllPosts();
-                                                                    setState(() {});
+                                                                    setState(
+                                                                        () {});
                                                                   }
                                                                 },
                                                               ),
@@ -665,8 +799,12 @@ class _DashBoardState extends State<DashBoard> {
                                                               color: violet2,
                                                             ),
                                                             Padding(
-                                                              padding: EdgeInsets.only(left: 8.0),
-                                                              child: Text('Comment'),
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      left:
+                                                                          8.0),
+                                                              child: Text(
+                                                                  'Comment'),
                                                             ),
                                                           ],
                                                         ),
@@ -679,8 +817,12 @@ class _DashBoardState extends State<DashBoard> {
                                                               color: violet2,
                                                             ),
                                                             Padding(
-                                                              padding: EdgeInsets.only(left: 8.0),
-                                                              child: Text('Share'),
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      left:
+                                                                          8.0),
+                                                              child:
+                                                                  Text('Share'),
                                                             ),
                                                           ],
                                                         ),
@@ -688,25 +830,42 @@ class _DashBoardState extends State<DashBoard> {
                                                           setState(() {
                                                             _isLoading = true;
                                                           });
-                                                          final String text = posts[index]['content'];
-                                                          var req = await HttpClient().getUrl(
+                                                          final String text =
+                                                              posts[index]
+                                                                  ['content'];
+                                                          var req =
+                                                              await HttpClient()
+                                                                  .getUrl(
                                                             Uri.parse(
-                                                              posts[index]['mediaUrl'],
+                                                              posts[index]
+                                                                  ['mediaUrl'],
                                                             ),
                                                           );
-                                                          var response = await req.close();
+                                                          var response =
+                                                              await req.close();
 
                                                           setState(() {
                                                             _isLoading = false;
                                                           });
-                                                          Uint8List bytes = await consolidateHttpClientResponseBytes(response);
-                                                          await ImagePickerSaver.saveFile(fileData: bytes).whenComplete(() {
+                                                          Uint8List bytes =
+                                                              await consolidateHttpClientResponseBytes(
+                                                                  response);
+                                                          await ImagePickerSaver
+                                                                  .saveFile(
+                                                                      fileData:
+                                                                          bytes)
+                                                              .whenComplete(() {
                                                             WcFlutterShare.share(
-                                                                sharePopupTitle: 'Share',
+                                                                sharePopupTitle:
+                                                                    'Share',
                                                                 text: text,
-                                                                fileName: 'share.png',
-                                                                mimeType: 'image/png',
-                                                                bytesOfFile: bytes.buffer.asUint8List());
+                                                                fileName:
+                                                                    'share.png',
+                                                                mimeType:
+                                                                    'image/png',
+                                                                bytesOfFile: bytes
+                                                                    .buffer
+                                                                    .asUint8List());
                                                           });
                                                         })
                                                   ],
@@ -714,28 +873,57 @@ class _DashBoardState extends State<DashBoard> {
                                               ),
                                               posts[index]['commentEnabled']
                                                   ? Container(
-                                                      height: posts[index]['comments'].length != 0 ? 200 : 0,
-                                                      width: MediaQuery.of(context).size.width * 0.8,
+                                                      height: posts[index][
+                                                                      'comments']
+                                                                  .length !=
+                                                              0
+                                                          ? 200
+                                                          : 0,
+                                                      width:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width *
+                                                              0.8,
                                                       child: Column(
-                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .stretch,
                                                         children: [
-                                                          Text(posts[index]['comments'].length != 0 ? 'Comments' : ''),
-                                                          posts[index]['comments'].length != 0
+                                                          Text(posts[index][
+                                                                          'comments']
+                                                                      .length !=
+                                                                  0
+                                                              ? 'Comments'
+                                                              : ''),
+                                                          posts[index]['comments']
+                                                                      .length !=
+                                                                  0
                                                               ? Container(
                                                                   height: 180,
-                                                                  child: ListView.builder(
-                                                                    shrinkWrap: true,
-                                                                    itemCount: posts[index]['comments'].length,
-                                                                    itemBuilder: (context, i) {
+                                                                  child: ListView
+                                                                      .builder(
+                                                                    shrinkWrap:
+                                                                        true,
+                                                                    itemCount: posts[index]
+                                                                            [
+                                                                            'comments']
+                                                                        .length,
+                                                                    itemBuilder:
+                                                                        (context,
+                                                                            i) {
                                                                       return Column(
                                                                         children: [
                                                                           ListTile(
-                                                                            title: Text(
+                                                                            title:
+                                                                                Text(
                                                                               posts[index]['comments'][i]['userName'],
                                                                               style: TextStyle(color: violet2, fontWeight: FontWeight.bold),
                                                                             ),
-                                                                            subtitle: Text(
+                                                                            subtitle:
+                                                                                Text(
                                                                               posts[index]['comments'][i]['comment'],
                                                                               style: TextStyle(color: Colors.black),
                                                                             ),
@@ -753,39 +941,78 @@ class _DashBoardState extends State<DashBoard> {
                                                   : Container(),
                                               posts[index]['commentEnabled']
                                                   ? TextFormField(
-                                                      style: TextStyle(color: Colors.black),
+                                                      style: TextStyle(
+                                                          color: Colors.black),
                                                       maxLines: 1,
                                                       controller: contro,
-                                                      cursorRadius: Radius.circular(8),
+                                                      cursorRadius:
+                                                          Radius.circular(8),
                                                       cursorColor: Colors.black,
-                                                      decoration: InputDecoration(
-                                                        enabledBorder: OutlineInputBorder(
-                                                            borderSide: BorderSide(
+                                                      decoration:
+                                                          InputDecoration(
+                                                        enabledBorder:
+                                                            OutlineInputBorder(
+                                                                borderSide:
+                                                                    BorderSide(
                                                           color: Colors.grey,
                                                         )),
                                                         isDense: true,
-                                                        focusedBorder: OutlineInputBorder(
-                                                          borderSide: BorderSide(color: Colors.grey, width: 2),
+                                                        focusedBorder:
+                                                            OutlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide(
+                                                                  color: Colors
+                                                                      .grey,
+                                                                  width: 2),
                                                         ),
-                                                        hintText: 'Add a comment',
+                                                        hintText:
+                                                            'Add a comment',
                                                         suffixIcon: IconButton(
-                                                            icon: Icon(Icons.send),
+                                                            icon: Icon(
+                                                                Icons.send),
                                                             color: violet2,
-                                                            onPressed: () async {
-                                                              print(contro.text);
-                                                              if (contro.text.isNotEmpty) {
-                                                                var response = await http.post('$baseUrl/post/comment',
-                                                                    body: {"id": posts[index]['_id'], "comment": contro.text.toString(), "userName": User.userName});
+                                                            onPressed:
+                                                                () async {
+                                                              print(
+                                                                  contro.text);
+                                                              if (contro.text
+                                                                  .isNotEmpty) {
+                                                                var response =
+                                                                    await http.post(
+                                                                        '$baseUrl/post/comment',
+                                                                        body: {
+                                                                      "id": posts[
+                                                                              index]
+                                                                          [
+                                                                          '_id'],
+                                                                      "comment": contro
+                                                                          .text
+                                                                          .toString(),
+                                                                      "userName":
+                                                                          User.userName
+                                                                    });
 
-                                                                print(response.body);
-                                                                if (json.decode(response.body)['statusCode'] == 200) {
-                                                                  Fluttertoast.showToast(context, msg: 'Comment posted');
+                                                                print(response
+                                                                    .body);
+                                                                if (json.decode(
+                                                                        response
+                                                                            .body)['statusCode'] ==
+                                                                    200) {
+                                                                  Fluttertoast
+                                                                      .showToast(
+                                                                          context,
+                                                                          msg:
+                                                                              'Comment posted');
                                                                   setState(() {
                                                                     _getAllPosts();
                                                                   });
                                                                 }
                                                               } else {
-                                                                Fluttertoast.showToast(context, msg: 'Comment can\'t be empty');
+                                                                Fluttertoast
+                                                                    .showToast(
+                                                                        context,
+                                                                        msg:
+                                                                            'Comment can\'t be empty');
                                                               }
                                                             }),
                                                       ),
@@ -797,27 +1024,44 @@ class _DashBoardState extends State<DashBoard> {
                                       ),
                                       User.userRole == 'superAdmin'
                                           ? Padding(
-                                              padding: EdgeInsets.only(top: 8.0, left: MediaQuery.of(context).size.width * 0.83),
+                                              padding: EdgeInsets.only(
+                                                  top: 8.0,
+                                                  left: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.83),
                                               child: PopupMenuButton(
                                                 onSelected: (value) async {
                                                   setState(() {
                                                     _isLoading = true;
                                                   });
                                                   if (value == 1) {
-                                                    var response =
-                                                        await http.post(posts[index]['enabled'] == true ? '$baseUrl/post/disablePost' : '$baseUrl/post/enablePost', body: {
-                                                      "id": posts[index]['_id'],
-                                                    });
+                                                    var response = await http.post(
+                                                        posts[index][
+                                                                    'enabled'] ==
+                                                                true
+                                                            ? '$baseUrl/post/disablePost'
+                                                            : '$baseUrl/post/enablePost',
+                                                        body: {
+                                                          "id": posts[index]
+                                                              ['_id'],
+                                                        });
                                                     print(response.body);
                                                     setState(() {
                                                       _getAllPosts();
                                                       _isLoading = false;
                                                     });
                                                   } else if (value == 2) {
-                                                    var response = await http
-                                                        .post(posts[index]['commentEnabled'] == true ? '$baseUrl/post/disableComment' : '$baseUrl/post/enableComment', body: {
-                                                      "id": posts[index]['_id'],
-                                                    });
+                                                    var response = await http.post(
+                                                        posts[index][
+                                                                    'commentEnabled'] ==
+                                                                true
+                                                            ? '$baseUrl/post/disableComment'
+                                                            : '$baseUrl/post/enableComment',
+                                                        body: {
+                                                          "id": posts[index]
+                                                              ['_id'],
+                                                        });
                                                     print(response.body);
                                                     setState(() {
                                                       _getAllPosts();
@@ -828,11 +1072,19 @@ class _DashBoardState extends State<DashBoard> {
                                                 itemBuilder: (context) => [
                                                   PopupMenuItem(
                                                     value: 1,
-                                                    child: Text(posts[index]['enabled'] == true ? 'Disable Post' : 'Enable Post'),
+                                                    child: Text(posts[index]
+                                                                ['enabled'] ==
+                                                            true
+                                                        ? 'Disable Post'
+                                                        : 'Enable Post'),
                                                   ),
                                                   PopupMenuItem(
                                                     value: 2,
-                                                    child: Text(posts[index]['commentEnabled'] == true ? 'Disable Comments' : 'Enable Comments'),
+                                                    child: Text(posts[index][
+                                                                'commentEnabled'] ==
+                                                            true
+                                                        ? 'Disable Comments'
+                                                        : 'Enable Comments'),
                                                   ),
                                                 ],
                                               ),
@@ -849,11 +1101,16 @@ class _DashBoardState extends State<DashBoard> {
                                                   ),
                                                 ],
                                                 color: Colors.white,
-                                                borderRadius: BorderRadius.circular(20),
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
                                               ),
                                               child: Text(
                                                 'DISABLED',
-                                                style: TextStyle(fontSize: 18, color: Colors.red, fontWeight: FontWeight.bold),
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: Colors.red,
+                                                    fontWeight:
+                                                        FontWeight.bold),
                                               ),
                                               padding: EdgeInsets.all(8),
                                             ),

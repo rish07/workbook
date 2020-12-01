@@ -1,29 +1,28 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
-import 'package:universal_html/prefer_universal/html.dart' as html;
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase/firebase.dart' as fb;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:path/path.dart' as p;
+import 'package:universal_html/prefer_universal/html.dart' as html;
 import 'package:universal_io/prefer_universal/io.dart' as uni;
 import 'package:workbook/constants.dart';
-import 'package:http/http.dart' as http;
 import 'package:workbook/responsive_widget.dart';
 import 'package:workbook/screens/dashboard.dart';
-import 'package:workbook/screens/tasks/created_tasks.dart';
-import 'package:workbook/screens/tasks/view_tasks.dart';
 import 'package:workbook/widget/popUpDialog.dart';
-import 'package:path/path.dart' as p;
+
 import '../../user.dart';
-import 'package:firebase/firebase.dart' as fb;
 
 class CreateTask extends StatefulWidget {
   final bool isAdmin;
@@ -71,7 +70,8 @@ class _CreateTaskState extends State<CreateTask> {
   }
 
   Future getDivision() async {
-    var response = await http.get("$baseUrl/fetchDivision/${User.instituteName}");
+    var response =
+        await http.get("$baseUrl/fetchDivision/${User.instituteName}");
     print('Response status: ${response.statusCode}');
     setState(() {
       divisionData = json.decode(response.body)['payload']['divisions'];
@@ -130,7 +130,9 @@ class _CreateTaskState extends State<CreateTask> {
     });
     print(_selectedType);
     var response = await http.post(
-      widget.isAdmin ? '$baseUrl/task/adminCreate' : '$baseUrl/task/employeeCreate',
+      widget.isAdmin
+          ? '$baseUrl/task/adminCreate'
+          : '$baseUrl/task/employeeCreate',
       body: widget.isAdmin
           ? {
               "userID": User.userEmail,
@@ -139,7 +141,9 @@ class _CreateTaskState extends State<CreateTask> {
               "type": _selectedType,
               "topic": "${User.instituteName.replaceAll(RegExp(r' '), '_')}",
               "description": _descriptionController.text.toString(),
-              "name": _taskNameController.text.toString().isEmpty ? _selectedType : _taskNameController.text.toString(),
+              "name": _taskNameController.text.toString().isEmpty
+                  ? _selectedType
+                  : _taskNameController.text.toString(),
               "mediaUrl": mediaUrl,
             }
           : {
@@ -147,11 +151,14 @@ class _CreateTaskState extends State<CreateTask> {
               "jwtToken": User.userJwtToken,
               "instituteName": User.instituteName,
               "type": _selectedType,
-              "topic": "${User.grade.replaceAll(RegExp(r' '), '_')}${User.division.replaceAll(RegExp(r' '), '_')}",
+              "topic":
+                  "${User.grade.replaceAll(RegExp(r' '), '_')}${User.division.replaceAll(RegExp(r' '), '_')}",
               "description": _descriptionController.text.toString(),
               "grade": _selectedGrade,
               "division": _selectedDivision,
-              "name": _taskNameController.text.toString().isEmpty ? _selectedType : _taskNameController.text.toString(),
+              "name": _taskNameController.text.toString().isEmpty
+                  ? _selectedType
+                  : _taskNameController.text.toString(),
               "mediaUrl": mediaUrl,
             },
     );
@@ -190,7 +197,8 @@ class _CreateTaskState extends State<CreateTask> {
 
         reader.onLoadEnd.listen(
           (loadEndEvent) async {
-            uploadImageFile(file, imageName: _taskNameController.text.toString());
+            uploadImageFile(file,
+                imageName: _taskNameController.text.toString());
           },
         );
       },
@@ -201,8 +209,10 @@ class _CreateTaskState extends State<CreateTask> {
     setState(() {
       _isLoading = true;
     });
-    fb.StorageReference storageRef = fb.app().storage().ref('images/$imageName');
-    fb.UploadTaskSnapshot uploadTaskSnapshot = await storageRef.put(image).future;
+    fb.StorageReference storageRef =
+        fb.app().storage().ref('images/$imageName');
+    fb.UploadTaskSnapshot uploadTaskSnapshot =
+        await storageRef.put(image).future;
 
     Uri imageUri = await uploadTaskSnapshot.ref.getDownloadURL();
     print(imageUri);
@@ -220,8 +230,14 @@ class _CreateTaskState extends State<CreateTask> {
     super.initState();
     getGrades();
     if (uni.Platform.isAndroid) {
-      User.userRole != 'admin' ? _fcm.subscribeToTopic(User.instituteName.replaceAll(RegExp(r' '), '_')) : {};
-      User.userRole == 'customer' ? _fcm.subscribeToTopic('${User.grade.replaceAll(RegExp(r' '), '_')}${User.division.replaceAll(RegExp(r' '), '_')}') : {};
+      User.userRole != 'admin'
+          ? _fcm.subscribeToTopic(
+              User.instituteName.replaceAll(RegExp(r' '), '_'))
+          : {};
+      User.userRole == 'customer'
+          ? _fcm.subscribeToTopic(
+              '${User.grade.replaceAll(RegExp(r' '), '_')}${User.division.replaceAll(RegExp(r' '), '_')}')
+          : {};
     }
   }
 
@@ -240,33 +256,6 @@ class _CreateTaskState extends State<CreateTask> {
       inAsyncCall: _isLoading,
       child: Scaffold(
         appBar: AppBar(
-          actions: [
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: MaterialButton(
-                color: violet2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(32),
-                ),
-                onPressed: () async {
-                  setState(() {
-                    isOther ? (_taskNameController.text.isEmpty ? _validateTaskName = true : _validateTaskName = false) : {};
-                    _selectedType == null ? _validateType = true : _validateType = false;
-                    User.userRole == 'employee' ? (_selectedGrade == null ? _validateGrade = true : _validateGrade = false) : {};
-                    User.userRole == 'employee' ? (_selectedDivision == null ? _validateDivision = true : _validateDivision = false) : {};
-                    _descriptionController.text.isEmpty ? _validateDescription = true : _validateDescription = false;
-                  });
-                  if (!_validateDescription && !_validateTaskName && !_validateType && !_validateGrade && !_validateDivision) {
-                    await _createTask();
-                  }
-                },
-                child: Text(
-                  'Send',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ],
           leading: IconButton(
               icon: Icon(
                 Icons.arrow_back,
@@ -331,7 +320,8 @@ class _CreateTaskState extends State<CreateTask> {
                           style: TextStyle(color: violet1, fontSize: 18),
                         ),
                         decoration: InputDecoration(
-                          errorText: _validateType ? 'Please choose an option' : null,
+                          errorText:
+                              _validateType ? 'Please choose an option' : null,
                           isDense: true,
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: violet1),
@@ -361,63 +351,94 @@ class _CreateTaskState extends State<CreateTask> {
               SizedBox(
                 height: 20,
               ),
-              isOther
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.04),
-                            child: Text(
-                              'Task Name: ',
-                              style: TextStyle(fontSize: 20, color: violet2),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: TextFormField(
-                            autocorrect: true,
-                            controller: _taskNameController,
-                            cursorRadius: Radius.circular(8),
-                            cursorColor: violet1,
-                            keyboardType: TextInputType.text,
-                            textCapitalization: TextCapitalization.sentences,
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: violet1,
-                            ),
-                            decoration: InputDecoration(
-                              errorText: _validateTaskName ? "This field can't be empty" : null,
-                              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 18),
-                              isDense: true,
-                              errorMaxLines: 1,
-                              focusedErrorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: violet1, width: 2),
-                              ),
-                              errorStyle: TextStyle(height: 0, fontSize: 10),
-                              floatingLabelBehavior: FloatingLabelBehavior.auto,
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: violet1, width: 1),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: violet1, width: 2.0),
-                              ),
-                              fillColor: Colors.lightBlueAccent,
-                              hintText: "Name of the task",
-                              alignLabelWithHint: true,
-                              labelStyle: TextStyle(
-                                fontSize: 20,
-                                color: violet1,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  : Container(),
+              // isOther
+              //     ? Row(
+              //         mainAxisAlignment: MainAxisAlignment.center,
+              //         textBaseline: TextBaseline.alphabetic,
+              //         children: [
+              //           Expanded(
+              //             flex: 1,
+              //             child: Container(
+              //               padding: EdgeInsets.only(
+              //                   left: uni.Platform.isAndroid
+              //                       ? MediaQuery.of(context).size.width * 0.04
+              //                       : ResponsiveWidget.isMediumScreen(context)
+              //                           ? MediaQuery.of(context).size.width *
+              //                               0.15
+              //                           : ResponsiveWidget.isLargeScreen(
+              //                                   context)
+              //                               ? MediaQuery.of(context)
+              //                                       .size
+              //                                       .width *
+              //                                   0.32
+              //                               : 0),
+              //               child: Text(
+              //                 'Task Name: ',
+              //                 style: TextStyle(fontSize: 20, color: violet2),
+              //               ),
+              //             ),
+              //           ),
+              //           Container(
+              //             padding: uni.Platform.isAndroid
+              //                 ? EdgeInsets.zero
+              //                 : EdgeInsets.only(
+              //                     left: 0,
+              //                     right: ResponsiveWidget.isMediumScreen(
+              //                             context)
+              //                         ? size.width * 0.15
+              //                         : ResponsiveWidget.isLargeScreen(context)
+              //                             ? size.width * 0.32
+              //                             : 0),
+              //             child: Expanded(
+              //               flex: 2,
+              //               child: TextFormField(
+              //                 autocorrect: true,
+              //                 controller: _taskNameController,
+              //                 cursorRadius: Radius.circular(8),
+              //                 cursorColor: violet1,
+              //                 keyboardType: TextInputType.text,
+              //                 textCapitalization: TextCapitalization.sentences,
+              //                 style: TextStyle(
+              //                   fontSize: 18,
+              //                   color: violet1,
+              //                 ),
+              //                 decoration: InputDecoration(
+              //                   errorText: _validateTaskName
+              //                       ? "This field can't be empty"
+              //                       : null,
+              //                   contentPadding: EdgeInsets.symmetric(
+              //                       horizontal: 10, vertical: 18),
+              //                   isDense: true,
+              //                   errorMaxLines: 1,
+              //                   focusedErrorBorder: OutlineInputBorder(
+              //                     borderSide:
+              //                         BorderSide(color: violet1, width: 2),
+              //                   ),
+              //                   errorStyle: TextStyle(height: 0, fontSize: 10),
+              //                   floatingLabelBehavior:
+              //                       FloatingLabelBehavior.auto,
+              //                   enabledBorder: OutlineInputBorder(
+              //                     borderSide:
+              //                         BorderSide(color: violet1, width: 1),
+              //                   ),
+              //                   focusedBorder: OutlineInputBorder(
+              //                     borderSide:
+              //                         BorderSide(color: violet1, width: 2.0),
+              //                   ),
+              //                   fillColor: Colors.lightBlueAccent,
+              //                   hintText: "Name of the task",
+              //                   alignLabelWithHint: true,
+              //                   labelStyle: TextStyle(
+              //                     fontSize: 20,
+              //                     color: violet1,
+              //                   ),
+              //                 ),
+              //               ),
+              //             ),
+              //           ),
+              //         ],
+              //       )
+              //     : Container(),
               SizedBox(
                 height: isOther ? 20 : 0,
               ),
@@ -433,9 +454,14 @@ class _CreateTaskState extends State<CreateTask> {
                                 left: uni.Platform.isAndroid
                                     ? MediaQuery.of(context).size.width * 0.04
                                     : ResponsiveWidget.isMediumScreen(context)
-                                        ? MediaQuery.of(context).size.width * 0.15
-                                        : ResponsiveWidget.isLargeScreen(context)
-                                            ? MediaQuery.of(context).size.width * 0.32
+                                        ? MediaQuery.of(context).size.width *
+                                            0.15
+                                        : ResponsiveWidget.isLargeScreen(
+                                                context)
+                                            ? MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.32
                                             : 0),
                             child: Text(
                               'Grade: ',
@@ -454,18 +480,22 @@ class _CreateTaskState extends State<CreateTask> {
                                 ? EdgeInsets.zero
                                 : EdgeInsets.only(
                                     left: 0,
-                                    right: ResponsiveWidget.isMediumScreen(context)
-                                        ? size.width * 0.15
-                                        : ResponsiveWidget.isLargeScreen(context)
-                                            ? size.width * 0.32
-                                            : 0),
+                                    right:
+                                        ResponsiveWidget.isMediumScreen(context)
+                                            ? size.width * 0.15
+                                            : ResponsiveWidget.isLargeScreen(
+                                                    context)
+                                                ? size.width * 0.32
+                                                : 0),
                             child: DropdownButtonFormField(
                               hint: Text(
                                 'Select Grade',
                                 style: TextStyle(color: violet1, fontSize: 18),
                               ),
                               decoration: InputDecoration(
-                                errorText: _validateGrade ? 'Please choose an option' : null,
+                                errorText: _validateGrade
+                                    ? 'Please choose an option'
+                                    : null,
                                 isDense: true,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(color: violet1),
@@ -508,9 +538,14 @@ class _CreateTaskState extends State<CreateTask> {
                                 left: uni.Platform.isAndroid
                                     ? MediaQuery.of(context).size.width * 0.04
                                     : ResponsiveWidget.isMediumScreen(context)
-                                        ? MediaQuery.of(context).size.width * 0.15
-                                        : ResponsiveWidget.isLargeScreen(context)
-                                            ? MediaQuery.of(context).size.width * 0.32
+                                        ? MediaQuery.of(context).size.width *
+                                            0.15
+                                        : ResponsiveWidget.isLargeScreen(
+                                                context)
+                                            ? MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.32
                                             : 0),
                             child: Text(
                               'Division: ',
@@ -529,18 +564,22 @@ class _CreateTaskState extends State<CreateTask> {
                                 ? EdgeInsets.zero
                                 : EdgeInsets.only(
                                     left: 0,
-                                    right: ResponsiveWidget.isMediumScreen(context)
-                                        ? size.width * 0.15
-                                        : ResponsiveWidget.isLargeScreen(context)
-                                            ? size.width * 0.32
-                                            : 0),
+                                    right:
+                                        ResponsiveWidget.isMediumScreen(context)
+                                            ? size.width * 0.15
+                                            : ResponsiveWidget.isLargeScreen(
+                                                    context)
+                                                ? size.width * 0.32
+                                                : 0),
                             child: DropdownButtonFormField(
                               hint: Text(
                                 'Select Division',
                                 style: TextStyle(color: violet1, fontSize: 18),
                               ),
                               decoration: InputDecoration(
-                                errorText: _validateDivision ? 'Please choose an option' : null,
+                                errorText: _validateDivision
+                                    ? 'Please choose an option'
+                                    : null,
                                 isDense: true,
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(color: violet1),
@@ -616,8 +655,11 @@ class _CreateTaskState extends State<CreateTask> {
                     color: violet1,
                   ),
                   decoration: InputDecoration(
-                    errorText: _validateDescription ? "This field can't be empty!" : null,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 18),
+                    errorText: _validateDescription
+                        ? "This field can't be empty!"
+                        : null,
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 10, vertical: 18),
                     isDense: true,
                     errorMaxLines: 1,
                     focusedErrorBorder: OutlineInputBorder(
@@ -657,7 +699,9 @@ class _CreateTaskState extends State<CreateTask> {
                                 ? MediaQuery.of(context).size.width * 0.32
                                 : 0),
                 child: Row(
-                  mainAxisAlignment: uni.Platform.isAndroid ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: uni.Platform.isAndroid
+                      ? MainAxisAlignment.start
+                      : MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'Attachments: ',
@@ -691,43 +735,108 @@ class _CreateTaskState extends State<CreateTask> {
             ],
           ),
         ),
-        floatingActionButton: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              FloatingActionButton.extended(
-                heroTag: null,
-                backgroundColor: violet2,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    PageTransition(child: CreatedTasks(), type: PageTransitionType.rightToLeft),
-                  );
-                },
-                label: Text('History'),
+        // floatingActionButton: Padding(
+        //   padding: const EdgeInsets.all(16.0),
+        //   child: Row(
+        //     crossAxisAlignment: CrossAxisAlignment.end,
+        //     mainAxisAlignment: MainAxisAlignment.center,
+        //     children: [
+        //       FloatingActionButton.extended(
+        //         heroTag: null,
+        //         backgroundColor: violet2,
+        //         onPressed: () {
+        //           Navigator.push(
+        //             context,
+        //             PageTransition(child: CreatedTasks(), type: PageTransitionType.rightToLeft),
+        //           );
+        //         },
+        //         label: Text('History'),
+        //       ),
+        //       SizedBox(
+        //         width: 10,
+        //       ),
+        //       User.userRole == 'employee'
+        //           ? FloatingActionButton.extended(
+        //               heroTag: null,
+        //               backgroundColor: violet2,
+        //               onPressed: () {
+        //                 Navigator.push(
+        //                   context,
+        //                   PageTransition(child: ViewTasks(), type: PageTransitionType.rightToLeft),
+        //                 );
+        //               },
+        //               label: Text('My Tasks'),
+        //             )
+        //           : Container(),
+        //     ],
+        //   ),
+        // ),
+        // floatingActionButtonLocation: uni.Platform.isAndroid ? FloatingActionButtonLocation.centerDocked : FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            MaterialButton(
+              color: violet2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(32),
               ),
-              SizedBox(
-                width: 10,
+              onPressed: () async {
+                setState(() {
+                  isOther
+                      ? (_taskNameController.text.isEmpty
+                          ? _validateTaskName = true
+                          : _validateTaskName = false)
+                      : {};
+                  _selectedType == null
+                      ? _validateType = true
+                      : _validateType = false;
+                  User.userRole == 'employee'
+                      ? (_selectedGrade == null
+                          ? _validateGrade = true
+                          : _validateGrade = false)
+                      : {};
+                  User.userRole == 'employee'
+                      ? (_selectedDivision == null
+                          ? _validateDivision = true
+                          : _validateDivision = false)
+                      : {};
+                  _descriptionController.text.isEmpty
+                      ? _validateDescription = true
+                      : _validateDescription = false;
+                });
+                if (!_validateDescription &&
+                    !_validateTaskName &&
+                    !_validateType &&
+                    !_validateGrade &&
+                    !_validateDivision) {
+                  await _createTask();
+                }
+              },
+              child: Text(
+                'Send',
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
-              User.userRole == 'employee'
-                  ? FloatingActionButton.extended(
-                      heroTag: null,
-                      backgroundColor: violet2,
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          PageTransition(child: ViewTasks(), type: PageTransitionType.rightToLeft),
-                        );
-                      },
-                      label: Text('My Tasks'),
-                    )
-                  : Container(),
-            ],
-          ),
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            MaterialButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              color: violet2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(32),
+              ),
+              child: Text(
+                'Cancel',
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
         ),
-        floatingActionButtonLocation: uni.Platform.isAndroid ? FloatingActionButtonLocation.centerDocked : FloatingActionButtonLocation.centerFloat,
       ),
     );
   }

@@ -5,8 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:universal_io/io.dart';
 import 'package:workbook/responsive_widget.dart';
+import 'package:workbook/screens/tasks/create_tasks.dart';
+
 import '../../constants.dart';
 import '../../user.dart';
 
@@ -75,7 +78,8 @@ class _CreatedTasksState extends State<CreatedTasks> {
                       : ResponsiveWidget.isMediumScreen(context)
                           ? EdgeInsets.symmetric(horizontal: size.width * 0.1)
                           : EdgeInsets.symmetric(horizontal: size.width * 0.2),
-                  separatorBuilder: (BuildContext context, int index) => Divider(
+                  separatorBuilder: (BuildContext context, int index) =>
+                      Divider(
                         thickness: 2,
                       ),
                   itemCount: _tasks.length,
@@ -84,7 +88,9 @@ class _CreatedTasksState extends State<CreatedTasks> {
                         title: Text(_tasks[index]['name']),
                         subtitle: Text(_tasks[index]['description']),
                         trailing: Container(
-                          width: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.25 : size.width * 0.3,
+                          width: ResponsiveWidget.isMediumScreen(context)
+                              ? size.width * 0.25
+                              : size.width * 0.3,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -113,7 +119,8 @@ class _CreatedTasksState extends State<CreatedTasks> {
                                   Text('Created at: '),
                                   Text(
                                     DateFormat.yMd().add_jm().format(
-                                          DateTime.fromMillisecondsSinceEpoch(_tasks[index]['createdAt']),
+                                          DateTime.fromMillisecondsSinceEpoch(
+                                              _tasks[index]['createdAt']),
                                         ),
                                   ),
                                 ],
@@ -126,6 +133,28 @@ class _CreatedTasksState extends State<CreatedTasks> {
                   child: Text('No History Available'),
                 ),
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: FloatingActionButton.extended(
+            backgroundColor: violet2,
+            onPressed: () {
+              Navigator.push(
+                context,
+                PageTransition(
+                    child: CreateTask(
+                      isAdmin: User.userRole == 'admin' ? true : false,
+                    ),
+                    type: PageTransitionType.rightToLeft),
+              );
+            },
+            label: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Icon(Icons.add),
+                ),
+                Text('Add New'),
+              ],
+            )),
       ),
     );
   }
