@@ -7,8 +7,8 @@ import '../../responsive_widget.dart';
 
 class ViewDivisions extends StatefulWidget {
   final String gradeName;
-
-  const ViewDivisions({Key key, this.gradeName}) : super(key: key);
+  final bool isEdit;
+  const ViewDivisions({Key key, this.gradeName, this.isEdit}) : super(key: key);
   @override
   _ViewDivisionsState createState() => _ViewDivisionsState();
 }
@@ -58,7 +58,11 @@ class _ViewDivisionsState extends State<ViewDivisions> {
           width: MediaQuery.of(context).size.width,
           padding: Platform.isAndroid
               ? EdgeInsets.all(16)
-              : EdgeInsets.symmetric(vertical: 16, horizontal: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.25 : size.width * 0.3),
+              : EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: ResponsiveWidget.isMediumScreen(context)
+                      ? size.width * 0.25
+                      : size.width * 0.3),
           child: ListView(
             children: [
               Column(
@@ -69,7 +73,8 @@ class _ViewDivisionsState extends State<ViewDivisions> {
                     style: TextStyle(color: violet2, fontSize: 20),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.01),
+                    padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).size.height * 0.01),
                     child: Container(
                       height: MediaQuery.of(context).size.height * 0.8,
                       child: ListView.builder(
@@ -90,6 +95,17 @@ class _ViewDivisionsState extends State<ViewDivisions> {
             ],
           ),
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: widget.isEdit
+            ? Padding(
+                padding: EdgeInsets.all(16.0),
+                child: FloatingActionButton.extended(
+                  backgroundColor: violet2,
+                  onPressed: () {},
+                  label: Text('Add Grade'),
+                ),
+              )
+            : null,
       ),
     );
   }

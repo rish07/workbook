@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:workbook/constants.dart';
-import 'package:http/http.dart' as http;
+import 'package:workbook/responsive_widget.dart';
 
 import '../../../user.dart';
 
@@ -128,28 +129,6 @@ class _CreateHolidayState extends State<CreateHoliday> {
       inAsyncCall: _isLoading,
       child: Scaffold(
         appBar: AppBar(
-          actions: [
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: MaterialButton(
-                color: violet2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(32),
-                ),
-                onPressed: () async {
-                  if (_toSend.isNotEmpty) {
-                    await _setHolidays();
-                  } else {
-                    Fluttertoast.showToast(context, msg: 'Please choose holidays!');
-                  }
-                },
-                child: Text(
-                  'Send',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ],
           leading: IconButton(
               icon: Icon(
                 Icons.arrow_back,
@@ -178,7 +157,8 @@ class _CreateHolidayState extends State<CreateHoliday> {
                 title: Text(_holidays[index]['name']),
                 subtitle: Text(
                   DateFormat.yMMMMd().format(
-                    DateTime.fromMillisecondsSinceEpoch(int.parse(_holidays[index]['date'])),
+                    DateTime.fromMillisecondsSinceEpoch(
+                        int.parse(_holidays[index]['date'])),
                   ),
                 ),
                 trailing: IconButton(
@@ -194,7 +174,8 @@ class _CreateHolidayState extends State<CreateHoliday> {
                             "date": _holidays[index]['date'],
                           });
                         } else {
-                          _toSend.removeWhere((element) => element['name'] == _holidays[index]['name']);
+                          _toSend.removeWhere((element) =>
+                              element['name'] == _holidays[index]['name']);
                         }
                         print(_toSend);
                       });
@@ -203,110 +184,172 @@ class _CreateHolidayState extends State<CreateHoliday> {
             },
           ),
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            return showDialog(
-                context: (context),
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Center(
-                        child: Text(
-                      'Add Holiday',
-                      style: TextStyle(color: violet1),
-                    )),
-                    content: Container(
-                      height: MediaQuery.of(context).size.height * 0.2,
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          TextFormField(
-                            autocorrect: true,
-                            autofocus: true,
-                            textCapitalization: TextCapitalization.words,
-                            cursorRadius: Radius.circular(8),
-                            cursorColor: violet1,
-                            style: TextStyle(color: Colors.black, fontSize: 18),
-                            controller: _holidayNameController,
-                            decoration: InputDecoration(
-                              hintText: 'Holiday Name',
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: violet2),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: violet2, width: 2),
-                              ),
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  child: Text(
-                                    'Date: ',
-                                    style: TextStyle(fontSize: 18, color: violet2),
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: MaterialButton(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(32),
+                ),
+                onPressed: () {
+                  return showDialog(
+                      context: (context),
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Center(
+                              child: Text(
+                            'Add Holiday',
+                            style: TextStyle(color: violet1),
+                          )),
+                          content: Container(
+                            height: MediaQuery.of(context).size.height * 0.2,
+                            width: ResponsiveWidget.isMediumScreen(context)
+                                ? MediaQuery.of(context).size.width * 0.5
+                                : MediaQuery.of(context).size.width * 0.27,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                TextFormField(
+                                  autocorrect: true,
+                                  autofocus: true,
+                                  textCapitalization: TextCapitalization.words,
+                                  cursorRadius: Radius.circular(8),
+                                  cursorColor: violet1,
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 18),
+                                  controller: _holidayNameController,
+                                  decoration: InputDecoration(
+                                    hintText: 'Holiday Name',
+                                    enabledBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(color: violet2),
+                                    ),
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: violet2, width: 2),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Expanded(
-                                flex: 3,
-                                child: Container(
-                                  child: DateTimeField(
-                                    format: DateFormat("yyyy-MM-dd"),
-                                    onChanged: (dt) {
-                                      _selectedDate = dt;
-                                    },
-                                    onShowPicker: (context, currentValue) {
-                                      return showDatePicker(context: context, firstDate: DateTime(1900), initialDate: currentValue ?? DateTime.now(), lastDate: DateTime(2100));
-                                    },
-                                  ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        child: Text(
+                                          'Date: ',
+                                          style: TextStyle(
+                                              fontSize: 18, color: violet2),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Expanded(
+                                      flex: 3,
+                                      child: Container(
+                                        child: DateTimeField(
+                                          format: DateFormat("yyyy-MM-dd"),
+                                          onChanged: (dt) {
+                                            _selectedDate = dt;
+                                          },
+                                          onShowPicker:
+                                              (context, currentValue) {
+                                            return showDatePicker(
+                                                context: context,
+                                                firstDate: DateTime(1900),
+                                                initialDate: currentValue ??
+                                                    DateTime.now(),
+                                                lastDate: DateTime(2100));
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    actions: <Widget>[
-                      // usually buttons at the bottom of the dialog
-                      new MaterialButton(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                          color: violet2,
-                          child: new Text(
-                            'Proceed',
-                            style: TextStyle(
-                              color: Colors.white,
+                              ],
                             ),
                           ),
-                          onPressed: () {
-                            if (_holidayNameController.text.isNotEmpty && _selectedDate != null) {
-                              setState(() {
-                                _holidays.add({
-                                  "name": _holidayNameController.text.toString(),
-                                  "date": _selectedDate.millisecondsSinceEpoch.toString(),
-                                });
-                                _toSend.add({
-                                  "name": _holidayNameController.text.toString(),
-                                  "date": _selectedDate.millisecondsSinceEpoch.toString(),
-                                });
-                                _isSelected.add(true);
-                                _holidayNameController.clear();
-                                _selectedDate = null;
-                              });
-                            } else {
-                              Fluttertoast.showToast(context, msg: 'Holiday Name and Date are required.');
-                            }
-                            Navigator.pop(context);
-                          }),
-                    ],
-                  );
-                });
-          },
-          label: Text('Add Holiday'),
-          backgroundColor: violet2,
+                          actions: <Widget>[
+                            // usually buttons at the bottom of the dialog
+                            new MaterialButton(
+                                padding: EdgeInsets.all(10),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30)),
+                                color: violet2,
+                                child: new Text(
+                                  'Proceed',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  if (_holidayNameController.text.isNotEmpty &&
+                                      _selectedDate != null) {
+                                    setState(() {
+                                      _holidays.add({
+                                        "name": _holidayNameController.text
+                                            .toString(),
+                                        "date": _selectedDate
+                                            .millisecondsSinceEpoch
+                                            .toString(),
+                                      });
+                                      _toSend.add({
+                                        "name": _holidayNameController.text
+                                            .toString(),
+                                        "date": _selectedDate
+                                            .millisecondsSinceEpoch
+                                            .toString(),
+                                      });
+                                      _isSelected.add(true);
+                                      _holidayNameController.clear();
+                                      _selectedDate = null;
+                                    });
+                                  } else {
+                                    Fluttertoast.showToast(context,
+                                        msg:
+                                            'Holiday Name and Date are required.');
+                                  }
+                                  Navigator.pop(context);
+                                }),
+                          ],
+                        );
+                      });
+                },
+                child: Text(
+                  'Add Holiday',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                color: violet2,
+              ),
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: MaterialButton(
+                color: violet2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(32),
+                ),
+                onPressed: () async {
+                  if (_toSend.isNotEmpty) {
+                    await _setHolidays();
+                  } else {
+                    Fluttertoast.showToast(context,
+                        msg: 'Please choose holidays!');
+                  }
+                },
+                child: Text(
+                  'Publish',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),

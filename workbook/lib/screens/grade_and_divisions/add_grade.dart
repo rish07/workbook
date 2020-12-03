@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:basic_utils/basic_utils.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:universal_io/prefer_universal/io.dart';
@@ -13,9 +15,6 @@ import 'package:workbook/responsive_widget.dart';
 import 'package:workbook/screens/grade_and_divisions/view_divisions.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
 import 'package:workbook/widget/popUpDialog.dart';
 
 class AddGrade extends StatefulWidget {
@@ -25,7 +24,6 @@ class AddGrade extends StatefulWidget {
 
 class _AddGradeState extends State<AddGrade> {
   bool _isLoading = false;
-  List toBeUploadedGrade = [];
 
   // Get the grades for the particular institutes
   Future getGrades({String instituteName}) async {
@@ -45,14 +43,21 @@ class _AddGradeState extends State<AddGrade> {
 
   // Update Grades and Divisions
   Future updateGD() async {
-    grades.forEach((gra) {
-      toBeUploadedGrade.add({"grade": gra});
-    });
+    // grades.forEach((gra) {
+    //   toBeUploadedGrade.add({"grade": gra});
+    // });
 
-    var data = {"userID": User.userEmail, "instituteName": User.instituteName, "jwtToken": User.userJwtToken, "grade": toBeUploadedGrade, "division": divisions};
+    var data = {
+      "userID": User.userEmail,
+      "instituteName": User.instituteName,
+      "jwtToken": User.userJwtToken,
+      "grade": toBeUploadedData,
+      "division": divisions
+    };
     String body = json.encode(data);
     print(body);
-    var response = await http.post("$baseUrl/admin/setGD", body: body, headers: {
+    var response =
+        await http.post("$baseUrl/admin/setGD", body: body, headers: {
       HttpHeaders.contentTypeHeader: 'application/json',
     });
     print('Response status: ${response.statusCode}');
@@ -87,7 +92,8 @@ class _AddGradeState extends State<AddGrade> {
   }
 
   //Local storage of Divisions
-  Future addDivision({BuildContext context, String label, int index, List division}) {
+  Future addDivision(
+      {BuildContext context, String label, int index, List division}) {
     final controller = TextEditingController();
     String name;
     return showDialog(
@@ -224,7 +230,11 @@ class _AddGradeState extends State<AddGrade> {
           width: MediaQuery.of(context).size.width,
           padding: Platform.isAndroid
               ? EdgeInsets.all(16)
-              : EdgeInsets.symmetric(vertical: 16, horizontal: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.25 : size.width * 0.3),
+              : EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: ResponsiveWidget.isMediumScreen(context)
+                      ? size.width * 0.25
+                      : size.width * 0.3),
           child: ListView(
             children: [
               Column(
@@ -235,7 +245,8 @@ class _AddGradeState extends State<AddGrade> {
                     style: TextStyle(color: violet2, fontSize: 20),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.01),
+                    padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).size.height * 0.01),
                     child: Container(
                       height: MediaQuery.of(context).size.height * 0.8,
                       child: ListView.builder(
@@ -249,7 +260,8 @@ class _AddGradeState extends State<AddGrade> {
                                 onLongPress: () {
                                   if (_isEdit) {
                                     popDialog(
-                                        content: 'Do you want to delete this grade?',
+                                        content:
+                                            'Do you want to delete this grade?',
                                         title: 'Delete Grade',
                                         context: context,
                                         buttonTitle: 'Delete',
@@ -265,10 +277,25 @@ class _AddGradeState extends State<AddGrade> {
                                   title: Text(grades[index]),
                                   trailing: _isEdit
                                       ? Container(
-                                          width: MediaQuery.of(context).size.width * 0.32,
+                                          width: Platform.isAndroid
+                                              ? MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.32
+                                              : ResponsiveWidget.isLargeScreen(
+                                                      context)
+                                                  ? MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.08
+                                                  : MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.17,
                                           child: MaterialButton(
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(32),
+                                              borderRadius:
+                                                  BorderRadius.circular(32),
                                             ),
                                             padding: EdgeInsets.all(2),
                                             color: violet1,
@@ -282,13 +309,18 @@ class _AddGradeState extends State<AddGrade> {
                                                 Expanded(
                                                   child: Text(
                                                     'Add Division',
-                                                    style: TextStyle(color: Colors.white),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
                                                   ),
                                                 ),
                                               ],
                                             ),
                                             onPressed: () {
-                                              return addDivision(context: context, index: index, division: divisions, label: 'division');
+                                              return addDivision(
+                                                  context: context,
+                                                  index: index,
+                                                  division: divisions,
+                                                  label: 'division');
                                             },
                                           ),
                                         )
@@ -299,9 +331,11 @@ class _AddGradeState extends State<AddGrade> {
                                               context,
                                               PageTransition(
                                                   child: ViewDivisions(
+                                                    isEdit: false,
                                                     gradeName: grades[index],
                                                   ),
-                                                  type: PageTransitionType.rightToLeft),
+                                                  type: PageTransitionType
+                                                      .rightToLeft),
                                             );
                                           }),
                                 ),
@@ -363,7 +397,8 @@ class _AddGradeState extends State<AddGrade> {
                   if (controller.text.isEmpty) {
                     Fluttertoast.showToast(context, msg: 'Please enter a name');
                   } else if (grades.contains(controller.text)) {
-                    Fluttertoast.showToast(context, msg: 'Duplicate Entry', gravity: ToastGravity.TOP);
+                    Fluttertoast.showToast(context,
+                        msg: 'Duplicate Entry', gravity: ToastGravity.TOP);
                   } else {
                     grades.add(name);
                     controller.clear();

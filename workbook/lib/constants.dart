@@ -7,6 +7,8 @@ String baseUrl = "https://app-workbook.herokuapp.com";
 //String baseUrl = "https://workbook.ngrok.io";
 //String baseUrl = "http://ec2-18-222-203-149.us-east-2.compute.amazonaws.com:8000";
 bool isEmailVerified = false;
+List toBeUploadedData = [];
+
 List<String> states = [
   "Andhra Pradesh",
   "Arunachal Pradesh",

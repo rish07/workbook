@@ -1,8 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
-import 'dart:math' as math;
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -11,14 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker_saver/image_picker_saver.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:universal_io/io.dart' as uni;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:visibility_detector/visibility_detector.dart';
-import 'package:wc_flutter_share/wc_flutter_share.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/auth/approve_user.dart';
 import 'package:workbook/screens/coming_soon.dart';
@@ -696,328 +691,328 @@ class _DashBoardState extends State<DashBoard> {
                                                   textAlign: TextAlign.left,
                                                 ),
                                               ),
-                                              Padding(
-                                                padding: EdgeInsets.only(
-                                                    left: 16.0,
-                                                    top: 32,
-                                                    right: 16),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        Text('Likes: '),
-                                                        Text(posts[index]
-                                                                ['likes']
-                                                            .toString()),
-                                                      ],
-                                                    ),
-                                                    Row(
-                                                      children: [
-                                                        Icon(
-                                                          Icons.show_chart,
-                                                          color: violet2,
-                                                        ),
-                                                        Text(
-                                                          posts[index]['views']
-                                                              .toString(),
-                                                          style: TextStyle(
-                                                              color: violet1),
-                                                        ),
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
+                                              // Padding(
+                                              //   padding: EdgeInsets.only(
+                                              //       left: 16.0,
+                                              //       top: 32,
+                                              //       right: 16),
+                                              //   child: Row(
+                                              //     mainAxisAlignment:
+                                              //         MainAxisAlignment
+                                              //             .spaceBetween,
+                                              //     children: [
+                                              //       Row(
+                                              //         children: [
+                                              //           Text('Likes: '),
+                                              //           Text(posts[index]
+                                              //                   ['likes']
+                                              //               .toString()),
+                                              //         ],
+                                              //       ),
+                                              //       Row(
+                                              //         children: [
+                                              //           Icon(
+                                              //             Icons.show_chart,
+                                              //             color: violet2,
+                                              //           ),
+                                              //           Text(
+                                              //             posts[index]['views']
+                                              //                 .toString(),
+                                              //             style: TextStyle(
+                                              //                 color: violet1),
+                                              //           ),
+                                              //         ],
+                                              //       )
+                                              //     ],
+                                              //   ),
+                                              // ),
                                               Divider(
-                                                height: 0,
+                                                height: 1,
                                                 color: Colors.grey,
                                               ),
-                                              Container(
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        Container(
-                                                          child: Row(
-                                                            children: [
-                                                              IconButton(
-                                                                icon: Transform(
-                                                                  alignment:
-                                                                      Alignment
-                                                                          .center,
-                                                                  transform: Matrix4
-                                                                      .rotationY(
-                                                                          math.pi),
-                                                                  child: Icon(
-                                                                    Icons
-                                                                        .thumb_up,
-                                                                    color: temp.contains(User
-                                                                            .userEmail)
-                                                                        ? violet2
-                                                                        : Colors
-                                                                            .grey,
-                                                                  ),
-                                                                ),
-                                                                onPressed:
-                                                                    () async {
-                                                                  if (temp.contains(
-                                                                      User.userEmail)) {
-                                                                    Fluttertoast.showToast(
-                                                                        context,
-                                                                        msg:
-                                                                            'Liked already!');
-                                                                  } else {
-                                                                    await _likePost(
-                                                                        postId: posts[index]
-                                                                            [
-                                                                            '_id'],
-                                                                        userName:
-                                                                            User.userName);
-                                                                    await _getAllPosts();
-                                                                    setState(
-                                                                        () {});
-                                                                  }
-                                                                },
-                                                              ),
-                                                              Text('Like'),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    MaterialButton(
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              Icons.comment,
-                                                              color: violet2,
-                                                            ),
-                                                            Padding(
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                      left:
-                                                                          8.0),
-                                                              child: Text(
-                                                                  'Comment'),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        onPressed: () {}),
-                                                    MaterialButton(
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              Icons.share,
-                                                              color: violet2,
-                                                            ),
-                                                            Padding(
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                      left:
-                                                                          8.0),
-                                                              child:
-                                                                  Text('Share'),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        onPressed: () async {
-                                                          setState(() {
-                                                            _isLoading = true;
-                                                          });
-                                                          final String text =
-                                                              posts[index]
-                                                                  ['content'];
-                                                          var req =
-                                                              await HttpClient()
-                                                                  .getUrl(
-                                                            Uri.parse(
-                                                              posts[index]
-                                                                  ['mediaUrl'],
-                                                            ),
-                                                          );
-                                                          var response =
-                                                              await req.close();
-
-                                                          setState(() {
-                                                            _isLoading = false;
-                                                          });
-                                                          Uint8List bytes =
-                                                              await consolidateHttpClientResponseBytes(
-                                                                  response);
-                                                          await ImagePickerSaver
-                                                                  .saveFile(
-                                                                      fileData:
-                                                                          bytes)
-                                                              .whenComplete(() {
-                                                            WcFlutterShare.share(
-                                                                sharePopupTitle:
-                                                                    'Share',
-                                                                text: text,
-                                                                fileName:
-                                                                    'share.png',
-                                                                mimeType:
-                                                                    'image/png',
-                                                                bytesOfFile: bytes
-                                                                    .buffer
-                                                                    .asUint8List());
-                                                          });
-                                                        })
-                                                  ],
-                                                ),
-                                              ),
-                                              posts[index]['commentEnabled']
-                                                  ? Container(
-                                                      height: posts[index][
-                                                                      'comments']
-                                                                  .length !=
-                                                              0
-                                                          ? 200
-                                                          : 0,
-                                                      width:
-                                                          MediaQuery.of(context)
-                                                                  .size
-                                                                  .width *
-                                                              0.8,
-                                                      child: Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .stretch,
-                                                        children: [
-                                                          Text(posts[index][
-                                                                          'comments']
-                                                                      .length !=
-                                                                  0
-                                                              ? 'Comments'
-                                                              : ''),
-                                                          posts[index]['comments']
-                                                                      .length !=
-                                                                  0
-                                                              ? Container(
-                                                                  height: 180,
-                                                                  child: ListView
-                                                                      .builder(
-                                                                    shrinkWrap:
-                                                                        true,
-                                                                    itemCount: posts[index]
-                                                                            [
-                                                                            'comments']
-                                                                        .length,
-                                                                    itemBuilder:
-                                                                        (context,
-                                                                            i) {
-                                                                      return Column(
-                                                                        children: [
-                                                                          ListTile(
-                                                                            title:
-                                                                                Text(
-                                                                              posts[index]['comments'][i]['userName'],
-                                                                              style: TextStyle(color: violet2, fontWeight: FontWeight.bold),
-                                                                            ),
-                                                                            subtitle:
-                                                                                Text(
-                                                                              posts[index]['comments'][i]['comment'],
-                                                                              style: TextStyle(color: Colors.black),
-                                                                            ),
-                                                                          ),
-                                                                          Divider(),
-                                                                        ],
-                                                                      );
-                                                                    },
-                                                                  ),
-                                                                )
-                                                              : Container(),
-                                                        ],
-                                                      ),
-                                                    )
-                                                  : Container(),
-                                              posts[index]['commentEnabled']
-                                                  ? TextFormField(
-                                                      style: TextStyle(
-                                                          color: Colors.black),
-                                                      maxLines: 1,
-                                                      controller: contro,
-                                                      cursorRadius:
-                                                          Radius.circular(8),
-                                                      cursorColor: Colors.black,
-                                                      decoration:
-                                                          InputDecoration(
-                                                        enabledBorder:
-                                                            OutlineInputBorder(
-                                                                borderSide:
-                                                                    BorderSide(
-                                                          color: Colors.grey,
-                                                        )),
-                                                        isDense: true,
-                                                        focusedBorder:
-                                                            OutlineInputBorder(
-                                                          borderSide:
-                                                              BorderSide(
-                                                                  color: Colors
-                                                                      .grey,
-                                                                  width: 2),
-                                                        ),
-                                                        hintText:
-                                                            'Add a comment',
-                                                        suffixIcon: IconButton(
-                                                            icon: Icon(
-                                                                Icons.send),
-                                                            color: violet2,
-                                                            onPressed:
-                                                                () async {
-                                                              print(
-                                                                  contro.text);
-                                                              if (contro.text
-                                                                  .isNotEmpty) {
-                                                                var response =
-                                                                    await http.post(
-                                                                        '$baseUrl/post/comment',
-                                                                        body: {
-                                                                      "id": posts[
-                                                                              index]
-                                                                          [
-                                                                          '_id'],
-                                                                      "comment": contro
-                                                                          .text
-                                                                          .toString(),
-                                                                      "userName":
-                                                                          User.userName
-                                                                    });
-
-                                                                print(response
-                                                                    .body);
-                                                                if (json.decode(
-                                                                        response
-                                                                            .body)['statusCode'] ==
-                                                                    200) {
-                                                                  Fluttertoast
-                                                                      .showToast(
-                                                                          context,
-                                                                          msg:
-                                                                              'Comment posted');
-                                                                  setState(() {
-                                                                    _getAllPosts();
-                                                                  });
-                                                                }
-                                                              } else {
-                                                                Fluttertoast
-                                                                    .showToast(
-                                                                        context,
-                                                                        msg:
-                                                                            'Comment can\'t be empty');
-                                                              }
-                                                            }),
-                                                      ),
-                                                    )
-                                                  : Container(),
+                                              // Container(
+                                              //   child: Row(
+                                              //     mainAxisAlignment:
+                                              //         MainAxisAlignment
+                                              //             .spaceBetween,
+                                              //     children: [
+                                              //       Row(
+                                              //         children: [
+                                              //           Container(
+                                              //             child: Row(
+                                              //               children: [
+                                              //                 IconButton(
+                                              //                   icon: Transform(
+                                              //                     alignment:
+                                              //                         Alignment
+                                              //                             .center,
+                                              //                     transform: Matrix4
+                                              //                         .rotationY(
+                                              //                             math.pi),
+                                              //                     child: Icon(
+                                              //                       Icons
+                                              //                           .thumb_up,
+                                              //                       color: temp.contains(User
+                                              //                               .userEmail)
+                                              //                           ? violet2
+                                              //                           : Colors
+                                              //                               .grey,
+                                              //                     ),
+                                              //                   ),
+                                              //                   onPressed:
+                                              //                       () async {
+                                              //                     if (temp.contains(
+                                              //                         User.userEmail)) {
+                                              //                       Fluttertoast.showToast(
+                                              //                           context,
+                                              //                           msg:
+                                              //                               'Liked already!');
+                                              //                     } else {
+                                              //                       await _likePost(
+                                              //                           postId: posts[index]
+                                              //                               [
+                                              //                               '_id'],
+                                              //                           userName:
+                                              //                               User.userName);
+                                              //                       await _getAllPosts();
+                                              //                       setState(
+                                              //                           () {});
+                                              //                     }
+                                              //                   },
+                                              //                 ),
+                                              //                 Text('Like'),
+                                              //               ],
+                                              //             ),
+                                              //           ),
+                                              //         ],
+                                              //       ),
+                                              //       MaterialButton(
+                                              //           child: Row(
+                                              //             children: [
+                                              //               Icon(
+                                              //                 Icons.comment,
+                                              //                 color: violet2,
+                                              //               ),
+                                              //               Padding(
+                                              //                 padding: EdgeInsets
+                                              //                     .only(
+                                              //                         left:
+                                              //                             8.0),
+                                              //                 child: Text(
+                                              //                     'Comment'),
+                                              //               ),
+                                              //             ],
+                                              //           ),
+                                              //           onPressed: () {}),
+                                              //       MaterialButton(
+                                              //           child: Row(
+                                              //             children: [
+                                              //               Icon(
+                                              //                 Icons.share,
+                                              //                 color: violet2,
+                                              //               ),
+                                              //               Padding(
+                                              //                 padding: EdgeInsets
+                                              //                     .only(
+                                              //                         left:
+                                              //                             8.0),
+                                              //                 child:
+                                              //                     Text('Share'),
+                                              //               ),
+                                              //             ],
+                                              //           ),
+                                              //           onPressed: () async {
+                                              //             setState(() {
+                                              //               _isLoading = true;
+                                              //             });
+                                              //             final String text =
+                                              //                 posts[index]
+                                              //                     ['content'];
+                                              //             var req =
+                                              //                 await HttpClient()
+                                              //                     .getUrl(
+                                              //               Uri.parse(
+                                              //                 posts[index]
+                                              //                     ['mediaUrl'],
+                                              //               ),
+                                              //             );
+                                              //             var response =
+                                              //                 await req.close();
+                                              //
+                                              //             setState(() {
+                                              //               _isLoading = false;
+                                              //             });
+                                              //             Uint8List bytes =
+                                              //                 await consolidateHttpClientResponseBytes(
+                                              //                     response);
+                                              //             await ImagePickerSaver
+                                              //                     .saveFile(
+                                              //                         fileData:
+                                              //                             bytes)
+                                              //                 .whenComplete(() {
+                                              //               WcFlutterShare.share(
+                                              //                   sharePopupTitle:
+                                              //                       'Share',
+                                              //                   text: text,
+                                              //                   fileName:
+                                              //                       'share.png',
+                                              //                   mimeType:
+                                              //                       'image/png',
+                                              //                   bytesOfFile: bytes
+                                              //                       .buffer
+                                              //                       .asUint8List());
+                                              //             });
+                                              //           })
+                                              //     ],
+                                              //   ),
+                                              // ),
+                                              // posts[index]['commentEnabled']
+                                              //     ? Container(
+                                              //         height: posts[index][
+                                              //                         'comments']
+                                              //                     .length !=
+                                              //                 0
+                                              //             ? 200
+                                              //             : 0,
+                                              //         width:
+                                              //             MediaQuery.of(context)
+                                              //                     .size
+                                              //                     .width *
+                                              //                 0.8,
+                                              //         child: Column(
+                                              //           mainAxisAlignment:
+                                              //               MainAxisAlignment
+                                              //                   .center,
+                                              //           crossAxisAlignment:
+                                              //               CrossAxisAlignment
+                                              //                   .stretch,
+                                              //           children: [
+                                              //             Text(posts[index][
+                                              //                             'comments']
+                                              //                         .length !=
+                                              //                     0
+                                              //                 ? 'Comments'
+                                              //                 : ''),
+                                              //             posts[index]['comments']
+                                              //                         .length !=
+                                              //                     0
+                                              //                 ? Container(
+                                              //                     height: 180,
+                                              //                     child: ListView
+                                              //                         .builder(
+                                              //                       shrinkWrap:
+                                              //                           true,
+                                              //                       itemCount: posts[index]
+                                              //                               [
+                                              //                               'comments']
+                                              //                           .length,
+                                              //                       itemBuilder:
+                                              //                           (context,
+                                              //                               i) {
+                                              //                         return Column(
+                                              //                           children: [
+                                              //                             ListTile(
+                                              //                               title:
+                                              //                                   Text(
+                                              //                                 posts[index]['comments'][i]['userName'],
+                                              //                                 style: TextStyle(color: violet2, fontWeight: FontWeight.bold),
+                                              //                               ),
+                                              //                               subtitle:
+                                              //                                   Text(
+                                              //                                 posts[index]['comments'][i]['comment'],
+                                              //                                 style: TextStyle(color: Colors.black),
+                                              //                               ),
+                                              //                             ),
+                                              //                             Divider(),
+                                              //                           ],
+                                              //                         );
+                                              //                       },
+                                              //                     ),
+                                              //                   )
+                                              //                 : Container(),
+                                              //           ],
+                                              //         ),
+                                              //       )
+                                              //     : Container(),
+                                              // posts[index]['commentEnabled']
+                                              //     ? TextFormField(
+                                              //         style: TextStyle(
+                                              //             color: Colors.black),
+                                              //         maxLines: 1,
+                                              //         controller: contro,
+                                              //         cursorRadius:
+                                              //             Radius.circular(8),
+                                              //         cursorColor: Colors.black,
+                                              //         decoration:
+                                              //             InputDecoration(
+                                              //           enabledBorder:
+                                              //               OutlineInputBorder(
+                                              //                   borderSide:
+                                              //                       BorderSide(
+                                              //             color: Colors.grey,
+                                              //           )),
+                                              //           isDense: true,
+                                              //           focusedBorder:
+                                              //               OutlineInputBorder(
+                                              //             borderSide:
+                                              //                 BorderSide(
+                                              //                     color: Colors
+                                              //                         .grey,
+                                              //                     width: 2),
+                                              //           ),
+                                              //           hintText:
+                                              //               'Add a comment',
+                                              //           suffixIcon: IconButton(
+                                              //               icon: Icon(
+                                              //                   Icons.send),
+                                              //               color: violet2,
+                                              //               onPressed:
+                                              //                   () async {
+                                              //                 print(
+                                              //                     contro.text);
+                                              //                 if (contro.text
+                                              //                     .isNotEmpty) {
+                                              //                   var response =
+                                              //                       await http.post(
+                                              //                           '$baseUrl/post/comment',
+                                              //                           body: {
+                                              //                         "id": posts[
+                                              //                                 index]
+                                              //                             [
+                                              //                             '_id'],
+                                              //                         "comment": contro
+                                              //                             .text
+                                              //                             .toString(),
+                                              //                         "userName":
+                                              //                             User.userName
+                                              //                       });
+                                              //
+                                              //                   print(response
+                                              //                       .body);
+                                              //                   if (json.decode(
+                                              //                           response
+                                              //                               .body)['statusCode'] ==
+                                              //                       200) {
+                                              //                     Fluttertoast
+                                              //                         .showToast(
+                                              //                             context,
+                                              //                             msg:
+                                              //                                 'Comment posted');
+                                              //                     setState(() {
+                                              //                       _getAllPosts();
+                                              //                     });
+                                              //                   }
+                                              //                 } else {
+                                              //                   Fluttertoast
+                                              //                       .showToast(
+                                              //                           context,
+                                              //                           msg:
+                                              //                               'Comment can\'t be empty');
+                                              //                 }
+                                              //               }),
+                                              //         ),
+                                              //       )
+                                              //     : Container(),
                                             ],
                                           ),
                                         ),
