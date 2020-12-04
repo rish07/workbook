@@ -1,4 +1,6 @@
+import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:universal_io/prefer_universal/io.dart';
 import 'package:workbook/constants.dart';
@@ -29,11 +31,95 @@ class _ViewDivisionsState extends State<ViewDivisions> {
     print(gradeDivision);
   }
 
+  //Local storage of Divisions
+  Future addDivision({BuildContext context, String label}) {
+    final controller = TextEditingController();
+    String name;
+    return showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  "CANCEL",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: violet2,
+                  ),
+                ),
+              ),
+              FlatButton(
+                onPressed: () {
+                  if (controller.text.isEmpty) {
+                    // ignore: deprecated_member_use
+                    Fluttertoast.showToast(context, msg: 'Please enter a name');
+                  } else {
+                    setState(() {
+                      tempData[widget.gradeName]
+                          .add(controller.text.toString());
+                    });
+                    print(tempData);
+                    controller.clear();
+                    Navigator.pop(context);
+                  }
+                },
+                child: Text(
+                  'ADD',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: violet2,
+                  ),
+                ),
+              )
+            ],
+            title: Column(
+              children: <Widget>[
+                Center(
+                  child: Text(
+                    'Add a new $label',
+                    style: TextStyle(
+                      color: violet2,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                TextField(
+                  controller: controller,
+                  textCapitalization: TextCapitalization.words,
+                  textInputAction: TextInputAction.next,
+                  onChanged: (value) {
+                    setState(() {
+                      name = value;
+                    });
+                  },
+                  decoration: InputDecoration(
+                      hintText: 'Enter ${StringUtils.capitalize(label)} Name',
+                      hintStyle: TextStyle(
+                        color: violet1,
+                      )),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
   bool _isLoading = false;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    tempData[widget.gradeName] = [];
     _div();
   }
 
@@ -78,13 +164,17 @@ class _ViewDivisionsState extends State<ViewDivisions> {
                     child: Container(
                       height: MediaQuery.of(context).size.height * 0.8,
                       child: ListView.builder(
-                          itemCount: gradeDivision.length,
+                          itemCount: widget.isEdit
+                              ? tempData[widget.gradeName].length
+                              : gradeDivision.length,
                           itemBuilder: (context, index) {
                             return Card(
                               elevation: 5,
                               shadowColor: Colors.grey,
                               child: ListTile(
-                                title: Text(gradeDivision[index]),
+                                title: Text(widget.isEdit
+                                    ? tempData[widget.gradeName][index]
+                                    : gradeDivision[index]),
                               ),
                             );
                           }),
@@ -101,8 +191,10 @@ class _ViewDivisionsState extends State<ViewDivisions> {
                 padding: EdgeInsets.all(16.0),
                 child: FloatingActionButton.extended(
                   backgroundColor: violet2,
-                  onPressed: () {},
-                  label: Text('Add Grade'),
+                  onPressed: () {
+                    return addDivision(context: context, label: 'Division');
+                  },
+                  label: Text('Add Division'),
                 ),
               )
             : null,
