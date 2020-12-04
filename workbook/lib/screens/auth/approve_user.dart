@@ -3,17 +3,21 @@ import 'dart:async';
 import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 
 import 'package:workbook/constants.dart';
-import 'package:workbook/screens/active_users.dart';
+import 'package:workbook/screens/auth/active_users.dart';
 import 'package:workbook/screens/request_profile_page.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';
 import 'dart:convert';
 
 import 'package:workbook/widget/popUpDialog.dart';
+
+import '../../responsive_widget.dart';
 
 class ApproveUser extends StatefulWidget {
   final bool isDriver;
@@ -36,12 +40,14 @@ class _ApproveUserState extends State<ApproveUser> {
         ? await http.post(
             User.userRole == 'admin' && !widget.isDriver
                 ? "$baseUrl/admin/viewAllEmployees"
-                : (User.userRole == 'admin' && widget.isDriver) ? "$baseUrl/admin/viewAllDrivers" : "$baseUrl/employee/viewAllCustomers",
+                : (User.userRole == 'admin' && widget.isDriver)
+                    ? "$baseUrl/admin/viewAllDrivers"
+                    : "$baseUrl/employee/viewAllCustomers",
             body: {"userID": User.userEmail, "instituteName": User.instituteName, "jwtToken": User.userJwtToken},
           )
         : await http.get('$baseUrl/superAdmin/viewAllAdmin');
     print('Response status: ${response.statusCode}');
-
+    print(response.body);
     if (json.decode(response.body)["statusCode"] == 200) {
       setState(() {
         _loading = false;
@@ -50,7 +56,9 @@ class _ApproveUserState extends State<ApproveUser> {
           ? json.decode(response.body)['payload']['employees']
           : (User.userRole == 'admin' && widget.isDriver)
               ? json.decode(response.body)['payload']['drivers']
-              : (User.userRole == 'employee') ? json.decode(response.body)['payload']['customer'] : json.decode(response.body)['payload']['admin'];
+              : (User.userRole == 'employee')
+                  ? json.decode(response.body)['payload']['customer']
+                  : json.decode(response.body)['payload']['admin'];
       for (var employee in employees) {
         _employeeList.add(employee);
       }
@@ -76,7 +84,9 @@ class _ApproveUserState extends State<ApproveUser> {
             ? "$baseUrl/admin/approveEmployee"
             : (User.userRole == 'admin' && widget.isDriver)
                 ? "$baseUrl/admin/approveDriver"
-                : (User.userRole == 'employee') ? "$baseUrl/employee/approveCustomer" : "$baseUrl/superAdmin/approveAdmin",
+                : (User.userRole == 'employee')
+                    ? "$baseUrl/employee/approveCustomer"
+                    : "$baseUrl/superAdmin/approveAdmin",
         body: User.userRole != 'employee'
             ? {
                 "userID": User.userEmail,
@@ -121,7 +131,9 @@ class _ApproveUserState extends State<ApproveUser> {
             ? "$baseUrl/admin/rejectEmployee"
             : (User.userRole == 'admin' && widget.isDriver)
                 ? "$baseUrl/admin/rejectDriver"
-                : (User.userRole == 'employee') ? "$baseUrl/employee/rejectCustomer" : "$baseUrl/superAdmin/rejectAdmin",
+                : (User.userRole == 'employee')
+                    ? "$baseUrl/employee/rejectCustomer"
+                    : "$baseUrl/superAdmin/rejectAdmin",
         body: User.userRole != 'employee'
             ? {"id": id, "jwtToken": User.userJwtToken, "userID": User.userEmail}
             : {
@@ -173,6 +185,7 @@ class _ApproveUserState extends State<ApproveUser> {
   // UI block
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -181,7 +194,11 @@ class _ApproveUserState extends State<ApproveUser> {
         title: Text(
           User.userRole == 'admin' && !widget.isDriver
               ? 'Approve Employees'
-              : (User.userRole == 'admin' && widget.isDriver) ? "Approve Driver" : (User.userRole == 'employee') ? 'Approve Customers' : 'Approve Admins',
+              : (User.userRole == 'admin' && widget.isDriver)
+                  ? "Approve Driver"
+                  : (User.userRole == 'employee')
+                      ? 'Approve Customers'
+                      : 'Approve Admins',
           style: TextStyle(color: violet2, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
@@ -214,7 +231,11 @@ class _ApproveUserState extends State<ApproveUser> {
               Text(
                 User.userRole == 'admin' && !widget.isDriver
                     ? 'Active Employees'
-                    : (User.userRole == 'admin' && widget.isDriver) ? "Active Drivers" : (User.userRole == 'employee') ? 'Active Customers' : 'Active Admins',
+                    : (User.userRole == 'admin' && widget.isDriver)
+                        ? "Active Drivers"
+                        : (User.userRole == 'employee')
+                            ? 'Active Customers'
+                            : 'Active Admins',
               ),
             ],
           )),
@@ -235,7 +256,9 @@ class _ApproveUserState extends State<ApproveUser> {
                   itemBuilder: (context, index) {
                     if (_employeeList[index]['approved'] == false) {
                       return Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: Platform.isAndroid
+                            ? EdgeInsets.all(16)
+                            : EdgeInsets.symmetric(vertical: 16, horizontal: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.25 : size.width * 0.3),
                         child: GestureDetector(
                           onTap: () async {
                             Navigator.push(
@@ -321,6 +344,15 @@ class _ApproveUserState extends State<ApproveUser> {
                                                   _employeeList[index]['grade'],
                                                   style: TextStyle(fontSize: 14),
                                                 ),
+                                                SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Text('Received on: '),
+                                                Text(
+                                                  DateFormat("yyyy-MM-dd HH:mm:ss").format(
+                                                    DateTime.parse(_employeeList[index]['createdAt']),
+                                                  ),
+                                                )
                                               ],
                                             )
                                           : !widget.isDriver
@@ -365,7 +397,9 @@ class _ApproveUserState extends State<ApproveUser> {
                                                   ? "Reject Employee"
                                                   : (User.userRole == 'admin' && widget.isDriver)
                                                       ? "Reject Driver"
-                                                      : (User.userRole == 'employee') ? "Reject Customer" : "Reject Admin",
+                                                      : (User.userRole == 'employee')
+                                                          ? "Reject Customer"
+                                                          : "Reject Admin",
                                               content: 'Do you want to reject this registration?',
                                               context: context,
                                               buttonTitle: 'Reject',
@@ -402,7 +436,9 @@ class _ApproveUserState extends State<ApproveUser> {
                                                   ? "Approve Employee"
                                                   : (User.userRole == 'admin' && widget.isDriver)
                                                       ? "Approve Driver"
-                                                      : (User.userRole == 'employee') ? "Approve Customer" : "Approve Admin",
+                                                      : (User.userRole == 'employee')
+                                                          ? "Approve Customer"
+                                                          : "Approve Admin",
                                               content: 'Do you want to approve this registration?',
                                               context: context,
                                               buttonTitle: 'Approve',

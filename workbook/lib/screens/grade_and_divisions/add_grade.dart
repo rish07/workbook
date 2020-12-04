@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:basic_utils/basic_utils.dart';
@@ -5,15 +6,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:universal_io/prefer_universal/io.dart';
 import 'package:workbook/constants.dart';
-import 'package:workbook/screens/view_divisions.dart';
+import 'package:workbook/responsive_widget.dart';
+import 'package:workbook/screens/grade_and_divisions/view_divisions.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/drawer.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
 import 'package:workbook/widget/popUpDialog.dart';
 
 class AddGrade extends StatefulWidget {
@@ -23,7 +24,6 @@ class AddGrade extends StatefulWidget {
 
 class _AddGradeState extends State<AddGrade> {
   bool _isLoading = false;
-  List toBeUploadedGrade = [];
 
   // Get the grades for the particular institutes
   Future getGrades({String instituteName}) async {
@@ -43,14 +43,25 @@ class _AddGradeState extends State<AddGrade> {
 
   // Update Grades and Divisions
   Future updateGD() async {
-    grades.forEach((gra) {
-      toBeUploadedGrade.add({"grade": gra});
-    });
+    for (int i = 0; i < tempData.keys.toList().length; i++) {
+      tempData[tempData.keys.toList()[i]].forEach((value) {
+        toBeUploadedData.add({
+          "grade": tempData.keys.toList()[i].toString(),
+          "division": value.toString()
+        });
+      });
+    }
 
-    var data = {"userID": User.userEmail, "instituteName": User.instituteName, "jwtToken": User.userJwtToken, "grade": toBeUploadedGrade, "division": divisions};
+    var data = {
+      "userID": User.userEmail,
+      "instituteName": User.instituteName,
+      "jwtToken": User.userJwtToken,
+      "data": toBeUploadedData,
+    };
     String body = json.encode(data);
     print(body);
-    var response = await http.post("$baseUrl/admin/setGD", body: body, headers: {
+    var response =
+        await http.post("$baseUrl/admin/setGD", body: body, headers: {
       HttpHeaders.contentTypeHeader: 'application/json',
     });
     print('Response status: ${response.statusCode}');
@@ -84,86 +95,6 @@ class _AddGradeState extends State<AddGrade> {
     getGrades(instituteName: User.instituteName);
   }
 
-  //Local storage of Divisions
-  Future addDivision({BuildContext context, String label, int index, List division}) {
-    final controller = TextEditingController();
-    String name;
-    return showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  "CANCEL",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: violet2,
-                  ),
-                ),
-              ),
-              FlatButton(
-                onPressed: () {
-                  if (controller.text.isEmpty) {
-                    Fluttertoast.showToast(context, msg: 'Please enter a name');
-                  } else {
-                    divisions.add({'division': name, 'grade': grades[index]});
-                    print(divisions);
-                    print(grades);
-                    controller.clear();
-                    Navigator.pop(context);
-                  }
-                },
-                child: Text(
-                  'ADD',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: violet2,
-                  ),
-                ),
-              )
-            ],
-            title: Column(
-              children: <Widget>[
-                Center(
-                  child: Text(
-                    'Add a new $label',
-                    style: TextStyle(
-                      color: violet2,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                TextField(
-                  controller: controller,
-                  textCapitalization: TextCapitalization.words,
-                  textInputAction: TextInputAction.next,
-                  onChanged: (value) {
-                    setState(() {
-                      name = value;
-                    });
-                  },
-                  decoration: InputDecoration(
-                      hintText: 'Enter ${StringUtils.capitalize(label)} Name',
-                      hintStyle: TextStyle(
-                        color: violet1,
-                      )),
-                ),
-              ],
-            ),
-          );
-        });
-  }
-
   @override
   void dispose() {
     // TODO: implement dispose
@@ -174,6 +105,7 @@ class _AddGradeState extends State<AddGrade> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return ModalProgressHUD(
       progressIndicator: CircularProgressIndicator(
         valueColor: AlwaysStoppedAnimation<Color>(violet2),
@@ -219,7 +151,13 @@ class _AddGradeState extends State<AddGrade> {
         body: Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.all(16),
+          padding: Platform.isAndroid
+              ? EdgeInsets.all(16)
+              : EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: ResponsiveWidget.isMediumScreen(context)
+                      ? size.width * 0.25
+                      : size.width * 0.3),
           child: ListView(
             children: [
               Column(
@@ -230,7 +168,8 @@ class _AddGradeState extends State<AddGrade> {
                     style: TextStyle(color: violet2, fontSize: 20),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.01),
+                    padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).size.height * 0.01),
                     child: Container(
                       height: MediaQuery.of(context).size.height * 0.8,
                       child: ListView.builder(
@@ -244,7 +183,8 @@ class _AddGradeState extends State<AddGrade> {
                                 onLongPress: () {
                                   if (_isEdit) {
                                     popDialog(
-                                        content: 'Do you want to delete this grade?',
+                                        content:
+                                            'Do you want to delete this grade?',
                                         title: 'Delete Grade',
                                         context: context,
                                         buttonTitle: 'Delete',
@@ -252,6 +192,7 @@ class _AddGradeState extends State<AddGrade> {
                                           setState(() {
                                             grades.removeAt(index);
                                           });
+                                          Navigator.pop(context);
                                         });
                                   }
                                 },
@@ -259,10 +200,25 @@ class _AddGradeState extends State<AddGrade> {
                                   title: Text(grades[index]),
                                   trailing: _isEdit
                                       ? Container(
-                                          width: MediaQuery.of(context).size.width * 0.32,
+                                          width: Platform.isAndroid
+                                              ? MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.32
+                                              : ResponsiveWidget.isLargeScreen(
+                                                      context)
+                                                  ? MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.08
+                                                  : MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.17,
                                           child: MaterialButton(
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(32),
+                                              borderRadius:
+                                                  BorderRadius.circular(32),
                                             ),
                                             padding: EdgeInsets.all(2),
                                             color: violet1,
@@ -276,13 +232,23 @@ class _AddGradeState extends State<AddGrade> {
                                                 Expanded(
                                                   child: Text(
                                                     'Add Division',
-                                                    style: TextStyle(color: Colors.white),
+                                                    style: TextStyle(
+                                                        color: Colors.white),
                                                   ),
                                                 ),
                                               ],
                                             ),
                                             onPressed: () {
-                                              return addDivision(context: context, index: index, division: divisions, label: 'division');
+                                              Navigator.push(
+                                                context,
+                                                PageTransition(
+                                                    child: ViewDivisions(
+                                                      isEdit: true,
+                                                      gradeName: grades[index],
+                                                    ),
+                                                    type: PageTransitionType
+                                                        .rightToLeft),
+                                              );
                                             },
                                           ),
                                         )
@@ -293,9 +259,11 @@ class _AddGradeState extends State<AddGrade> {
                                               context,
                                               PageTransition(
                                                   child: ViewDivisions(
+                                                    isEdit: false,
                                                     gradeName: grades[index],
                                                   ),
-                                                  type: PageTransitionType.rightToLeft),
+                                                  type: PageTransitionType
+                                                      .rightToLeft),
                                             );
                                           }),
                                 ),
@@ -357,10 +325,14 @@ class _AddGradeState extends State<AddGrade> {
                   if (controller.text.isEmpty) {
                     Fluttertoast.showToast(context, msg: 'Please enter a name');
                   } else if (grades.contains(controller.text)) {
-                    Fluttertoast.showToast(context, msg: 'Duplicate Entry', gravity: ToastGravity.TOP);
+                    Fluttertoast.showToast(context,
+                        msg: 'Duplicate Entry', gravity: ToastGravity.TOP);
                   } else {
-                    grades.add(name);
-                    controller.clear();
+                    setState(() {
+                      grades.add(name);
+                      controller.clear();
+                    });
+
                     Navigator.pop(context);
                   }
                 },

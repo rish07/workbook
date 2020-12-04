@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:workbook/constants.dart';
-import 'package:workbook/screens/query_dashboard.dart';
-import 'package:workbook/screens/query_status.dart';
+import 'package:workbook/screens/queries/query_dashboard.dart';
+import 'package:workbook/screens/queries/query_status.dart';
 
 class QueryData extends StatefulWidget {
   @override

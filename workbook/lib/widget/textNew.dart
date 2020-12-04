@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:universal_io/prefer_sdk/io.dart';
 
 class TextNew extends StatefulWidget {
   @override
@@ -16,7 +17,7 @@ class _TextNewState extends State<TextNew> {
 
         //color: Colors.green,
         height: MediaQuery.of(context).size.height * 0.35,
-        width: MediaQuery.of(context).size.width * 0.8,
+        width: Platform.isAndroid ? MediaQuery.of(context).size.width * 0.8 : MediaQuery.of(context).size.width * 0.35,
         child: Padding(
           padding: const EdgeInsets.only(top: 60.0),
           child: Text(

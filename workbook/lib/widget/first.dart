@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:workbook/screens/registration_page.dart';
+import 'package:workbook/screens/auth/registration_page.dart';
 
 class FirstTime extends StatefulWidget {
   @override
@@ -28,11 +28,7 @@ class _FirstTimeState extends State<FirstTime> {
             FlatButton(
               padding: EdgeInsets.only(left: 10),
               onPressed: () {
-                Navigator.push(
-                    context,
-                    PageTransition(
-                        child: RegistrationPage(),
-                        type: PageTransitionType.rightToLeft));
+                Navigator.push(context, PageTransition(child: RegistrationPage(), type: PageTransitionType.rightToLeft));
               },
               child: Text(
                 'Register here',

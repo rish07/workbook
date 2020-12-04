@@ -17,10 +17,32 @@
   <title>workbook</title>
   <link rel="manifest" href="manifest.json">
 </head>
+
 <body>
   <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
+  <script src="https://www.gstatic.com/firebasejs/7.9.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.9.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.9.1/firebase-functions.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.9.1/firebase-storage.js"></script>
+  <script>
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  var firebaseConfig = {
+    apiKey: "AIzaSyDX9vwzis8AN6WJUrWW7kzjxdXmrVgB0t0",
+    authDomain: "workbook-612e0.firebaseapp.com",
+    databaseURL: "https://workbook-612e0.firebaseio.com",
+    projectId: "workbook-612e0",
+    storageBucket: "workbook-612e0.appspot.com",
+    messagingSenderId: "1019156438469",
+    appId: "1:1019156438469:web:91a4440662a08eb834ffac",
+    measurementId: "G-1ENPBRETLW"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+</script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {

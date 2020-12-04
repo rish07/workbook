@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:universal_io/io.dart' show Platform;
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +11,9 @@ import 'package:regexed_validator/regexed_validator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/screens/dashboard.dart';
-import 'package:workbook/screens/guest_ticket.dart';
-import 'package:workbook/screens/otp_verification.dart';
+import 'package:workbook/screens/queries/guest_ticket.dart';
+import 'package:workbook/screens/auth/otp_verification.dart';
+import '../../responsive_widget.dart';
 import 'dart:convert';
 import 'package:workbook/widget/first.dart';
 import 'package:workbook/widget/input_field.dart';
@@ -25,6 +26,8 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:workbook/user.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 class LoginPage extends StatefulWidget {
   @override
@@ -44,7 +47,6 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   //Local notifications
   void registerNotification() {
@@ -91,11 +93,15 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-    getFCMToken();
+    if (Platform.isAndroid) {
+      getFCMToken();
+      registerNotification();
+      configLocalNotification();
+    }
+
     getInstitutes();
     super.initState();
-    registerNotification();
-    configLocalNotification();
+
     connectivity = new Connectivity();
     subscription = connectivity.onConnectivityChanged.listen((ConnectivityResult result) {
       _connectionStatus = result.toString();
@@ -119,6 +125,7 @@ class _LoginPageState extends State<LoginPage> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+    subscription.cancel();
   }
 
   // Get the FCM token
@@ -187,10 +194,20 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // Login user
+  //Login user
   Future _loginUser() async {
     print('working');
-    var response = await http.post('$baseUrl/login', body: {"userID": _emailController.text, "password": _passwordController.text, "fcmToken": fcmToken});
+    var response = await http.post('$baseUrl/login',
+        body: Platform.isAndroid
+            ? {
+                "userID": _emailController.text,
+                "password": _passwordController.text,
+                "fcmToken": fcmToken,
+              }
+            : {
+                "userID": _emailController.text,
+                "password": _passwordController.text,
+              });
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
     setState(() {
@@ -214,8 +231,8 @@ class _LoginPageState extends State<LoginPage> {
         User.instituteImage = tempo['instituteImageUrl'] ?? null;
         User.userInstituteType = tempo['instituteType'] ?? null;
         User.numberOfMembers = tempo['numberOfMembers'] ?? null;
-        User.state = tempo['state'] ?? null;
-        User.city = tempo['city'] ?? null;
+        User.state = tempo['state'] ?? 'Maharashtra';
+        User.city = tempo['city'] ?? 'Ahmednagar';
         User.mailAddress = tempo['mailAddress'] ?? null;
         User.aadharNumber = tempo['adharNumber'] ?? null;
         User.grade = tempo['grade'] ?? null;
@@ -288,6 +305,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
         body: WillPopScope(
       onWillPop: () async => false,
@@ -313,11 +331,25 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Row(children: <Widget>[
-                    VerticalText(),
-                    TextLogin(),
+                    Padding(
+                      padding: Platform.isAndroid ? EdgeInsets.zero : EdgeInsets.only(left: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.2 : size.width * 0.3),
+                      child: VerticalText(),
+                    ),
+                    Padding(
+                      padding: Platform.isAndroid ? EdgeInsets.zero : EdgeInsets.only(left: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.15 : 0),
+                      child: TextLogin(),
+                    ),
                   ]),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: Platform.isAndroid
+                        ? EdgeInsets.all(8.0)
+                        : EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: ResponsiveWidget.isMediumScreen(context)
+                                ? size.width * 0.2
+                                : ResponsiveWidget.isLargeScreen(context)
+                                    ? size.width * 0.3
+                                    : 8),
                     child: InputField(
                       validate: false,
                       validation: (String arg) {
@@ -335,7 +367,15 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(8),
+                    padding: Platform.isAndroid
+                        ? EdgeInsets.all(8.0)
+                        : EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: ResponsiveWidget.isMediumScreen(context)
+                                ? size.width * 0.2
+                                : ResponsiveWidget.isLargeScreen(context)
+                                    ? size.width * 0.3
+                                    : 8),
                     child: PasswordInput(
                       validate: false,
                       controller: _passwordController,
@@ -349,7 +389,14 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 28.0),
+                    padding: Platform.isAndroid
+                        ? EdgeInsets.only(left: 28.0)
+                        : EdgeInsets.only(
+                            left: ResponsiveWidget.isMediumScreen(context)
+                                ? size.width * 0.217
+                                : ResponsiveWidget.isLargeScreen(context)
+                                    ? size.width * 0.31
+                                    : 28),
                     child: GestureDetector(
                       onTap: () {
                         final TextEditingController _controller = TextEditingController();
@@ -418,7 +465,7 @@ class _LoginPageState extends State<LoginPage> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 25),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: Platform.isAndroid ? MainAxisAlignment.spaceBetween : MainAxisAlignment.center,
                       children: [
                         FlatButton(
                             onPressed: () {
@@ -431,10 +478,19 @@ class _LoginPageState extends State<LoginPage> {
                               'Guest user?',
                               style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                             )),
+                        !Platform.isAndroid
+                            ? SizedBox(
+                                width: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.35 : size.width * 0.25,
+                              )
+                            : Container(),
                         Container(
                           alignment: Alignment.bottomRight,
                           height: 50,
-                          width: MediaQuery.of(context).size.width * 0.3,
+                          width: Platform.isAndroid
+                              ? MediaQuery.of(context).size.width * 0.3
+                              : ResponsiveWidget.isMediumScreen(context)
+                                  ? size.width * 0.12
+                                  : size.width * 0.08,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(30),
@@ -444,6 +500,8 @@ class _LoginPageState extends State<LoginPage> {
                               if (_formKey.currentState.validate()) {
                                 print('working');
                                 setState(() {
+                                  print(_emailController.text);
+                                  print(_passwordController.text);
                                   _loading = true;
                                 });
                                 await _loginUser();
@@ -483,7 +541,17 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                   ),
-                  FirstTime(),
+                  Padding(
+                    padding: Platform.isAndroid
+                        ? EdgeInsets.zero
+                        : EdgeInsets.only(
+                            left: ResponsiveWidget.isMediumScreen(context)
+                                ? size.width * 0.19
+                                : ResponsiveWidget.isLargeScreen(context)
+                                    ? size.width * 0.297
+                                    : 28),
+                    child: FirstTime(),
+                  ),
                 ],
               ),
             ),

@@ -7,7 +7,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:workbook/constants.dart';
-import 'package:workbook/screens/login_page.dart';
+import 'package:workbook/screens/auth/login_page.dart';
 import 'package:workbook/screens/reset_password.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/popUpDialog.dart';
@@ -120,7 +120,7 @@ class _OTPVerificationState extends State<OTPVerification> {
               "mailAddress": widget.mail,
               "adharNumber": widget.aadhar,
               "contactNumber": widget.phone,
-              "fcmToken": widget.fcm,
+              "fcmToken": widget.fcm ?? 'fcmToken',
             }
           : (widget.role == 'customer' || widget.role == 'employee')
               ? {
@@ -133,7 +133,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                   "division": widget.division,
                   "adharNumber": widget.aadhar,
                   "contactNumber": widget.phone,
-                  "fcmToken": User.userFcmToken,
+                  "fcmToken": User.userFcmToken ?? 'fcmToken',
                 }
               : {
                   "role": "driver",
@@ -144,7 +144,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                   "carNumber": widget.carNumber,
                   "adharNumber": widget.aadhar,
                   "contactNumber": widget.phone,
-                  "fcmToken": User.userFcmToken,
+                  "fcmToken": User.userFcmToken ?? 'fcmToken',
                 },
     );
     print(response.body);
@@ -225,6 +225,7 @@ class _OTPVerificationState extends State<OTPVerification> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _registerUser();
     Timer(Duration(minutes: 5), () {
       setState(() {
         _time = true;

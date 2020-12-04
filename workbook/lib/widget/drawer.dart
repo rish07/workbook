@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workbook/constants.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:workbook/screens/add_grade.dart';
+import 'package:workbook/screens/grade_and_divisions/add_grade.dart';
 
-import 'package:workbook/screens/approve_user.dart';
+import 'package:workbook/screens/auth/approve_user.dart';
 
 import 'package:workbook/screens/coming_soon.dart';
 import 'package:workbook/screens/dashboard.dart';
-import 'package:workbook/screens/login_page.dart';
+import 'package:workbook/screens/auth/login_page.dart';
 import 'package:workbook/screens/profile_page.dart';
-import 'package:workbook/screens/query_data.dart';
+import 'package:workbook/screens/queries/query_data.dart';
 import 'package:workbook/screens/settings.dart';
 import 'package:workbook/user.dart';
 import 'package:workbook/widget/popUpDialog.dart';

@@ -4,9 +4,11 @@ Color violetColor = Color(0xFF7052C5);
 Color violet1 = Color(0xFF1E081D);
 Color violet2 = Color(0xFF591554);
 //String baseUrl = "https://app-workbook.herokuapp.com";
-//String baseUrl = "https://workbook.in.ngrok.io";
-String baseUrl = "http://ec2-18-222-203-149.us-east-2.compute.amazonaws.com:8000";
+String baseUrl = "https://workbook.ngrok.io";
+//String baseUrl = "http://ec2-18-222-203-149.us-east-2.compute.amazonaws.com:8000";
 bool isEmailVerified = false;
+List toBeUploadedData = [];
+
 List<String> states = [
   "Andhra Pradesh",
   "Arunachal Pradesh",
@@ -738,27 +740,13 @@ var cities = {
   ],
 };
 
-List<String> instituteType = ['Joint Venture', 'LLC', 'Proprietaryship'];
+List<String> instituteType = ['Joint Venture', 'LLC', 'Proprietary'];
 List<String> institutes = [];
 List<String> grades = [];
+Map<String, List> tempData = {};
 List divisions = [];
 List divisionData = [];
 List<String> carNumber = ['Car Number 1', 'Car Number 2', 'Car Number 3'];
-List routeData = [
-  {
-    "routeName": "Route 1",
-    "locations": [
-      {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"},
-      {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"}
-    ]
-  },
-  {
-    "routeName": "Route 2",
-    "locations": [
-      {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"},
-      {"longitude": 23.3, 'latitude': 34.2, "locationName": "someName"}
-    ]
-  },
-];
+List routeData = [];
 List routeNames = ['Route 1', 'Route 2'];
 List locationNames = [];

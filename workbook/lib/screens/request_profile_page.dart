@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:html';
 
 import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter/rendering.dart';
@@ -9,9 +10,13 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:universal_io/io.dart' as uni;
 import 'package:workbook/constants.dart';
-import 'package:workbook/screens/active_users.dart';
+import 'package:workbook/screens/auth/active_users.dart';
+import '../responsive_widget.dart';
 import 'package:workbook/user.dart';
+
+import 'auth/approve_user.dart';
 
 class RequestProfilePage extends StatefulWidget {
   final String carNumber;
@@ -53,11 +58,18 @@ class RequestProfilePage extends StatefulWidget {
 }
 
 class _RequestProfilePageState extends State<RequestProfilePage> {
+  bool isEdit = false;
   String routeID;
   String routeName;
   bool _routeExists = false;
   bool _loading = false;
   final TextEditingController _routeNameController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _gradeController = TextEditingController();
+  final TextEditingController _divisionController = TextEditingController();
+  final TextEditingController _contactNumberController = TextEditingController();
+  final TextEditingController _aadharNumberController = TextEditingController();
   // Delete user
   Future _deleteUser() async {
     print('working');
@@ -76,6 +88,46 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
       print('Notification Sent');
     } else {
       throw Exception('Failed to load the employees');
+    }
+  }
+
+  Future _update() async {
+    setState(() {
+      _loading = true;
+    });
+    var body = json.encode(
+      {
+        "id": widget.id.toString(),
+        "data": {
+          "userName": _nameController.text.toString().isNotEmpty ? _nameController.text.toString() : User.userName.toString(),
+          "contactNumber": _contactNumberController.text.toString().isNotEmpty ? _contactNumberController.text.toString() : User.contactNumber.toString(),
+          "aadharNumber": _aadharNumberController.text.toString().isNotEmpty ? _aadharNumberController.text.toString() : User.aadharNumber.toString(),
+        },
+      },
+    );
+    print(body);
+    var response = await http.post(
+      widget.role == 'employee'
+          ? "$baseUrl/admin/updateEmployee"
+          : (widget.role == 'customer')
+              ? "$baseUrl/admin/updateCustomer"
+              : "$baseUrl/admin/updateDriver",
+      body: body,
+      headers: {"content-type": "application/json"},
+    );
+    print(response.body);
+    setState(() {
+      _loading = false;
+    });
+    if (json.decode(response.body)['statusCode'] == 200) {
+      Navigator.push(
+        context,
+        PageTransition(
+            child: ApproveUser(
+              isDriver: false,
+            ),
+            type: PageTransitionType.rightToLeft),
+      );
     }
   }
 
@@ -122,6 +174,7 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return ModalProgressHUD(
       inAsyncCall: _loading,
       child: Scaffold(
@@ -174,12 +227,20 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
                 ),
               )
             : Container(
-                padding: EdgeInsets.all(16),
+                padding: uni.Platform.isAndroid
+                    ? EdgeInsets.all(16)
+                    : EdgeInsets.symmetric(
+                        horizontal: ResponsiveWidget.isMediumScreen(context)
+                            ? size.width * 0.32
+                            : ResponsiveWidget.isLargeScreen(context)
+                                ? size.width * 0.4
+                                : 10,
+                      ),
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 20.0),
+                        padding: EdgeInsets.only(bottom: uni.Platform.isAndroid ? 20.0 : 30),
                         child: Center(
                           child: CircleAvatar(
                             radius: 50,
@@ -190,30 +251,45 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
                         ),
                       ),
                       buildFieldEntry(
+                        controller: _nameController,
                         label: 'Name',
                         value: widget.userName ?? "-",
                       ),
                       buildFieldEntry(
+                        readOnly: true,
+                        controller: _emailController,
                         label: 'Email ID',
                         value: widget.emailID ?? "-",
                       ),
                       buildFieldEntry(
-                        label: User.userRole != 'superAdmin' && !widget.isDriver ? 'Grade' : (User.userRole != 'superAdmin' && widget.isDriver) ? "Car Number" : 'Institute Name',
+                        readOnly: true,
+                        controller: _gradeController,
+                        label: User.userRole != 'superAdmin' && !widget.isDriver
+                            ? 'Grade'
+                            : (User.userRole != 'superAdmin' && widget.isDriver)
+                                ? "Car Number"
+                                : 'Institute Name',
                         value: User.userRole != 'superAdmin' && !widget.isDriver
                             ? widget.grade ?? "-"
-                            : (User.userRole != 'superAdmin' && widget.isDriver) ? widget.carNumber ?? '-' : widget.instituteName ?? '-',
+                            : (User.userRole != 'superAdmin' && widget.isDriver)
+                                ? widget.carNumber ?? '-'
+                                : widget.instituteName ?? '-',
                       ),
                       User.userRole != 'superAdmin' && !widget.isDriver
                           ? buildFieldEntry(
+                              readOnly: true,
+                              controller: _divisionController,
                               label: User.userRole != 'superAdmin' ? 'Division' : 'Institute Type',
                               value: User.userRole != 'superAdmin' ? widget.division ?? "-" : widget.instituteType ?? '-',
                             )
                           : Container(),
                       buildFieldEntry(
+                        controller: _contactNumberController,
                         label: 'Contact Number',
                         value: widget.contactNumber.toString() ?? "-",
                       ),
                       buildFieldEntry(
+                        controller: _aadharNumberController,
                         label: 'Aadhar Number',
                         value: widget.aadharNumber.toString() ?? "-",
                       ),
@@ -320,13 +396,30 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
 //                  ],
 //                ))
 //            : null,
+        floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: violet2,
+          onPressed: () async {
+            print(_nameController.text.toString());
+            print(_emailController.text.toString());
+            print(_contactNumberController.text.toString());
+            if (isEdit) {
+              await _update();
+            }
+            setState(() {
+              isEdit = !isEdit;
+            });
+          },
+          label: Text(isEdit ? 'Save' : 'Edit'),
+        ),
+
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
     );
   }
 
-  Padding buildFieldEntry({String label, String value}) {
+  Padding buildFieldEntry({String label, String value, TextEditingController controller, bool readOnly = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+      padding: EdgeInsets.symmetric(vertical: uni.Platform.isAndroid ? 8.0 : 16, horizontal: 16),
       child: Row(
         textBaseline: TextBaseline.alphabetic,
         children: [
@@ -343,19 +436,20 @@ class _RequestProfilePageState extends State<RequestProfilePage> {
             flex: 2,
             child: Container(
               child: TextFormField(
+                controller: controller,
                 textInputAction: TextInputAction.next,
                 style: TextStyle(color: violet1),
                 decoration: InputDecoration(
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
+                    borderSide: readOnly ? BorderSide.none : (isEdit ? BorderSide(width: 2, color: violet2) : BorderSide.none),
                   ),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
+                    borderSide: readOnly ? BorderSide.none : (isEdit ? BorderSide(width: 2, color: violet2) : BorderSide.none),
                   ),
                   hintText: value,
                   hintStyle: TextStyle(color: violet1, fontSize: 18),
                 ),
-                readOnly: true,
+                readOnly: readOnly ? true : (isEdit ? false : true),
               ),
             ),
           ),

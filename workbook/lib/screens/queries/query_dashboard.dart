@@ -3,6 +3,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:multi_charts/multi_charts.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:universal_io/io.dart';
 import 'package:workbook/constants.dart';
 
 class QueryDashboard extends StatefulWidget {
@@ -76,7 +77,7 @@ class _QueryDashboardState extends State<QueryDashboard> {
                     _pending.length / (_pending.length + _unregistered.length + _registered.length) * 100
                   ],
                   labels: ['Registered', 'Unregistered', 'Pending'],
-                  legendPosition: LegendPosition.Bottom,
+                  legendPosition: Platform.isAndroid ? LegendPosition.Bottom : LegendPosition.Top,
                 ),
               ),
             ),

@@ -6,9 +6,12 @@ import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:universal_io/io.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:workbook/constants.dart';
 import 'package:workbook/user.dart';
+
+import '../../responsive_widget.dart';
 
 class QueryStatus extends StatefulWidget {
   final bool isPending;
@@ -111,6 +114,7 @@ class _QueryStatusState extends State<QueryStatus> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return ModalProgressHUD(
       inAsyncCall: _isLoading,
       child: RefreshIndicator(
@@ -122,7 +126,9 @@ class _QueryStatusState extends State<QueryStatus> {
           return getAllQuery();
         },
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: 16),
+          padding: Platform.isAndroid
+              ? EdgeInsets.all(16)
+              : EdgeInsets.symmetric(vertical: 16, horizontal: ResponsiveWidget.isMediumScreen(context) ? size.width * 0.25 : size.width * 0.3),
           child: widget.isPending && pending.length == 0 && !_isLoading
               ? Center(
                   child: Text(
@@ -146,7 +152,11 @@ class _QueryStatusState extends State<QueryStatus> {
                         )
                       : ListView.builder(
                           shrinkWrap: true,
-                          itemCount: widget.isPending ? pending.length : (!widget.isPending && widget.isRegistered) ? registered.length : unregistered.length,
+                          itemCount: widget.isPending
+                              ? pending.length
+                              : (!widget.isPending && widget.isRegistered)
+                                  ? registered.length
+                                  : unregistered.length,
                           itemBuilder: (context, index) {
                             final TextEditingController _descriptionController = TextEditingController();
                             return Padding(
@@ -176,7 +186,9 @@ class _QueryStatusState extends State<QueryStatus> {
                                                 Text(
                                                   widget.isPending
                                                       ? pending[index]['userName']
-                                                      : (!widget.isPending && widget.isRegistered) ? registered[index]['userName'] : unregistered[index]['userName'],
+                                                      : (!widget.isPending && widget.isRegistered)
+                                                          ? registered[index]['userName']
+                                                          : unregistered[index]['userName'],
                                                   style: TextStyle(
                                                     fontSize: 16,
                                                   ),
@@ -267,39 +279,41 @@ class _QueryStatusState extends State<QueryStatus> {
                                                   ),
                                                 )
                                               : Container(),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-                                            child: MaterialButton(
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Icon(
-                                                    Icons.phone,
-                                                    color: Colors.white,
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                                    child: Text(
-                                                      'Call',
-                                                      style: TextStyle(color: Colors.white),
+                                          Platform.isAndroid
+                                              ? Padding(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+                                                  child: MaterialButton(
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        Icon(
+                                                          Icons.phone,
+                                                          color: Colors.white,
+                                                        ),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                                          child: Text(
+                                                            'Call',
+                                                            style: TextStyle(color: Colors.white),
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
+                                                    onPressed: () async {
+                                                      var url = "tel:${pending[index]['contactNumber']}";
+                                                      if (await canLaunch(url)) {
+                                                        await launch(url);
+                                                      } else {
+                                                        throw 'Could not launch $url';
+                                                      }
+                                                    },
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(32),
+                                                    ),
+                                                    color: violet1,
                                                   ),
-                                                ],
-                                              ),
-                                              onPressed: () async {
-                                                var url = "tel:${pending[index]['contactNumber']}";
-                                                if (await canLaunch(url)) {
-                                                  await launch(url);
-                                                } else {
-                                                  throw 'Could not launch $url';
-                                                }
-                                              },
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(32),
-                                              ),
-                                              color: violet1,
-                                            ),
-                                          ),
+                                                )
+                                              : Container(),
                                         ],
                                       ),
                                     ),
